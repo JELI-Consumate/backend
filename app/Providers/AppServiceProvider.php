@@ -2,6 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\ArticleContent;
+use App\Models\QuizContent;
+use App\Models\ReflectionContent;
+use App\Models\SimulationContent;
+use App\Models\VideoContent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -21,12 +26,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Relation::enforceMorphMap([
-            'video' => \App\Models\VideoContent::class,
-            'article' => \App\Models\ArticleContent::class,
-            'quiz' => \App\Models\QuizContent::class,
-            'simulation' => \App\Models\SimulationContent::class,
-            'reflection' => \App\Models\ReflectionContent::class,
+        Relation::morphMap([
+            'video' => VideoContent::class,
+            'article' => ArticleContent::class,
+            'quiz' => QuizContent::class,
+            'simulation' => SimulationContent::class,
+            'reflection' => ReflectionContent::class,
         ]);
 
         Model::preventLazyLoading(! app()->isProduction());
