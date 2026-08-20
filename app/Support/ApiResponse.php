@@ -8,21 +8,23 @@ use Illuminate\Http\JsonResponse;
 
 final class ApiResponse
 {
-    public static function success(mixed $data = null, ?string $message = null, int $status = 200): JsonResponse
+    /**
+     * @param  array<string, mixed>  $meta
+     */
+    public static function success(mixed $data = null, array $meta = [], int $status = 200): JsonResponse
     {
         return response()->json([
-            'success' => true,
-            'message' => $message,
             'data' => $data,
+            'meta' => $meta,
         ], $status);
     }
 
-    public static function error(string $message, int $status = 400, mixed $errors = null): JsonResponse
+    public static function error(string $message, int $status = 400, mixed $errors = null, ?string $code = null): JsonResponse
     {
         return response()->json([
-            'success' => false,
             'message' => $message,
             'errors' => $errors,
+            'code' => $code,
         ], $status);
     }
 }
