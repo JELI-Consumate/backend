@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\JourneyController;
 use App\Http\Controllers\Api\V1\ModuleController;
 use App\Http\Controllers\Api\V1\ModulePageController;
+use App\Http\Controllers\Api\V1\ProgressController;
 use App\Http\Controllers\Api\V1\SectorController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,5 +27,11 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/journeys/{id}', [JourneyController::class, 'show']);
         Route::get('/modules/{id}', [ModuleController::class, 'show']);
         Route::get('/module-pages/{id}', [ModulePageController::class, 'show']);
+
+        Route::post('/module-pages/{id}/complete', [ProgressController::class, 'complete']);
+        Route::patch('/module-pages/{id}/position', [ProgressController::class, 'position']);
+        Route::get('/progress/sectors/{slug}', [ProgressController::class, 'sectorProgress']);
+        Route::get('/progress/journeys/{id}', [ProgressController::class, 'journeyProgress']);
+        Route::get('/progress/summary', [ProgressController::class, 'summary']);
     });
 });
