@@ -1,6 +1,8 @@
 <?php
 
+use App\Exceptions\InvalidSubmissionException;
 use App\Exceptions\JourneyLockedException;
+use App\Exceptions\QuizNotEligibleException;
 use App\Support\ApiResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -27,5 +29,17 @@ return Application::configure(basePath: dirname(__DIR__))
             403,
             ['journey' => ['Selesaikan journey sebelumnya terlebih dahulu.']],
             'JOURNEY_LOCKED',
+        ));
+
+        $exceptions->render(fn (QuizNotEligibleException $e) => ApiResponse::error(
+            $e->getMessage(),
+            403,
+            code: 'QUIZ_NOT_ELIGIBLE',
+        ));
+
+        $exceptions->render(fn (InvalidSubmissionException $e) => ApiResponse::error(
+            $e->getMessage(),
+            409,
+            code: 'ATTEMPT_ALREADY_COMPLETED',
         ));
     })->create();
