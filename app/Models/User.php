@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,10 +16,20 @@ use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable(['name', 'email', 'phone', 'date_of_birth', 'password', 'google_id', 'avatar_url'])]
 #[Hidden(['password', 'remember_token', 'google_id'])]
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * TODO: belum ada sistem role/admin flag di skema — seluruh user terautentikasi
+     * saat ini diizinkan masuk admin panel. Perlu keputusan Faqih sebelum rilis
+     * (mis. kolom is_admin atau tabel role terpisah) — lihat 06-nonfunctional-ops.md.
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
+    }
 
     protected function casts(): array
     {
