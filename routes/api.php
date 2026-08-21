@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\JourneyController;
 use App\Http\Controllers\Api\V1\ModuleController;
 use App\Http\Controllers\Api\V1\ModulePageController;
 use App\Http\Controllers\Api\V1\ProgressController;
+use App\Http\Controllers\Api\V1\QuizAttemptController;
 use App\Http\Controllers\Api\V1\SectorController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,5 +34,12 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/progress/sectors/{slug}', [ProgressController::class, 'sectorProgress']);
         Route::get('/progress/journeys/{id}', [ProgressController::class, 'journeyProgress']);
         Route::get('/progress/summary', [ProgressController::class, 'summary']);
+
+        Route::get('/quizzes/{id}', [QuizAttemptController::class, 'showQuiz']);
+        Route::post('/quizzes/{id}/attempts', [QuizAttemptController::class, 'startAttempt']);
+        Route::post('/quiz-attempts/{id}/submit', [QuizAttemptController::class, 'submit'])->middleware('throttle:20,1');
+        Route::get('/quiz-attempts/{id}', [QuizAttemptController::class, 'showAttempt']);
+        Route::get('/sectors/{slug}/pretest', [QuizAttemptController::class, 'pretest']);
+        Route::get('/sectors/{slug}/posttest', [QuizAttemptController::class, 'posttest']);
     });
 });
