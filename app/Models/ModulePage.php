@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 #[Fillable(['module_id', 'order', 'contentable_type', 'contentable_id'])]
@@ -31,5 +32,13 @@ class ModulePage extends Model
     public function contentable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * @return HasMany<ModuleProgress, $this>
+     */
+    public function userProgress(): HasMany
+    {
+        return $this->hasMany(ModuleProgress::class);
     }
 }
