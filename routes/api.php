@@ -6,7 +6,9 @@ use App\Http\Controllers\Api\V1\ModuleController;
 use App\Http\Controllers\Api\V1\ModulePageController;
 use App\Http\Controllers\Api\V1\ProgressController;
 use App\Http\Controllers\Api\V1\QuizAttemptController;
+use App\Http\Controllers\Api\V1\ReflectionEntryController;
 use App\Http\Controllers\Api\V1\SectorController;
+use App\Http\Controllers\Api\V1\SimulationAttemptController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -41,5 +43,12 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/quiz-attempts/{id}', [QuizAttemptController::class, 'showAttempt']);
         Route::get('/sectors/{slug}/pretest', [QuizAttemptController::class, 'pretest']);
         Route::get('/sectors/{slug}/posttest', [QuizAttemptController::class, 'posttest']);
+
+        Route::get('/simulations/{id}', [SimulationAttemptController::class, 'show']);
+        Route::post('/simulations/{id}/attempts', [SimulationAttemptController::class, 'startAttempt']);
+        Route::post('/simulation-attempts/{id}/submit', [SimulationAttemptController::class, 'submit'])->middleware('throttle:20,1');
+
+        Route::get('/reflections/{id}', [ReflectionEntryController::class, 'show']);
+        Route::put('/reflections/{id}/entries', [ReflectionEntryController::class, 'updateEntries']);
     });
 });
