@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('simulation_matching_answers', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('simulation_attempt_id')->constrained('simulation_attempts')->cascadeOnDelete();
+            $table->foreignId('simulation_matching_pair_id')->constrained('simulation_matching_pairs')->cascadeOnDelete();
+            $table->foreignId('submitted_right_pair_id')->constrained('simulation_matching_pairs')->cascadeOnDelete();
+            $table->boolean('is_correct');
+            $table->timestamps();
+
+            $table->unique(['simulation_attempt_id', 'simulation_matching_pair_id']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('simulation_matching_answers');
+    }
+};
