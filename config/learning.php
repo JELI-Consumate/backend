@@ -16,6 +16,15 @@ return [
     'empowerment_index' => [
         'knowledge_weight' => 50,
         'attitude_weight' => 50,
+
+        /*
+        | Rentang nilai skala Likert dipakai untuk normalisasi likert_average
+        | (quiz_attempts) ke 0-100. Pertanyaan terbuka #2 (06-nonfunctional-ops.md
+        | §14) tentang 4 vs 5 poin belum dijawab Faqih — default 1-5, revisit
+        | kalau keputusan final beda.
+        */
+        'likert_min' => 1,
+        'likert_max' => 5,
     ],
 
 ];

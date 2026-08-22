@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\BadgeController;
+use App\Http\Controllers\Api\V1\EmpowermentIndexController;
 use App\Http\Controllers\Api\V1\JourneyController;
 use App\Http\Controllers\Api\V1\ModuleController;
 use App\Http\Controllers\Api\V1\ModulePageController;
@@ -50,5 +52,8 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('/reflections/{id}', [ReflectionEntryController::class, 'show']);
         Route::put('/reflections/{id}/entries', [ReflectionEntryController::class, 'updateEntries']);
+
+        Route::get('/badges', [BadgeController::class, 'index']);
+        Route::get('/empowerment-index', [EmpowermentIndexController::class, 'index']);
     });
 });
