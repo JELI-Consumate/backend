@@ -62,6 +62,7 @@ class QuizContentForm
                         ->orderColumn('order')
                         ->reorderable()
                         ->collapsible()
+                        ->itemLabel(fn (array $state): ?string => $state['question'] ?? null)
                         ->visible(fn ($get) => $get('segment_type') === QuizSegmentType::MultipleChoice->value)
                         ->components([
                             Textarea::make('question')->required(),
@@ -70,6 +71,8 @@ class QuizContentForm
                                 ->relationship()
                                 ->orderColumn('order')
                                 ->reorderable()
+                                ->collapsible()
+                                ->itemLabel(fn (array $state): ?string => $state['option_text'] ?? null)
                                 ->components([
                                     TextInput::make('option_text')->required(),
                                     Toggle::make('is_correct'),
@@ -79,6 +82,8 @@ class QuizContentForm
                         ->relationship()
                         ->orderColumn('order')
                         ->reorderable()
+                        ->collapsible()
+                        ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
                         ->visible(fn ($get) => $get('segment_type') === QuizSegmentType::Likert->value)
                         ->components([
                             TextInput::make('value')->numeric()->required(),

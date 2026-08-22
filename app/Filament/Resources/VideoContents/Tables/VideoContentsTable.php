@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\VideoContents\Tables;
 
+use App\Filament\Resources\VideoContents\Schemas\VideoContentPreview;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
@@ -32,6 +35,14 @@ class VideoContentsTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
+                Action::make('preview')
+                    ->label('Preview')
+                    ->icon(Heroicon::OutlinedEye)
+                    ->color('gray')
+                    ->modalHeading('Preview Video')
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup')
+                    ->schema(VideoContentPreview::components()),
                 EditAction::make(),
             ])
             ->toolbarActions([

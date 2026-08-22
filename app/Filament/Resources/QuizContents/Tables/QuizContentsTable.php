@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\QuizContents\Tables;
 
+use App\Filament\Resources\QuizContents\Schemas\QuizContentPreview;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -18,6 +21,7 @@ class QuizContentsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['segments.questions.choiceOptions', 'segments.likertScaleOptions']))
             ->columns([
                 TextColumn::make('kind')->badge(),
                 TextColumn::make('journey.title'),
@@ -29,6 +33,14 @@ class QuizContentsTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
+                Action::make('preview')
+                    ->label('Preview')
+                    ->icon(Heroicon::OutlinedEye)
+                    ->color('gray')
+                    ->modalHeading('Preview Kuis')
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup')
+                    ->schema(QuizContentPreview::components()),
                 EditAction::make(),
             ])
             ->toolbarActions([

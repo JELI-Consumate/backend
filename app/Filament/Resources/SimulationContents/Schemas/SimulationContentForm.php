@@ -31,6 +31,7 @@ class SimulationContentForm
                 ->orderColumn('order')
                 ->reorderable()
                 ->collapsible()
+                ->itemLabel(fn (array $state): ?string => $state['left_label'] ?? null)
                 ->visible(fn ($get) => $get('simulation_type') === SimulationType::Matching->value)
                 ->components([
                     Textarea::make('left_label')->required(),
@@ -45,6 +46,7 @@ class SimulationContentForm
                 ->orderColumn('order')
                 ->reorderable()
                 ->collapsible()
+                ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
                 ->visible(fn ($get) => $get('simulation_type') === SimulationType::Ordering->value)
                 ->components([
                     Textarea::make('label')->required(),

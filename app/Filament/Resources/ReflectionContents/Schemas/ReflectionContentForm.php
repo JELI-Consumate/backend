@@ -39,6 +39,7 @@ class ReflectionContentForm
                         ->orderColumn('order')
                         ->reorderable()
                         ->collapsible()
+                        ->itemLabel(fn (array $state): ?string => $state['question_text'] ?? null)
                         ->components([
                             Select::make('question_type')
                                 ->options(collect(ReflectionQuestionType::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value]))
