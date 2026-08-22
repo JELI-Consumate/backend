@@ -10,7 +10,7 @@ final class ApiDocumentationTest extends TestCase
 {
     public function test_swagger_ui_loads(): void
     {
-        $this->get('/api/documentation')->assertOk();
+        $this->get('/api/docs')->assertOk();
     }
 
     public function test_openapi_json_lists_all_v1_endpoints(): void

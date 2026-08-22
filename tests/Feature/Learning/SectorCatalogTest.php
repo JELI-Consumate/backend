@@ -8,6 +8,7 @@ use App\Models\Journey;
 use App\Models\Sector;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 final class SectorCatalogTest extends TestCase
@@ -51,5 +52,34 @@ final class SectorCatalogTest extends TestCase
     public function test_sector_endpoints_require_authentication(): void
     {
         $this->getJson('/api/v1/sectors')->assertUnauthorized();
+    }
+
+    /**
+     * Budget query GET /sectors (06-nonfunctional-ops.md §8, target ≤8 query).
+     */
+    public function test_sectors_index_stays_within_query_budget(): void
+    {
+        $user = User::factory()->create();
+        Sector::factory()->count(5)->sequence(fn ($sequence) => ['order' => $sequence->index + 1])->create(['is_active' => true]);
+
+        DB::enableQueryLog();
+        $this->actingAs($user)->getJson('/api/v1/sectors')->assertOk();
+
+        $this->assertLessThanOrEqual(8, count(DB::getQueryLog()));
+    }
+
+    /**
+     * Budget query GET /sectors/{slug} (06-nonfunctional-ops.md §8, target ≤8 query).
+     */
+    public function test_sector_show_stays_within_query_budget(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create(['is_active' => true]);
+        Journey::factory()->count(4)->sequence(fn ($sequence) => ['order' => $sequence->index + 1])->create(['sector_id' => $sector->id]);
+
+        DB::enableQueryLog();
+        $this->actingAs($user)->getJson("/api/v1/sectors/{$sector->slug}")->assertOk();
+
+        $this->assertLessThanOrEqual(8, count(DB::getQueryLog()));
     }
 }

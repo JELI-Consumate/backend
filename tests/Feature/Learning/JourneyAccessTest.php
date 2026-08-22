@@ -7,9 +7,11 @@ namespace Tests\Feature\Learning;
 use App\Enums\ProgressStatus;
 use App\Models\Journey;
 use App\Models\JourneyProgress;
+use App\Models\Module;
 use App\Models\Sector;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /**
@@ -67,5 +69,21 @@ final class JourneyAccessTest extends TestCase
 
         $this->actingAs($user)->getJson("/api/v1/journeys/{$third->id}")
             ->assertStatus(403)->assertJsonPath('code', 'JOURNEY_LOCKED');
+    }
+
+    /**
+     * Budget query GET /journeys/{id} (06-nonfunctional-ops.md §8, target ≤8 query).
+     */
+    public function test_journey_show_stays_within_query_budget(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        Module::factory()->count(5)->sequence(fn ($sequence) => ['order' => $sequence->index + 1])->create(['journey_id' => $journey->id]);
+
+        DB::enableQueryLog();
+        $this->actingAs($user)->getJson("/api/v1/journeys/{$journey->id}")->assertOk();
+
+        $this->assertLessThanOrEqual(8, count(DB::getQueryLog()));
     }
 }
