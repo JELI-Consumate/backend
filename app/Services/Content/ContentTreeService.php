@@ -65,7 +65,7 @@ final readonly class ContentTreeService
             ArticleContent::class => ['blocks'],
             QuizContent::class => ['segments.questions.choiceOptions', 'segments.likertScaleOptions'],
             SimulationContent::class => ['matchingPairs', 'orderingSteps'],
-            ReflectionContent::class => ['sections.questions'],
+            ReflectionContent::class => ['sections.questions.checklistItems'],
         ];
     }
 }

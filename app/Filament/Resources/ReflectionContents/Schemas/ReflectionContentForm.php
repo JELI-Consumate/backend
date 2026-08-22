@@ -9,6 +9,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class ReflectionContentForm
@@ -43,9 +44,23 @@ class ReflectionContentForm
                         ->components([
                             Select::make('question_type')
                                 ->options(collect(ReflectionQuestionType::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value]))
-                                ->required(),
+                                ->required()
+                                ->live(),
                             Textarea::make('question_text')
                                 ->required(),
+                            Repeater::make('checklistItems')
+                                ->relationship()
+                                ->label('Item checklist')
+                                ->orderColumn('order')
+                                ->reorderable()
+                                ->collapsible()
+                                ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
+                                ->visible(fn (Get $get): bool => $get('question_type') === ReflectionQuestionType::Checklist->value)
+                                ->components([
+                                    TextInput::make('label')
+                                        ->required()
+                                        ->maxLength(255),
+                                ]),
                         ]),
                 ]),
         ]);

@@ -6,6 +6,7 @@ namespace App\Services\Reflection;
 
 use App\Data\ReflectionEntriesData;
 use App\Enums\ReflectionQuestionType;
+use App\Models\ReflectionChecklistAnswer;
 use App\Models\ReflectionContent;
 use App\Models\ReflectionEntry;
 use App\Models\User;
@@ -18,31 +19,50 @@ final readonly class ReflectionService
 
     /**
      * Upsert seluruh jawaban refleksi user (satu panggilan bulk upsert, bukan loop
-     * insert/update per baris) — idempotent lewat UNIQUE(user_id, reflection_question_id).
+     * insert/update per baris) — idempotent lewat UNIQUE(user_id, reflection_question_id)
+     * untuk open_question dan UNIQUE(user_id, reflection_checklist_item_id) untuk
+     * checklist (tidak ada benar/salah, cuma penanda personal user).
      * Kalau setelahnya seluruh open_question sudah terisi (BR-10), tandai halaman selesai.
      */
     public function upsertEntries(User $user, ReflectionContent $content, ReflectionEntriesData $data): void
     {
-        if ($data->entries === []) {
-            return;
-        }
-
         $now = Date::now();
 
-        $rows = array_map(fn (array $entry): array => [
-            'user_id' => $user->id,
-            'reflection_question_id' => $entry['reflection_question_id'],
-            'answer_text' => $entry['answer_text'] ?? null,
-            'is_checked' => $entry['is_checked'] ?? null,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ], $data->entries);
+        if ($data->entries !== []) {
+            $rows = array_map(fn (array $entry): array => [
+                'user_id' => $user->id,
+                'reflection_question_id' => $entry['reflection_question_id'],
+                'answer_text' => $entry['answer_text'] ?? null,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ], $data->entries);
 
-        ReflectionEntry::query()->upsert(
-            $rows,
-            ['user_id', 'reflection_question_id'],
-            ['answer_text', 'is_checked', 'updated_at'],
-        );
+            ReflectionEntry::query()->upsert(
+                $rows,
+                ['user_id', 'reflection_question_id'],
+                ['answer_text', 'updated_at'],
+            );
+        }
+
+        if ($data->checklistAnswers !== []) {
+            $checklistRows = array_map(fn (array $answer): array => [
+                'user_id' => $user->id,
+                'reflection_checklist_item_id' => $answer['reflection_checklist_item_id'],
+                'is_checked' => $answer['is_checked'],
+                'created_at' => $now,
+                'updated_at' => $now,
+            ], $data->checklistAnswers);
+
+            ReflectionChecklistAnswer::query()->upsert(
+                $checklistRows,
+                ['user_id', 'reflection_checklist_item_id'],
+                ['is_checked', 'updated_at'],
+            );
+        }
+
+        if ($data->entries === [] && $data->checklistAnswers === []) {
+            return;
+        }
 
         if ($this->isCompleted($user, $content)) {
             $content->loadMissing('modulePage');

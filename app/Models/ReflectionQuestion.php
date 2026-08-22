@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['reflection_section_id', 'question_type', 'question_text', 'order'])]
@@ -31,5 +32,15 @@ class ReflectionQuestion extends Model
     public function reflectionSection(): BelongsTo
     {
         return $this->belongsTo(ReflectionSection::class);
+    }
+
+    /**
+     * Cuma relevan untuk question_type=checklist.
+     *
+     * @return HasMany<ReflectionChecklistItem, $this>
+     */
+    public function checklistItems(): HasMany
+    {
+        return $this->hasMany(ReflectionChecklistItem::class)->orderBy('order');
     }
 }

@@ -35,6 +35,13 @@ final class ReflectionContentResource extends JsonResource
                         'question_type' => $question->question_type->value,
                         'question_text' => $question->question_text,
                         'order' => $question->order,
+                        'checklist_items' => $question->relationLoaded('checklistItems')
+                            ? $question->checklistItems->map(fn ($item): array => [
+                                'id' => $item->id,
+                                'label' => $item->label,
+                                'order' => $item->order,
+                            ])
+                            : [],
                     ])
                     : [],
             ])),

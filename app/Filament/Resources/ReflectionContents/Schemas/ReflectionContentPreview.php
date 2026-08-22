@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReflectionContents\Schemas;
 
+use App\Enums\ReflectionQuestionType;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Component;
@@ -28,6 +29,12 @@ class ReflectionContentPreview
                         ->schema([
                             TextEntry::make('question_type')->badge(),
                             TextEntry::make('question_text'),
+                            RepeatableEntry::make('checklistItems')
+                                ->label('Item checklist')
+                                ->visible(fn ($record): bool => $record?->question_type === ReflectionQuestionType::Checklist)
+                                ->schema([
+                                    TextEntry::make('label'),
+                                ]),
                         ]),
                 ]),
             TextEntry::make('closing_title'),
