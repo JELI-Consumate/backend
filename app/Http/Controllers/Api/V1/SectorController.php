@@ -15,11 +15,27 @@ use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use OpenApi\Attributes as OA;
 
 final class SectorController extends Controller
 {
     public function __construct(private readonly JourneyAccessService $journeyAccess) {}
 
+    #[OA\Get(
+        path: '/sectors',
+        summary: 'Daftar sektor perlindungan konsumen aktif',
+        tags: ['Katalog Pembelajaran'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK — diurutkan sesuai `order`, dilengkapi progres user per sektor',
+                content: new OA\JsonContent(properties: [
+                    new OA\Property(property: 'data', type: 'array', items: new OA\Items(type: 'object')),
+                ])
+            ),
+            new OA\Response(response: 401, description: 'Belum login'),
+        ]
+    )]
     public function index(Request $request): AnonymousResourceCollection
     {
         $sectors = Sector::query()->active()->orderBy('order')->paginate(50);
@@ -37,6 +53,19 @@ final class SectorController extends Controller
         return SectorResource::collection($sectors);
     }
 
+    #[OA\Get(
+        path: '/sectors/{slug}',
+        summary: 'Detail sektor + daftar journey (dengan status unlock/progres)',
+        tags: ['Katalog Pembelajaran'],
+        parameters: [
+            new OA\Parameter(name: 'slug', in: 'path', required: true, schema: new OA\Schema(type: 'string'), example: 'e-commerce'),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 401, description: 'Belum login'),
+            new OA\Response(response: 404, description: 'Sektor tidak ditemukan / tidak aktif'),
+        ]
+    )]
     public function show(Request $request, string $slug): JsonResponse
     {
         $sector = Sector::query()->active()->where('slug', $slug)->firstOrFail();
