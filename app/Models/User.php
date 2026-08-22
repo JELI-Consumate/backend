@@ -10,6 +10,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -38,5 +39,21 @@ class User extends Authenticatable implements FilamentUser
             'date_of_birth' => 'date',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * @return HasMany<SectorProgress, $this>
+     */
+    public function sectorProgress(): HasMany
+    {
+        return $this->hasMany(SectorProgress::class);
+    }
+
+    /**
+     * @return HasMany<JourneyProgress, $this>
+     */
+    public function journeyProgress(): HasMany
+    {
+        return $this->hasMany(JourneyProgress::class);
     }
 }

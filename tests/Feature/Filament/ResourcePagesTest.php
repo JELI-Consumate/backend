@@ -27,6 +27,8 @@ final class ResourcePagesTest extends TestCase
             'quiz-contents' => ['/admin/quiz-contents'],
             'simulation-contents' => ['/admin/simulation-contents'],
             'reflection-contents' => ['/admin/reflection-contents'],
+            'users' => ['/admin/users'],
+            'learning-analytics' => ['/admin/learning-analytics'],
         ];
     }
 
