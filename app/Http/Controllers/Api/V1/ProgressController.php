@@ -21,7 +21,6 @@ use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use OpenApi\Attributes as OA;
 
 final class ProgressController extends Controller
 {
@@ -30,20 +29,6 @@ final class ProgressController extends Controller
         private readonly JourneyAccessService $journeyAccess,
     ) {}
 
-    #[OA\Post(
-        path: '/module-pages/{id}/complete',
-        summary: 'Tandai halaman selesai (BR-11: idempotent)',
-        tags: ['Progres'],
-        parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
-        ],
-        responses: [
-            new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),
-            new OA\Response(response: 401, description: 'Belum login'),
-            new OA\Response(response: 403, description: 'Journey terkunci (`JOURNEY_LOCKED`)'),
-            new OA\Response(response: 404, description: 'Halaman tidak ditemukan'),
-        ]
-    )]
     public function complete(Request $request, int $id): JsonResponse
     {
         $page = ModulePage::query()->with('module.journey')->findOrFail($id);
@@ -57,28 +42,6 @@ final class ProgressController extends Controller
         return ApiResponse::success(new ModuleProgressResource($progress));
     }
 
-    #[OA\Patch(
-        path: '/module-pages/{id}/position',
-        summary: 'Simpan posisi terakhir (detik video / indeks slide)',
-        description: 'Menaikkan status not_started→in_progress, tidak pernah menurunkan dari completed.',
-        tags: ['Progres'],
-        parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
-        ],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['position'],
-                properties: [new OA\Property(property: 'position', type: 'integer', minimum: 0, example: 42)]
-            )
-        ),
-        responses: [
-            new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),
-            new OA\Response(response: 401, description: 'Belum login'),
-            new OA\Response(response: 403, description: 'Journey terkunci (`JOURNEY_LOCKED`)'),
-            new OA\Response(response: 422, description: 'position invalid (negatif)'),
-        ]
-    )]
     public function position(UpdatePositionRequest $request, int $id): JsonResponse
     {
         $page = ModulePage::query()->with('module.journey')->findOrFail($id);
@@ -92,19 +55,6 @@ final class ProgressController extends Controller
         return ApiResponse::success(new ModuleProgressResource($progress));
     }
 
-    #[OA\Get(
-        path: '/progress/sectors/{slug}',
-        summary: 'Progres user pada satu sektor',
-        tags: ['Progres'],
-        parameters: [
-            new OA\Parameter(name: 'slug', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
-        ],
-        responses: [
-            new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),
-            new OA\Response(response: 401, description: 'Belum login'),
-            new OA\Response(response: 404, description: 'Sektor tidak ditemukan'),
-        ]
-    )]
     public function sectorProgress(Request $request, string $slug): JsonResponse
     {
         $sector = Sector::query()->active()->where('slug', $slug)->firstOrFail();
@@ -117,19 +67,6 @@ final class ProgressController extends Controller
         return ApiResponse::success(new SectorProgressResource($sector));
     }
 
-    #[OA\Get(
-        path: '/progress/journeys/{id}',
-        summary: 'Progres user pada satu journey',
-        tags: ['Progres'],
-        parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
-        ],
-        responses: [
-            new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),
-            new OA\Response(response: 401, description: 'Belum login'),
-            new OA\Response(response: 404, description: 'Journey tidak ditemukan'),
-        ]
-    )]
     public function journeyProgress(Request $request, int $id): JsonResponse
     {
         $journey = Journey::query()->findOrFail($id);
@@ -142,22 +79,6 @@ final class ProgressController extends Controller
         return ApiResponse::success(new JourneyProgressResource($journey));
     }
 
-    #[OA\Get(
-        path: '/progress/summary',
-        summary: 'Ringkasan progres lintas sektor untuk dashboard',
-        description: 'Membaca kolom terdenormalisasi sector_progress, tanpa agregasi realtime (06 §8).',
-        tags: ['Progres'],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: 'OK',
-                content: new OA\JsonContent(properties: [
-                    new OA\Property(property: 'data', type: 'array', items: new OA\Items(type: 'object')),
-                ])
-            ),
-            new OA\Response(response: 401, description: 'Belum login'),
-        ]
-    )]
     public function summary(Request $request): AnonymousResourceCollection
     {
         $sectors = Sector::query()->active()->orderBy('order')->get();
