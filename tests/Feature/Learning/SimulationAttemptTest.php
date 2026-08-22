@@ -84,7 +84,54 @@ final class SimulationAttemptTest extends TestCase
         $this->assertStringNotContainsString('correct_position', (string) json_encode($response->json()));
     }
 
-    public function test_submitting_matching_simulation_scores_and_completes_module_page(): void
+    public function test_wrong_answer_is_rejected_and_not_persisted(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        [$simulation, , $pairs] = $this->createMatchingSimulation($journey, 2);
+
+        $attemptId = $this->actingAs($user)->postJson("/api/v1/simulations/{$simulation->id}/attempts")
+            ->assertCreated()->json('data.attempt_id');
+
+        $response = $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", [
+            'type' => 'matching',
+            'simulation_matching_pair_id' => $pairs[1]->id,
+            'submitted_right_pair_id' => $pairs[0]->id,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.correct', false)
+            ->assertJsonPath('data.attempt.completed_at', null);
+
+        $this->assertDatabaseCount('simulation_matching_answers', 0);
+    }
+
+    public function test_correct_matching_answer_is_accepted_and_saved(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        [$simulation, , $pairs] = $this->createMatchingSimulation($journey, 2);
+
+        $attemptId = $this->actingAs($user)->postJson("/api/v1/simulations/{$simulation->id}/attempts")
+            ->assertCreated()->json('data.attempt_id');
+
+        $response = $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", [
+            'type' => 'matching',
+            'simulation_matching_pair_id' => $pairs[0]->id,
+            'submitted_right_pair_id' => $pairs[0]->id,
+        ]);
+
+        $response->assertOk()->assertJsonPath('data.correct', true);
+        $this->assertDatabaseHas('simulation_matching_answers', [
+            'simulation_attempt_id' => $attemptId,
+            'simulation_matching_pair_id' => $pairs[0]->id,
+            'is_correct' => 1,
+        ]);
+    }
+
+    public function test_attempt_completes_and_marks_module_page_once_all_items_answered_correctly(): void
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
@@ -94,28 +141,38 @@ final class SimulationAttemptTest extends TestCase
         $attemptId = $this->actingAs($user)->postJson("/api/v1/simulations/{$simulation->id}/attempts")
             ->assertCreated()->json('data.attempt_id');
 
-        $payload = [
-            'matching_answers' => [
-                ['simulation_matching_pair_id' => $pairs[0]->id, 'submitted_right_pair_id' => $pairs[0]->id],
-                ['simulation_matching_pair_id' => $pairs[1]->id, 'submitted_right_pair_id' => $pairs[0]->id],
-            ],
-            'ordering_answers' => [],
-        ];
+        // Coba salah dulu untuk pair kedua — harus ditolak, attempt belum selesai.
+        $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", [
+            'type' => 'matching',
+            'simulation_matching_pair_id' => $pairs[1]->id,
+            'submitted_right_pair_id' => $pairs[0]->id,
+        ])->assertJsonPath('data.correct', false);
 
-        $response = $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/submit", $payload);
+        $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", [
+            'type' => 'matching',
+            'simulation_matching_pair_id' => $pairs[0]->id,
+            'submitted_right_pair_id' => $pairs[0]->id,
+        ])->assertJsonPath('data.correct', true)
+            ->assertJsonPath('data.attempt.completed_at', null);
 
-        $response->assertOk()
-            ->assertJsonPath('data.score', 1)
-            ->assertJsonPath('data.max_score', 2)
-            ->assertJsonPath('data.is_passed', false)
-            ->assertJsonPath('data.matching_review.0.is_correct', true)
-            ->assertJsonPath('data.matching_review.1.is_correct', false);
+        $final = $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", [
+            'type' => 'matching',
+            'simulation_matching_pair_id' => $pairs[1]->id,
+            'submitted_right_pair_id' => $pairs[1]->id,
+        ]);
+
+        $final->assertOk()
+            ->assertJsonPath('data.correct', true)
+            ->assertJsonPath('data.attempt.score', 2)
+            ->assertJsonPath('data.attempt.max_score', 2)
+            ->assertJsonPath('data.attempt.is_passed', true);
+        $this->assertNotNull($final->json('data.attempt.completed_at'));
 
         $pageResponse = $this->actingAs($user)->getJson("/api/v1/module-pages/{$page->id}");
         $pageResponse->assertOk()->assertJsonPath('data.progress.status', 'completed');
     }
 
-    public function test_submitting_ordering_simulation_scores_against_correct_position(): void
+    public function test_ordering_answer_checked_against_correct_position(): void
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
@@ -125,29 +182,25 @@ final class SimulationAttemptTest extends TestCase
         $attemptId = $this->actingAs($user)->postJson("/api/v1/simulations/{$simulation->id}/attempts")
             ->assertCreated()->json('data.attempt_id');
 
-        $payload = [
-            'matching_answers' => [],
-            'ordering_answers' => [
-                ['simulation_ordering_step_id' => $steps[0]->id, 'submitted_position' => 1],
-                ['simulation_ordering_step_id' => $steps[1]->id, 'submitted_position' => 3],
-                ['simulation_ordering_step_id' => $steps[2]->id, 'submitted_position' => 3],
-            ],
-        ];
+        $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", [
+            'type' => 'ordering',
+            'simulation_ordering_step_id' => $steps[1]->id,
+            'submitted_position' => 3,
+        ])->assertJsonPath('data.correct', false);
 
-        $response = $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/submit", $payload);
+        $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", [
+            'type' => 'ordering',
+            'simulation_ordering_step_id' => $steps[1]->id,
+            'submitted_position' => 2,
+        ])->assertJsonPath('data.correct', true);
 
-        $response->assertOk()
-            ->assertJsonPath('data.score', 2)
-            ->assertJsonPath('data.max_score', 3)
-            ->assertJsonPath('data.ordering_review.0.is_correct', true)
-            ->assertJsonPath('data.ordering_review.1.is_correct', false)
-            ->assertJsonPath('data.ordering_review.2.is_correct', true);
+        $this->assertDatabaseCount('simulation_ordering_answers', 1);
     }
 
     /**
      * BR-08: attempt yang sudah completed_at != null bersifat immutable.
      */
-    public function test_resubmitting_completed_simulation_attempt_returns_409(): void
+    public function test_checking_answer_on_completed_attempt_returns_409(): void
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
@@ -157,30 +210,35 @@ final class SimulationAttemptTest extends TestCase
         $attemptId = $this->actingAs($user)->postJson("/api/v1/simulations/{$simulation->id}/attempts")
             ->assertCreated()->json('data.attempt_id');
 
-        $payload = ['matching_answers' => [
-            ['simulation_matching_pair_id' => $pairs[0]->id, 'submitted_right_pair_id' => $pairs[0]->id],
-        ], 'ordering_answers' => []];
+        $payload = [
+            'type' => 'matching',
+            'simulation_matching_pair_id' => $pairs[0]->id,
+            'submitted_right_pair_id' => $pairs[0]->id,
+        ];
 
-        $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/submit", $payload)->assertOk();
+        $first = $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", $payload);
+        $this->assertNotNull($first->json('data.attempt.completed_at'));
 
-        $response = $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/submit", $payload);
+        $response = $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", $payload);
 
         $response->assertStatus(409)->assertJsonPath('code', 'ATTEMPT_ALREADY_COMPLETED');
     }
 
-    public function test_other_user_cannot_submit_someone_elses_simulation_attempt(): void
+    public function test_other_user_cannot_check_someone_elses_simulation_attempt(): void
     {
         $owner = User::factory()->create();
         $intruder = User::factory()->create();
         $sector = Sector::factory()->create();
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
-        [$simulation] = $this->createMatchingSimulation($journey, 1);
+        [$simulation, , $pairs] = $this->createMatchingSimulation($journey, 1);
 
         $attemptId = $this->actingAs($owner)->postJson("/api/v1/simulations/{$simulation->id}/attempts")
             ->assertCreated()->json('data.attempt_id');
 
-        $this->actingAs($intruder)->postJson("/api/v1/simulation-attempts/{$attemptId}/submit", [
-            'matching_answers' => [], 'ordering_answers' => [],
+        $this->actingAs($intruder)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", [
+            'type' => 'matching',
+            'simulation_matching_pair_id' => $pairs[0]->id,
+            'submitted_right_pair_id' => $pairs[0]->id,
         ])->assertForbidden();
     }
 

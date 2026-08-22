@@ -48,7 +48,8 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('/simulations/{id}', [SimulationAttemptController::class, 'show']);
         Route::post('/simulations/{id}/attempts', [SimulationAttemptController::class, 'startAttempt']);
-        Route::post('/simulation-attempts/{id}/submit', [SimulationAttemptController::class, 'submit'])->middleware('throttle:20,1');
+        // Duolingo-style: 1 request per item (bukan 1 batch submit) -> limit lebih longgar dari kuis.
+        Route::post('/simulation-attempts/{id}/check', [SimulationAttemptController::class, 'checkAnswer'])->middleware('throttle:60,1');
 
         Route::get('/reflections/{id}', [ReflectionEntryController::class, 'show']);
         Route::put('/reflections/{id}/entries', [ReflectionEntryController::class, 'updateEntries']);

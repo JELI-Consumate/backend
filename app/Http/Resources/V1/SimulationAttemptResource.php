@@ -9,8 +9,13 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * Koreksi per item HANYA relevan di response submit ini — GET /simulations/{id}
+ * Koreksi per item HANYA relevan di response check ini — GET /simulations/{id}
  * (Content\SimulationContentResource) tidak pernah menyertakan correct_position.
+ *
+ * Duolingo-style: matching_review/ordering_review cuma berisi item yang SUDAH
+ * pernah dijawab benar sejauh ini (jawaban salah tidak pernah disimpan, jadi
+ * tidak pernah muncul di sini) — is_correct akan selalu true untuk tiap baris.
+ * score/max_score/is_passed/completed_at tetap null sampai seluruh item terjawab.
  *
  * @mixin SimulationAttempt
  */

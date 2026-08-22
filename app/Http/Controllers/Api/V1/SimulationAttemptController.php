@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Simulation\SubmitSimulationAttemptRequest;
+use App\Http\Requests\Simulation\CheckSimulationAnswerRequest;
 use App\Http\Resources\V1\Content\SimulationContentResource;
 use App\Http\Resources\V1\SimulationAttemptResource;
 use App\Models\SimulationAttempt;
@@ -70,42 +70,35 @@ final class SimulationAttemptController extends Controller
     }
 
     #[OA\Post(
-        path: '/simulation-attempts/{id}/submit',
-        summary: 'Submit jawaban simulasi (BR-08: attempt immutable setelah selesai)',
+        path: '/simulation-attempts/{id}/check',
+        summary: 'Cek 1 item jawaban (Duolingo-style: salah ditolak, tidak disimpan)',
+        description: 'BR-08: attempt immutable setelah completed. Jawaban salah dibalas `correct=false` tanpa mengubah attempt — client boleh retry item yang sama. Attempt otomatis completed begitu seluruh item simulasi ini pernah dijawab benar.',
         tags: ['Simulasi'],
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'), description: 'simulation_attempt id'),
         ],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(properties: [
-                new OA\Property(
-                    property: 'matching_answers',
-                    type: 'array',
-                    items: new OA\Items(properties: [
-                        new OA\Property(property: 'simulation_matching_pair_id', type: 'integer'),
-                        new OA\Property(property: 'submitted_right_pair_id', type: 'integer'),
-                    ], type: 'object')
-                ),
-                new OA\Property(
-                    property: 'ordering_answers',
-                    type: 'array',
-                    items: new OA\Items(properties: [
-                        new OA\Property(property: 'simulation_ordering_step_id', type: 'integer'),
-                        new OA\Property(property: 'submitted_position', type: 'integer', minimum: 1),
-                    ], type: 'object')
-                ),
-            ])
+            content: new OA\JsonContent(
+                required: ['type'],
+                properties: [
+                    new OA\Property(property: 'type', type: 'string', enum: ['matching', 'ordering']),
+                    new OA\Property(property: 'simulation_matching_pair_id', type: 'integer', description: 'wajib kalau type=matching'),
+                    new OA\Property(property: 'submitted_right_pair_id', type: 'integer', description: 'wajib kalau type=matching'),
+                    new OA\Property(property: 'simulation_ordering_step_id', type: 'integer', description: 'wajib kalau type=ordering'),
+                    new OA\Property(property: 'submitted_position', type: 'integer', minimum: 1, description: 'wajib kalau type=ordering'),
+                ]
+            )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'Skor + koreksi per item', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 200, description: '`data.correct` + state attempt terkini', content: new OA\JsonContent(type: 'object')),
             new OA\Response(response: 401, description: 'Belum login'),
             new OA\Response(response: 403, description: 'Attempt bukan milik user ini'),
             new OA\Response(response: 409, description: 'Attempt sudah selesai (`ATTEMPT_ALREADY_COMPLETED`)'),
             new OA\Response(response: 422, description: 'Pasangan/langkah tidak valid untuk simulasi ini'),
         ]
     )]
-    public function submit(SubmitSimulationAttemptRequest $request, int $id): JsonResponse
+    public function checkAnswer(CheckSimulationAnswerRequest $request, int $id): JsonResponse
     {
         $attempt = SimulationAttempt::query()->with(['user', 'simulationContent.modulePage.module.journey'])->findOrFail($id);
 
@@ -113,9 +106,12 @@ final class SimulationAttemptController extends Controller
             throw new AccessDeniedHttpException('Attempt ini bukan milik kamu.');
         }
 
-        $attempt = $this->scoring->submit($attempt, $request->toData());
-        $attempt->load(['matchingAnswers', 'orderingAnswers.orderingStep']);
+        $result = $this->scoring->checkAnswer($attempt, $request->toData());
+        $result->attempt->load(['matchingAnswers', 'orderingAnswers.orderingStep']);
 
-        return ApiResponse::success(new SimulationAttemptResource($attempt));
+        return ApiResponse::success([
+            'correct' => $result->correct,
+            'attempt' => new SimulationAttemptResource($result->attempt),
+        ]);
     }
 }
