@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
 
-            $table->index(['user_id', 'simulation_content_id', 'completed_at']);
+            $table->index(['user_id', 'simulation_content_id', 'completed_at'], 'sim_attempts_user_content_completed_idx');
         });
     }
 

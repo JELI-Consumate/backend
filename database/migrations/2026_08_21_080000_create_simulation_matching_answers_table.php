@@ -18,7 +18,7 @@ return new class extends Migration
             $table->boolean('is_correct');
             $table->timestamps();
 
-            $table->unique(['simulation_attempt_id', 'simulation_matching_pair_id']);
+            $table->unique(['simulation_attempt_id', 'simulation_matching_pair_id'], 'sim_matching_answers_attempt_pair_unique');
         });
     }
 
