@@ -6,7 +6,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Indeks Keberdayaan (BR-12)
+    | Indeks Keberdayaan
     |--------------------------------------------------------------------------
     |
     | Bobot skor pengetahuan (choice benar) vs skor sikap (likert
@@ -20,7 +20,6 @@ return [
         /*
         | Rentang nilai skala Likert dipakai untuk normalisasi likert_average
         | (quiz_attempts) ke 0-100. Pertanyaan terbuka #2 (06-nonfunctional-ops.md
-        | §14) tentang 4 vs 5 poin belum dijawab Faqih — default 1-5, revisit
         | kalau keputusan final beda.
         */
         'likert_min' => 1,

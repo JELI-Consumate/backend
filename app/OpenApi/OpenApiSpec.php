@@ -6,10 +6,7 @@ namespace App\OpenApi;
 
 use OpenApi\Attributes as OA;
 
-/**
- * Kelas kosong sebagai tempat menempel metadata root OpenAPI (Info, Server,
- * Tag). Tidak dipakai di kode, hanya di-scan swagger-php.
- */
+
 #[OA\Info(
     version: '1.0.0',
     title: 'Perlindungan Konsumen API',
