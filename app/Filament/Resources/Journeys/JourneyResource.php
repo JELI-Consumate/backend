@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Journeys;
 use App\Filament\Resources\Journeys\Pages\CreateJourney;
 use App\Filament\Resources\Journeys\Pages\EditJourney;
 use App\Filament\Resources\Journeys\Pages\ListJourneys;
+use App\Filament\Resources\Journeys\RelationManagers\ModulesRelationManager;
 use App\Filament\Resources\Journeys\Schemas\JourneyForm;
 use App\Filament\Resources\Journeys\Tables\JourneysTable;
 use App\Models\Journey;
@@ -23,6 +24,11 @@ class JourneyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return JourneyForm::configure($schema);
@@ -36,7 +42,7 @@ class JourneyResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ModulesRelationManager::class,
         ];
     }
 

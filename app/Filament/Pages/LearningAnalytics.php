@@ -16,6 +16,7 @@ use App\Services\Gamification\EmpowermentIndexService;
 use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
+use UnitEnum;
 
 /**
  * Halaman kustom "Pengguna & Analitik" (06-nonfunctional-ops.md §10): user
@@ -28,6 +29,10 @@ class LearningAnalytics extends Page
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
     protected static ?string $navigationLabel = 'Learning Analytics';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Pengguna & Analitik';
+
+    protected static ?int $navigationSort = 2;
 
     protected string $view = 'filament.pages.learning-analytics';
 
