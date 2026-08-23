@@ -21,7 +21,7 @@ final class LoginTest extends TestCase
         ]);
 
         $response = $this->postJson('/api/v1/auth/login', [
-            'identifier' => 'login@example.com',
+            'email' => 'login@example.com',
             'password' => 'secret123',
         ]);
 
@@ -38,7 +38,7 @@ final class LoginTest extends TestCase
         ]);
 
         $response = $this->postJson('/api/v1/auth/login', [
-            'identifier' => 'login2@example.com',
+            'email' => 'login2@example.com',
             'password' => 'wrong-password',
         ]);
 
@@ -58,10 +58,25 @@ final class LoginTest extends TestCase
         ]);
 
         $response = $this->postJson('/api/v1/auth/login', [
-            'identifier' => 'google-only@example.com',
+            'email' => 'google-only@example.com',
             'password' => 'whatever',
         ]);
 
         $response->assertStatus(422)->assertJsonPath('code', 'GOOGLE_ONLY_ACCOUNT');
+    }
+
+    public function test_login_rejects_phone_number_as_identifier(): void
+    {
+        User::factory()->create([
+            'phone' => '081234567890',
+            'password' => Hash::make('secret123'),
+        ]);
+
+        $response = $this->postJson('/api/v1/auth/login', [
+            'email' => '081234567890',
+            'password' => 'secret123',
+        ]);
+
+        $response->assertStatus(422)->assertJsonValidationErrors('email');
     }
 }

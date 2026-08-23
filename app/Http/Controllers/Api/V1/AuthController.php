@@ -35,7 +35,7 @@ final class AuthController extends Controller
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $user = $this->authService->findByIdentifier($request->string('identifier')->toString());
+        $user = $this->authService->findByEmail($request->string('email')->toString());
 
         if ($user === null || $user->password === null) {
             return ApiResponse::error(

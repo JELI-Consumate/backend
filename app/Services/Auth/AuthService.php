@@ -24,11 +24,9 @@ final readonly class AuthService
         return new AuthResultData($user, $user->createToken('auth')->plainTextToken);
     }
 
-    public function findByIdentifier(string $identifier): ?User
+    public function findByEmail(string $email): ?User
     {
-        return User::where('email', $identifier)
-            ->orWhere('phone', $identifier)
-            ->first();
+        return User::where('email', $email)->first();
     }
 
     public function issueToken(User $user, string $password): ?AuthResultData
