@@ -33,6 +33,9 @@ class JourneyResource extends JsonResource
             'order' => $this->order,
             'estimated_minutes' => $this->estimated_minutes,
             'is_unlocked' => (bool) $this->is_unlocked,
+            'modules_count' => $this->relationLoaded('modules')
+                ? $this->modules->count()
+                : (int) ($this->modules_count ?? 0),
             'progress' => [
                 'status' => $progress?->status->value ?? ProgressStatus::NotStarted->value,
                 'percent' => $progress?->progress_percent ?? 0,

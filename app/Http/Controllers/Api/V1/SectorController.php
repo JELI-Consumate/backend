@@ -41,7 +41,7 @@ final class SectorController extends Controller
     {
         $sector = Sector::query()->active()->where('slug', $slug)->firstOrFail();
 
-        $journeys = $sector->journeys()->orderBy('order')->get();
+        $journeys = $sector->journeys()->withCount('modules')->orderBy('order')->get();
 
         $unlockedMap = $this->journeyAccess->unlockedMapForSector($request->user(), $sector);
 
