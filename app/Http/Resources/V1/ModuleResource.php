@@ -27,6 +27,10 @@ final class ModuleResource extends JsonResource
             'estimated_minutes' => $this->estimated_minutes,
             'is_required' => $this->is_required,
             'pages' => ModulePageResource::collection($this->whenLoaded('pages')),
+            'progress' => $this->when(
+                array_key_exists('progress', $this->resource->getAttributes()),
+                fn () => $this->progress
+            ),
         ];
     }
 }
