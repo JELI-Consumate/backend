@@ -21,6 +21,11 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:6,1');
         Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:6,1');
 
+        // No auth guard: the user has no session/token yet at this point,
+        // only the email+otp they just typed in the app.
+        Route::post('/verify-email', [AuthController::class, 'verifyEmail'])->middleware('throttle:6,1');
+        Route::post('/verify-email/resend', [AuthController::class, 'resendVerification'])->middleware('throttle:6,1');
+
         Route::middleware('auth:sanctum')->group(function (): void {
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::get('/me', [AuthController::class, 'me']);
@@ -28,7 +33,11 @@ Route::prefix('v1')->group(function (): void {
         });
     });
 
-    Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function (): void {
+    // 'verified' requires email_verified_at to be set. In practice no token
+    // is ever issued for an unverified user (register() no longer returns
+    // one, login()/verifyOtp() both check it first) — this is defense in
+    // depth, not the primary gate.
+    Route::middleware(['auth:sanctum', 'verified', 'throttle:60,1'])->group(function (): void {
         Route::get('/sectors', [SectorController::class, 'index']);
         Route::get('/sectors/{slug}', [SectorController::class, 'show']);
         Route::get('/journeys/{id}', [JourneyController::class, 'show']);

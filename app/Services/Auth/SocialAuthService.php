@@ -35,6 +35,13 @@ final readonly class SocialAuthService
                 $user->update(['google_id' => $googleUser->getId()]);
             }
 
+            // Google has already confirmed the user controls this mailbox,
+            // so an existing local (password-based) account linked here
+            // shouldn't stay stuck behind the email-verification gate.
+            if (! $user->hasVerifiedEmail()) {
+                $user->markEmailAsVerified();
+            }
+
             return $user;
         });
 

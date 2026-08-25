@@ -9,8 +9,10 @@ use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\GoogleLoginRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\ResendVerificationRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\UpdateProfileRequest;
+use App\Http\Requests\Auth\VerifyOtpRequest;
 use App\Http\Resources\V1\UserResource;
 use App\Services\Auth\AuthService;
 use App\Services\Auth\SocialAuthService;
@@ -26,14 +28,18 @@ final class AuthController extends Controller
         private readonly SocialAuthService $socialAuthService,
     ) {}
 
+    /**
+     * No token in the response on purpose — the app navigates straight to
+     * the OTP-entry screen after this, and only gets a session from
+     * verifyEmail() once the code is confirmed.
+     */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $result = $this->authService->register($request->toData());
+        $user = $this->authService->register($request->toData());
 
         return ApiResponse::success([
-            'user' => new UserResource($result->user),
-            'token' => $result->token,
-        ], status: 201);
+            'user' => new UserResource($user),
+        ], ['message' => 'Kode verifikasi telah dikirim ke email kamu.'], status: 201);
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -50,8 +56,16 @@ final class AuthController extends Controller
 
         $result = $this->authService->issueToken($user, $request->string('password')->toString());
 
-        if ($result === null) {
-            return ApiResponse::error('Email/telepon atau kata sandi salah.', 401, code: 'INVALID_CREDENTIALS');
+        if ($result === AuthService::INVALID_CREDENTIALS) {
+            return ApiResponse::error('Email atau kata sandi salah.', 401, code: 'INVALID_CREDENTIALS');
+        }
+
+        if ($result === AuthService::EMAIL_NOT_VERIFIED) {
+            return ApiResponse::error(
+                'Email kamu belum diverifikasi. Silakan cek inbox atau minta kirim ulang email verifikasi.',
+                403,
+                code: 'EMAIL_NOT_VERIFIED',
+            );
         }
 
         return ApiResponse::success([
@@ -90,6 +104,34 @@ final class AuthController extends Controller
         }
 
         return ApiResponse::success(null, ['message' => 'Kata sandi berhasil direset.']);
+    }
+
+    /**
+     * No auth guard here on purpose — the user has no session/token yet at
+     * this point, only the email+otp they just typed in the app.
+     */
+    public function verifyEmail(VerifyOtpRequest $request): JsonResponse
+    {
+        $result = $this->authService->verifyOtp(
+            $request->string('email')->toString(),
+            $request->string('otp')->toString(),
+        );
+
+        if ($result === AuthService::INVALID_OTP) {
+            return ApiResponse::error('Kode OTP tidak valid atau sudah kedaluwarsa.', 422, code: 'INVALID_OTP');
+        }
+
+        return ApiResponse::success([
+            'user' => new UserResource($result->user),
+            'token' => $result->token,
+        ]);
+    }
+
+    public function resendVerification(ResendVerificationRequest $request): JsonResponse
+    {
+        $this->authService->resendOtp($request->string('email')->toString());
+
+        return ApiResponse::success(null, ['message' => 'Jika email terdaftar dan belum diverifikasi, kode OTP baru telah dikirim.']);
     }
 
     public function logout(Request $request): JsonResponse

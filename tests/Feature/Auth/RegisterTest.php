@@ -22,11 +22,14 @@ final class RegisterTest extends TestCase
             'password' => 'password123',
         ]);
 
+        // No token here on purpose: the account isn't usable until the OTP
+        // just emailed to it is confirmed via /auth/verify-email.
         $response->assertStatus(201)
             ->assertJsonPath('data.user.email', 'budi@example.com')
-            ->assertJsonStructure(['data' => ['user' => ['id', 'name', 'email'], 'token']]);
+            ->assertJsonStructure(['data' => ['user' => ['id', 'name', 'email']]])
+            ->assertJsonMissingPath('data.token');
 
-        $this->assertDatabaseHas('users', ['email' => 'budi@example.com']);
+        $this->assertDatabaseHas('users', ['email' => 'budi@example.com', 'email_verified_at' => null]);
     }
 
     public function test_register_rejects_duplicate_email(): void
