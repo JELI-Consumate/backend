@@ -19,7 +19,7 @@ final class AnalyticsAndUserResourceTest extends TestCase
 
     public function test_user_view_page_loads_with_progress_relation_managers(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $sector = Sector::factory()->create();
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
 
@@ -32,7 +32,7 @@ final class AnalyticsAndUserResourceTest extends TestCase
 
     public function test_learning_analytics_page_loads_and_computes_journey_completion(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $sector = Sector::factory()->create();
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
 

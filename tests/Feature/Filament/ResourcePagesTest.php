@@ -35,7 +35,7 @@ final class ResourcePagesTest extends TestCase
     #[DataProvider('resourcePaths')]
     public function test_resource_index_page_loads(string $path): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)->get($path)->assertOk();
     }

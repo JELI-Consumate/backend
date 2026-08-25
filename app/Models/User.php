@@ -24,13 +24,12 @@ class User extends Authenticatable implements FilamentUser
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * TODO: belum ada sistem role/admin flag di skema — seluruh user terautentikasi
-     * saat ini diizinkan masuk admin panel. Perlu keputusan Faqih sebelum rilis
-     * (mis. kolom is_admin atau tabel role terpisah) — lihat 06-nonfunctional-ops.md.
+     * is_admin sengaja tidak masuk #[Fillable] di atas — tidak boleh bisa
+     * di-set lewat endpoint register/update-profile, hanya lewat seeder/tinker.
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        return $this->is_admin;
     }
 
     public function sendPasswordResetNotification($token): void
@@ -44,6 +43,7 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'date_of_birth' => 'date',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
     }
 
