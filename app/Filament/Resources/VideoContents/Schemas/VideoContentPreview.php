@@ -17,6 +17,7 @@ class VideoContentPreview
     {
         return [
             TextEntry::make('title'),
+            TextEntry::make('description')->visible(fn ($record) => filled($record->description)),
             ViewEntry::make('youtube_embed')
                 ->label('Preview')
                 ->view('filament.infolists.video-embed'),

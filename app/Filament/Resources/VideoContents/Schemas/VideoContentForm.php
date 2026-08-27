@@ -16,6 +16,7 @@ class VideoContentForm
             TextInput::make('title')
                 ->required()
                 ->maxLength(200),
+            Textarea::make('description'),
             TextInput::make('youtube_url')
                 ->label('URL YouTube')
                 ->url()

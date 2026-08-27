@@ -27,6 +27,7 @@ class VideoContentsTable
         return $table
             ->columns([
                 TextColumn::make('title')->searchable(),
+                TextColumn::make('description')->limit(50)->toggleable(),
                 ...ParentContextColumns::forModulePage(),
                 TextColumn::make('youtube_video_id')->label('Video ID'),
                 ImageColumn::make('youtube_video_id')

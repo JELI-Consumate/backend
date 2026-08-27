@@ -21,6 +21,7 @@ class VideoContentFactory extends Factory
     {
         return [
             'title' => fake()->sentence(4),
+            'description' => fake()->sentence(),
             'youtube_url' => 'https://youtu.be/dQw4w9WgXcQ',
             'prompt_question' => fake()->sentence(),
         ];

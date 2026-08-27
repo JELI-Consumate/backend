@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['title', 'youtube_url', 'prompt_question'])]
+#[Fillable(['title', 'description', 'youtube_url', 'prompt_question'])]
 class VideoContent extends Model
 {
     /** @use HasFactory<VideoContentFactory> */
