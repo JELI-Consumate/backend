@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\UserRole;
 use App\Notifications\Auth\ResetPasswordNotification;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
@@ -13,6 +14,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -27,12 +29,26 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmailContr
     use HasApiTokens, HasFactory, MustVerifyEmail, Notifiable;
 
     /**
-     * is_admin sengaja tidak masuk #[Fillable] di atas — tidak boleh bisa
-     * di-set lewat endpoint register/update-profile, hanya lewat seeder/tinker.
+     * role & sector_id sengaja tidak masuk #[Fillable] di atas — tidak boleh
+     * bisa di-set lewat endpoint register/update-profile, hanya lewat resource
+     * "Kelola Admin" (super admin) atau seeder/tinker.
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->is_admin;
+        return $this->role->canAccessPanel();
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === UserRole::SuperAdmin;
+    }
+
+    /**
+     * Admin yang dibatasi hanya ke satu sector (lihat sector_id).
+     */
+    public function isSectorAdmin(): bool
+    {
+        return $this->role === UserRole::Admin;
     }
 
     public function sendPasswordResetNotification($token): void
@@ -54,8 +70,19 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmailContr
             'email_verified_at' => 'datetime',
             'date_of_birth' => 'date',
             'password' => 'hashed',
-            'is_admin' => 'boolean',
+            'role' => UserRole::class,
         ];
+    }
+
+    /**
+     * Sector yang boleh diakses ketika role = Admin. Null untuk super_admin
+     * (akses semua sector) maupun pengguna biasa.
+     *
+     * @return BelongsTo<Sector, $this>
+     */
+    public function sector(): BelongsTo
+    {
+        return $this->belongsTo(Sector::class);
     }
 
     /**

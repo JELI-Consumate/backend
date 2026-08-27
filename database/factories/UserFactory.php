@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserRole;
+use App\Models\Sector;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -30,7 +32,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
-            'is_admin' => false,
+            'role' => UserRole::User,
         ];
     }
 
@@ -45,12 +47,25 @@ class UserFactory extends Factory
     }
 
     /**
-     * Indicate that the user can access the Filament admin panel.
+     * Indicate that the user can access the Filament admin panel with full
+     * access to every sector.
      */
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_admin' => true,
+            'role' => UserRole::SuperAdmin,
+        ]);
+    }
+
+    /**
+     * Indicate that the user can access the Filament admin panel but is
+     * restricted to a single sector.
+     */
+    public function sectorAdmin(?Sector $sector = null): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => UserRole::Admin,
+            'sector_id' => $sector?->id ?? Sector::factory(),
         ]);
     }
 }
