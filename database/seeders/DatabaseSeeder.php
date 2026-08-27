@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Sector;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -27,6 +28,12 @@ class DatabaseSeeder extends Seeder
             JourneySeeder::class,
             ModuleSeeder::class,
             BadgeSeeder::class,
+        ]);
+
+        // Contoh akun admin sector: hanya bisa akses sector "E-Commerce".
+        User::factory()->sectorAdmin(Sector::query()->firstOrFail())->create([
+            'name' => 'Admin E-Commerce',
+            'email' => 'admin.ecommerce@example.com',
         ]);
     }
 }
