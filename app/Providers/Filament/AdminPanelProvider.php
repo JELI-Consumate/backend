@@ -6,6 +6,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -30,6 +31,25 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->colors([
                 'primary' => Color::Amber,
+            ])
+            /**
+             * Urutan grup sidebar sengaja didaftarkan eksplisit di sini —
+             * tanpa ini Filament mengurutkan grup berdasarkan urutan
+             * kemunculan item lintas resource (hasil auto-discover),
+             * bukan alur kerja sebenarnya. Urutan di bawah mengikuti alur
+             * pengisian data: struktur (Sector -> Journey -> Module) lebih
+             * dulu, baru konten, lalu data pengguna, lalu administrasi.
+             *
+             * Tidak diberi ->icon() di level grup — Filament melarang grup
+             * dan item di dalamnya sama-sama punya ikon, dan tiap resource
+             * di bawah sudah punya ikon sendiri-sendiri yang lebih berguna
+             * untuk membedakan Sector/Journey/Module & jenis konten.
+             */
+            ->navigationGroups([
+                NavigationGroup::make('Struktur Belajar'),
+                NavigationGroup::make('Konten Modul'),
+                NavigationGroup::make('Pengguna & Analitik'),
+                NavigationGroup::make('Administrasi'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
