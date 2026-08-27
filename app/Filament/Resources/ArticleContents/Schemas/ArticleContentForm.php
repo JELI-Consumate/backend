@@ -45,7 +45,7 @@ class ArticleContentForm
                         ]),
                     FileUpload::make('image_url')
                         ->image()
-                        ->maxSize(2048)
+                        ->maxSize(5120)
                         ->directory('articles/blocks')
                         ->visible(fn ($get) => $get('block_type') === ArticleBlockType::Image->value)
                         ->requiredIf('block_type', ArticleBlockType::Image->value),

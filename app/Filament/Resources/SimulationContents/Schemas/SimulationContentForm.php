@@ -36,10 +36,10 @@ class SimulationContentForm
                 ->components([
                     Textarea::make('left_label')->required(),
                     Textarea::make('left_description'),
-                    FileUpload::make('left_image_url')->image()->maxSize(2048)->directory('simulations/matching'),
+                    FileUpload::make('left_image_url')->image()->maxSize(5120)->directory('simulations/matching'),
                     Textarea::make('right_label')->required(),
                     Textarea::make('right_description'),
-                    FileUpload::make('right_image_url')->image()->maxSize(2048)->directory('simulations/matching'),
+                    FileUpload::make('right_image_url')->image()->maxSize(5120)->directory('simulations/matching'),
                 ]),
             Repeater::make('orderingSteps')
                 ->relationship()
@@ -50,7 +50,7 @@ class SimulationContentForm
                 ->visible(fn ($get) => $get('simulation_type') === SimulationType::Ordering->value)
                 ->components([
                     Textarea::make('label')->required(),
-                    FileUpload::make('image_url')->image()->maxSize(2048)->directory('simulations/ordering'),
+                    FileUpload::make('image_url')->image()->maxSize(5120)->directory('simulations/ordering'),
                     TextInput::make('correct_position')->numeric()->required(),
                 ]),
         ]);

@@ -28,7 +28,7 @@ class SectorForm
                 ->maxLength(1000),
             FileUpload::make('icon_url')
                 ->image()
-                ->maxSize(2048)
+                ->maxSize(5120)
                 ->directory('sectors/icons'),
             ColorPicker::make('color'),
             TextInput::make('order')
