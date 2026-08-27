@@ -23,7 +23,7 @@ final class ModulePageContentTest extends TestCase
         $sector = Sector::factory()->create();
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         $module = Module::factory()->create(['journey_id' => $journey->id]);
-        $video = VideoContent::factory()->create(['title' => 'Video Uji']);
+        $video = VideoContent::factory()->create(['title' => 'Video Uji', 'description' => 'Deskripsi video uji.']);
         $page = ModulePage::factory()->create([
             'module_id' => $module->id,
             'contentable_type' => 'video',
@@ -35,6 +35,7 @@ final class ModulePageContentTest extends TestCase
         $response->assertOk()
             ->assertJsonPath('data.content_type', 'video')
             ->assertJsonPath('data.content.title', 'Video Uji')
+            ->assertJsonPath('data.content.description', 'Deskripsi video uji.')
             ->assertJsonPath('data.progress.status', 'not_started');
     }
 

@@ -21,6 +21,7 @@ final class VideoContentResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'description' => $this->description,
             'youtube_url' => $this->youtube_url,
             'youtube_video_id' => $this->youtube_video_id,
             'prompt_question' => $this->prompt_question,
