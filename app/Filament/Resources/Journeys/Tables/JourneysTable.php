@@ -14,6 +14,8 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class JourneysTable
 {
@@ -21,14 +23,29 @@ class JourneysTable
     {
         return $table
             ->columns([
-                TextColumn::make('sector.name')->sortable(),
+                TextColumn::make('sector.name')->label('Sector')->sortable(),
                 TextColumn::make('order')->sortable(),
                 TextColumn::make('title')->searchable(),
                 TextColumn::make('status')->badge(),
                 TextColumn::make('estimated_minutes')->label('Durasi (menit)'),
             ])
-            ->defaultSort('order')
-            ->reorderable('order')
+            // Sengaja tidak reorderable di sini: daftar ini bisa berisi
+            // journey dari banyak sector sekaligus, jadi drag-reorder lintas
+            // sector akan merusak urutan "order" tiap sector (lihat urutan
+            // yang benar & bisa di-drag di tab "Journeys" pada halaman edit
+            // Sector — JourneysRelationManager, yang sudah dibatasi ke satu
+            // sector). Urutan tampil ikut order sector induknya dulu, baru
+            // order journey itu sendiri. Dibungkus lewat orderBy(Builder)
+            // supaya kolom "order" (reserved word di SQL) di-quote dengan
+            // benar oleh query builder, bukan ditulis manual.
+            ->defaultSort(fn (Builder $query): Builder => $query
+                ->orderBy(
+                    DB::table('sectors')
+                        ->whereColumn('sectors.id', 'journeys.sector_id')
+                        ->select('sectors.order')
+                        ->limit(1)
+                )
+                ->orderBy('journeys.order'))
             ->filters([
                 TrashedFilter::make(),
             ])
