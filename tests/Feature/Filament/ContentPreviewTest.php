@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
+use App\Enums\ArticleBlockType;
 use App\Filament\Resources\ArticleContents\Pages\ListArticleContents;
 use App\Filament\Resources\QuizContents\Pages\ListQuizContents;
 use App\Filament\Resources\ReflectionContents\Pages\ListReflectionContents;
@@ -51,6 +52,34 @@ final class ContentPreviewTest extends TestCase
         $this->actingAs(User::factory()->create());
         $article = ArticleContent::factory()->create();
         ArticleBlock::factory()->create(['article_content_id' => $article->id]);
+
+        Livewire::test(ListArticleContents::class)
+            ->callTableAction('preview', $article)
+            ->assertSuccessful();
+    }
+
+    /**
+     * Block bertipe list_item ditampilkan pakai bullet bernomor di preview
+     * (lihat ArticleBlock::listItemNumber & resources/views/filament/
+     * infolists/list-item-entry.blade.php), bukan teks polos — pastikan
+     * preview-nya tetap render sukses (bukan 500) begitu ada list_item.
+     */
+    public function test_article_preview_renders_with_list_item_blocks(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $article = ArticleContent::factory()->create();
+        ArticleBlock::factory()->create([
+            'article_content_id' => $article->id,
+            'block_type' => ArticleBlockType::ListItem,
+            'text_article' => 'Poin pertama',
+            'order' => 1,
+        ]);
+        ArticleBlock::factory()->create([
+            'article_content_id' => $article->id,
+            'block_type' => ArticleBlockType::ListItem,
+            'text_article' => 'Poin kedua',
+            'order' => 2,
+        ]);
 
         Livewire::test(ListArticleContents::class)
             ->callTableAction('preview', $article)

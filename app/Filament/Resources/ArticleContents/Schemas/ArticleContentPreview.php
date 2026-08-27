@@ -8,6 +8,7 @@ use App\Enums\ArticleBlockType;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Components\Component;
 
 class ArticleContentPreview
@@ -26,7 +27,14 @@ class ArticleContentPreview
                     TextEntry::make('text_article')
                         ->label('Teks')
                         ->markdown()
-                        ->visible(fn ($record) => $record->block_type !== ArticleBlockType::Image),
+                        ->visible(fn ($record) => ! in_array($record->block_type, [ArticleBlockType::Image, ArticleBlockType::ListItem], true)),
+                    // list_item ditampilkan pakai bullet bernomor (lihat
+                    // ArticleBlock::listItemNumber) supaya kebayang urutan
+                    // daftarnya sebelum publish, bukan cuma teks polos.
+                    ViewEntry::make('list_item_preview')
+                        ->label('Teks')
+                        ->view('filament.infolists.list-item-entry')
+                        ->visible(fn ($record) => $record->block_type === ArticleBlockType::ListItem),
                     ImageEntry::make('image_url')
                         ->label('Gambar')
                         ->visible(fn ($record) => $record->block_type === ArticleBlockType::Image),
