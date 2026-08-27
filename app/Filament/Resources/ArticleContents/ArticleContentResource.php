@@ -7,6 +7,7 @@ use App\Filament\Resources\ArticleContents\Pages\EditArticleContent;
 use App\Filament\Resources\ArticleContents\Pages\ListArticleContents;
 use App\Filament\Resources\ArticleContents\Schemas\ArticleContentForm;
 use App\Filament\Resources\ArticleContents\Tables\ArticleContentsTable;
+use App\Filament\Support\AdminScope;
 use App\Models\ArticleContent;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -21,7 +22,7 @@ class ArticleContentResource extends Resource
 {
     protected static ?string $model = ArticleContent::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
     protected static string|UnitEnum|null $navigationGroup = 'Konten Modul';
 
@@ -59,5 +60,10 @@ class ArticleContentResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return AdminScope::scopeSectorContent(parent::getEloquentQuery());
     }
 }

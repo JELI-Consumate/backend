@@ -8,6 +8,7 @@ use App\Filament\Resources\Modules\Pages\ListModules;
 use App\Filament\Resources\Modules\RelationManagers\PagesRelationManager;
 use App\Filament\Resources\Modules\Schemas\ModuleForm;
 use App\Filament\Resources\Modules\Tables\ModulesTable;
+use App\Filament\Support\AdminScope;
 use App\Models\Module;
 use App\Models\Scopes\Published;
 use BackedEnum;
@@ -17,17 +18,17 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 class ModuleResource extends Resource
 {
     protected static ?string $model = Module::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        return false;
-    }
+    protected static string|UnitEnum|null $navigationGroup = 'Struktur Belajar';
+
+    protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
     {
@@ -65,6 +66,15 @@ class ModuleResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withoutGlobalScope(Published::class);
+        $query = parent::getEloquentQuery()->withoutGlobalScope(Published::class);
+
+        if ($sectorId = AdminScope::restrictedSectorId()) {
+            $query->whereHas(
+                'journey',
+                fn (Builder $journeyQuery) => $journeyQuery->withoutGlobalScopes()->where('sector_id', $sectorId)
+            );
+        }
+
+        return $query;
     }
 }

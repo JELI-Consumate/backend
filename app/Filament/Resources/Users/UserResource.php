@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users;
 
+use App\Enums\UserRole;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\Pages\ViewUser;
 use App\Filament\Resources\Users\RelationManagers\JourneyProgressRelationManager;
 use App\Filament\Resources\Users\RelationManagers\SectorProgressRelationManager;
 use App\Filament\Resources\Users\Tables\UsersTable;
+use App\Filament\Support\AdminScope;
 use App\Models\User;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -55,6 +58,22 @@ class UserResource extends Resource
             'index' => ListUsers::route('/'),
             'view' => ViewUser::route('/{record}'),
         ];
+    }
+
+    /**
+     * Hanya pengguna aplikasi biasa yang tampil di sini (akun admin/super
+     * admin dikelola lewat resource "Kelola Admin"). Admin sector hanya
+     * melihat pengguna yang punya progres di sector-nya.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery()->where('role', UserRole::User);
+
+        if ($sectorId = AdminScope::restrictedSectorId()) {
+            $query->whereHas('sectorProgress', fn (Builder $q) => $q->where('sector_id', $sectorId));
+        }
+
+        return $query;
     }
 
     public static function canCreate(): bool

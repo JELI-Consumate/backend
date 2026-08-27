@@ -7,6 +7,7 @@ use App\Filament\Resources\VideoContents\Pages\EditVideoContent;
 use App\Filament\Resources\VideoContents\Pages\ListVideoContents;
 use App\Filament\Resources\VideoContents\Schemas\VideoContentForm;
 use App\Filament\Resources\VideoContents\Tables\VideoContentsTable;
+use App\Filament\Support\AdminScope;
 use App\Models\VideoContent;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -21,7 +22,7 @@ class VideoContentResource extends Resource
 {
     protected static ?string $model = VideoContent::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedVideoCamera;
 
     protected static string|UnitEnum|null $navigationGroup = 'Konten Modul';
 
@@ -59,5 +60,10 @@ class VideoContentResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return AdminScope::scopeSectorContent(parent::getEloquentQuery());
     }
 }

@@ -7,6 +7,7 @@ use App\Filament\Resources\SimulationContents\Pages\EditSimulationContent;
 use App\Filament\Resources\SimulationContents\Pages\ListSimulationContents;
 use App\Filament\Resources\SimulationContents\Schemas\SimulationContentForm;
 use App\Filament\Resources\SimulationContents\Tables\SimulationContentsTable;
+use App\Filament\Support\AdminScope;
 use App\Models\SimulationContent;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -21,7 +22,7 @@ class SimulationContentResource extends Resource
 {
     protected static ?string $model = SimulationContent::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPuzzlePiece;
 
     protected static string|UnitEnum|null $navigationGroup = 'Konten Modul';
 
@@ -59,5 +60,10 @@ class SimulationContentResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return AdminScope::scopeSectorContent(parent::getEloquentQuery());
     }
 }

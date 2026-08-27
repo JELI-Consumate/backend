@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Modules\RelationManagers;
 
 use App\Enums\ContentableType;
+use App\Filament\Support\AdminScope;
 use App\Models\ArticleContent;
 use App\Models\QuizContent;
 use App\Models\ReflectionContent;
@@ -51,7 +52,15 @@ class PagesRelationManager extends RelationManager
                 ->options(function ($get) {
                     $model = self::contentModel($get('contentable_type'));
 
-                    return $model ? $model::query()->pluck('title', 'id') : [];
+                    if (! $model) {
+                        return [];
+                    }
+
+                    $query = $model === QuizContent::class
+                        ? AdminScope::scopeQuizContentSector($model::query())
+                        : AdminScope::scopeSectorContent($model::query());
+
+                    return $query->pluck('title', 'id');
                 })
                 ->searchable()
                 ->required(),

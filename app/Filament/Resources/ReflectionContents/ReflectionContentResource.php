@@ -7,6 +7,7 @@ use App\Filament\Resources\ReflectionContents\Pages\EditReflectionContent;
 use App\Filament\Resources\ReflectionContents\Pages\ListReflectionContents;
 use App\Filament\Resources\ReflectionContents\Schemas\ReflectionContentForm;
 use App\Filament\Resources\ReflectionContents\Tables\ReflectionContentsTable;
+use App\Filament\Support\AdminScope;
 use App\Models\ReflectionContent;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -21,7 +22,7 @@ class ReflectionContentResource extends Resource
 {
     protected static ?string $model = ReflectionContent::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedLightBulb;
 
     protected static string|UnitEnum|null $navigationGroup = 'Konten Modul';
 
@@ -59,5 +60,10 @@ class ReflectionContentResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return AdminScope::scopeSectorContent(parent::getEloquentQuery());
     }
 }

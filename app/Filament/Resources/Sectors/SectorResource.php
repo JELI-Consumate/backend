@@ -8,15 +8,17 @@ use App\Filament\Resources\Sectors\Pages\ListSectors;
 use App\Filament\Resources\Sectors\RelationManagers\JourneysRelationManager;
 use App\Filament\Resources\Sectors\Schemas\SectorForm;
 use App\Filament\Resources\Sectors\Tables\SectorsTable;
+use App\Filament\Support\AdminScope;
 use App\Models\Sector;
 use BackedEnum;
-use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 class SectorResource extends Resource
 {
@@ -60,5 +62,58 @@ class SectorResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    /**
+     * Admin sector hanya boleh melihat/mengelola sector-nya sendiri.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if ($sectorId = AdminScope::restrictedSectorId()) {
+            $query->whereKey($sectorId);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Admin sector tidak boleh membuat sector baru maupun menghapus sector
+     * (termasuk sector-nya sendiri) — hanya super admin.
+     */
+    public static function canCreate(): bool
+    {
+        return ! AdminScope::restrictedSectorId();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return ! AdminScope::restrictedSectorId();
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return ! AdminScope::restrictedSectorId();
+    }
+
+    public static function canForceDelete(Model $record): bool
+    {
+        return ! AdminScope::restrictedSectorId();
+    }
+
+    public static function canForceDeleteAny(): bool
+    {
+        return ! AdminScope::restrictedSectorId();
+    }
+
+    public static function canRestore(Model $record): bool
+    {
+        return ! AdminScope::restrictedSectorId();
+    }
+
+    public static function canRestoreAny(): bool
+    {
+        return ! AdminScope::restrictedSectorId();
     }
 }

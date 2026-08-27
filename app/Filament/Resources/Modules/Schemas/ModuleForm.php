@@ -6,6 +6,7 @@ namespace App\Filament\Resources\Modules\Schemas;
 
 use App\Enums\ModuleType;
 use App\Enums\PublishStatus;
+use App\Filament\Support\AdminScope;
 use App\Models\Journey;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -20,7 +21,12 @@ class ModuleForm
         return $schema->components([
             Select::make('journey_id')
                 ->label('Journey')
-                ->options(fn () => Journey::withoutGlobalScopes()->pluck('title', 'id'))
+                ->options(fn () => Journey::withoutGlobalScopes()
+                    ->when(
+                        AdminScope::restrictedSectorId(),
+                        fn ($query, $sectorId) => $query->where('sector_id', $sectorId),
+                    )
+                    ->pluck('title', 'id'))
                 ->searchable()
                 ->required(),
             Select::make('type')

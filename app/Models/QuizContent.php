@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\QuizKind;
 use Database\Factories\QuizContentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -58,5 +59,24 @@ class QuizContent extends Model
     public function segments(): HasMany
     {
         return $this->hasMany(QuizSegment::class)->orderBy('order');
+    }
+
+    /**
+     * QuizContent terhubung ke sector lewat dua jalur: langsung via
+     * sector_id (kind pretest/posttest) atau tidak langsung via journey_id
+     * (kind quiz). Dipakai bareng oleh AdminScope (panel) & analitik.
+     *
+     * @param  Builder<QuizContent>  $query
+     * @return Builder<QuizContent>
+     */
+    public function scopeForSector(Builder $query, int $sectorId): Builder
+    {
+        return $query->where(function (Builder $q) use ($sectorId): void {
+            $q->where('sector_id', $sectorId)
+                ->orWhereHas(
+                    'journey',
+                    fn (Builder $journeyQuery) => $journeyQuery->withoutGlobalScopes()->where('sector_id', $sectorId)
+                );
+        });
     }
 }

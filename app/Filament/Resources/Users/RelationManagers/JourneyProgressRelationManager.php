@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\Support\AdminScope;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Read-only: progres dihasilkan otomatis oleh ProgressService, bukan diedit
@@ -21,6 +23,13 @@ class JourneyProgressRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query): Builder {
+                if ($sectorId = AdminScope::restrictedSectorId()) {
+                    $query->whereHas('journey', fn (Builder $q) => $q->withoutGlobalScopes()->where('sector_id', $sectorId));
+                }
+
+                return $query;
+            })
             ->recordTitleAttribute('id')
             ->columns([
                 TextColumn::make('journey.title')->label('Journey'),

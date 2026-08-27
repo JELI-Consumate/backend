@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Journeys\Schemas;
 
 use App\Enums\PublishStatus;
+use App\Filament\Support\AdminScope;
 use App\Models\Sector;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -18,7 +19,15 @@ class JourneyForm
         return $schema->components([
             Select::make('sector_id')
                 ->label('Sector')
-                ->options(fn () => Sector::query()->pluck('name', 'id'))
+                ->options(fn () => Sector::query()
+                    ->when(
+                        AdminScope::restrictedSectorId(),
+                        fn ($query, $sectorId) => $query->whereKey($sectorId),
+                    )
+                    ->pluck('name', 'id'))
+                ->default(fn () => AdminScope::restrictedSectorId())
+                ->disabled(fn () => (bool) AdminScope::restrictedSectorId())
+                ->dehydrated()
                 ->searchable()
                 ->required(),
             TextInput::make('title')

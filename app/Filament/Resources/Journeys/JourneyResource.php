@@ -8,6 +8,7 @@ use App\Filament\Resources\Journeys\Pages\ListJourneys;
 use App\Filament\Resources\Journeys\RelationManagers\ModulesRelationManager;
 use App\Filament\Resources\Journeys\Schemas\JourneyForm;
 use App\Filament\Resources\Journeys\Tables\JourneysTable;
+use App\Filament\Support\AdminScope;
 use App\Models\Journey;
 use App\Models\Scopes\Published;
 use BackedEnum;
@@ -17,17 +18,17 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 class JourneyResource extends Resource
 {
     protected static ?string $model = Journey::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMap;
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        return false;
-    }
+    protected static string|UnitEnum|null $navigationGroup = 'Struktur Belajar';
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {
@@ -65,6 +66,8 @@ class JourneyResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withoutGlobalScope(Published::class);
+        return AdminScope::scopeSectorColumn(
+            parent::getEloquentQuery()->withoutGlobalScope(Published::class)
+        );
     }
 }

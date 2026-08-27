@@ -7,6 +7,7 @@ use App\Filament\Resources\QuizContents\Pages\EditQuizContent;
 use App\Filament\Resources\QuizContents\Pages\ListQuizContents;
 use App\Filament\Resources\QuizContents\Schemas\QuizContentForm;
 use App\Filament\Resources\QuizContents\Tables\QuizContentsTable;
+use App\Filament\Support\AdminScope;
 use App\Models\QuizContent;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -21,7 +22,7 @@ class QuizContentResource extends Resource
 {
     protected static ?string $model = QuizContent::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
 
     protected static string|UnitEnum|null $navigationGroup = 'Konten Modul';
 
@@ -59,5 +60,10 @@ class QuizContentResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return AdminScope::scopeQuizContentSector(parent::getEloquentQuery());
     }
 }

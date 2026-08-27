@@ -6,6 +6,7 @@ namespace App\Filament\Resources\QuizContents\Schemas;
 
 use App\Enums\QuizKind;
 use App\Enums\QuizSegmentType;
+use App\Filament\Support\AdminScope;
 use App\Models\Journey;
 use App\Models\Sector;
 use Filament\Forms\Components\Repeater;
@@ -26,13 +27,24 @@ class QuizContentForm
                 ->required(),
             Select::make('journey_id')
                 ->label('Journey')
-                ->options(fn () => Journey::withoutGlobalScopes()->pluck('title', 'id'))
+                ->options(fn () => Journey::withoutGlobalScopes()
+                    ->when(
+                        AdminScope::restrictedSectorId(),
+                        fn ($query, $sectorId) => $query->where('sector_id', $sectorId),
+                    )
+                    ->pluck('title', 'id'))
                 ->searchable()
                 ->visible(fn ($get) => $get('kind') === QuizKind::Quiz->value)
                 ->requiredIf('kind', QuizKind::Quiz->value),
             Select::make('sector_id')
                 ->label('Sector')
-                ->options(fn () => Sector::query()->pluck('name', 'id'))
+                ->options(fn () => Sector::query()
+                    ->when(
+                        AdminScope::restrictedSectorId(),
+                        fn ($query, $sectorId) => $query->whereKey($sectorId),
+                    )
+                    ->pluck('name', 'id'))
+                ->default(fn () => AdminScope::restrictedSectorId())
                 ->searchable()
                 ->visible(fn ($get) => in_array($get('kind'), [QuizKind::Pretest->value, QuizKind::Posttest->value]))
                 ->requiredIf('kind', [QuizKind::Pretest->value, QuizKind::Posttest->value]),
