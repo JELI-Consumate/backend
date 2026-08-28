@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Exceptions\JourneyLockedException;
+use App\Exceptions\ModuleLockedException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\ModuleResource;
 use App\Models\ModulePage;
 use App\Models\ModuleProgress;
 use App\Services\Content\ContentTreeService;
 use App\Services\Learning\JourneyAccessService;
+use App\Services\Learning\ModuleAccessService;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,6 +22,7 @@ final class ModuleController extends Controller
     public function __construct(
         private readonly ContentTreeService $contentTree,
         private readonly JourneyAccessService $journeyAccess,
+        private readonly ModuleAccessService $moduleAccess,
     ) {}
 
     public function show(Request $request, int $id): JsonResponse
@@ -28,6 +31,10 @@ final class ModuleController extends Controller
 
         if (! $this->journeyAccess->isUnlocked($request->user(), $module->journey)) {
             throw new JourneyLockedException;
+        }
+
+        if (! $this->moduleAccess->isUnlocked($request->user(), $module)) {
+            throw new ModuleLockedException;
         }
 
         $progressByPageId = ModuleProgress::query()

@@ -31,6 +31,10 @@ final class ModuleResource extends JsonResource
                 array_key_exists('progress', $this->resource->getAttributes()),
                 fn () => $this->progress
             ),
+            'locked' => $this->when(
+                array_key_exists('locked', $this->resource->getAttributes()),
+                fn () => (bool) $this->locked
+            ),
         ];
     }
 }

@@ -43,15 +43,22 @@ final class JourneyController extends Controller
     }
 
     /**
-     * Tempel status selesai per module (dipakai FE untuk checklist di layar detail
-     * journey + menentukan "lanjutkan dari modul mana"). Tidak ada endpoint ringkas
-     * untuk ini, jadi dihitung di sini: 1 query bulk untuk seluruh module_progress
-     * user di journey ini, lalu di-keyBy per module_page_id — bukan query per modul
-     * (lihat pola yang sama di JourneyAccessService::unlockedMapForSector).
+     * Tempel status selesai + status kunci per module (dipakai FE untuk checklist
+     * di layar detail journey + menentukan "lanjutkan dari modul mana" + module mana
+     * yang masih digembok). Tidak ada endpoint ringkas untuk ini, jadi dihitung di
+     * sini: 1 query bulk untuk seluruh module_progress user di journey ini, lalu
+     * di-keyBy per module_page_id — bukan query per modul (lihat pola yang sama di
+     * JourneyAccessService::unlockedMapForSector).
+     *
+     * Status kunci dihitung SEKALIAN di loop yang sama TANPA query tambahan: module
+     * terurut ascending by order, status completed module SEBELUMNYA (dihitung di
+     * iterasi sebelumnya) menentukan apakah module SAAT INI terkunci -- pola yang
+     * sama dengan ModuleAccessService::isUnlocked, cuma di sini versi bulk-nya.
      */
     private function attachModuleProgress(User $user, Journey $journey): void
     {
-        $pageIds = $journey->modules->flatMap(fn (Module $module) => $module->pages->pluck('id'));
+        $modules = $journey->modules->sortBy('order')->values();
+        $pageIds = $modules->flatMap(fn (Module $module) => $module->pages->pluck('id'));
 
         $progressByPageId = ModuleProgress::query()
             ->where('user_id', $user->id)
@@ -59,7 +66,9 @@ final class JourneyController extends Controller
             ->get()
             ->keyBy('module_page_id');
 
-        $journey->modules->each(function (Module $module) use ($progressByPageId): void {
+        $previousCompleted = true;
+
+        $modules->each(function (Module $module) use ($progressByPageId, &$previousCompleted): void {
             $module->pages->each(
                 fn (ModulePage $page) => $page->setAttribute('user_progress', $progressByPageId->get($page->id))
             );
@@ -82,6 +91,9 @@ final class JourneyController extends Controller
                 'status' => $status->value,
                 'percent' => $totalPages > 0 ? intdiv($completedPages * 100, $totalPages) : 0,
             ]);
+
+            $module->setAttribute('locked', ! $previousCompleted);
+            $previousCompleted = $status === ProgressStatus::Completed;
         });
     }
 }

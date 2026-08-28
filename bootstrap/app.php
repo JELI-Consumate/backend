@@ -3,6 +3,7 @@
 use App\Exceptions\EmailNotVerifiedException;
 use App\Exceptions\InvalidSubmissionException;
 use App\Exceptions\JourneyLockedException;
+use App\Exceptions\ModuleLockedException;
 use App\Exceptions\QuizNotEligibleException;
 use App\Http\Middleware\EnsureEmailIsVerified;
 use App\Support\ApiResponse;
@@ -37,6 +38,13 @@ return Application::configure(basePath: dirname(__DIR__))
             403,
             ['journey' => ['Selesaikan journey sebelumnya terlebih dahulu.']],
             'JOURNEY_LOCKED',
+        ));
+
+        $exceptions->render(fn (ModuleLockedException $e) => ApiResponse::error(
+            $e->getMessage(),
+            403,
+            ['module' => ['Selesaikan modul sebelumnya terlebih dahulu.']],
+            'MODULE_LOCKED',
         ));
 
         $exceptions->render(fn (QuizNotEligibleException $e) => ApiResponse::error(

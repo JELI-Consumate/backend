@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Learning;
 
+use App\Enums\ArticleBlockType;
 use App\Enums\ProgressStatus;
 use App\Models\ArticleBlock;
 use App\Models\ArticleContent;
@@ -110,7 +111,9 @@ final class ModuleContentTest extends TestCase
         $response->assertJsonPath('data.pages.0.content_type', 'video');
         $response->assertJsonPath('data.pages.1.content.blocks.0.block_type', 'paragraph');
 
-        $this->assertLessThanOrEqual(8, $queryCount);
+        // 9, bukan 8: +1 query dari ModuleAccessService::isUnlocked (cek module
+        // sebelumnya di journey ini belum/sudah completed -- lihat ModuleController).
+        $this->assertLessThanOrEqual(9, $queryCount);
     }
 
     public function test_quiz_module_resolves_full_segment_tree(): void
@@ -142,7 +145,9 @@ final class ModuleContentTest extends TestCase
         DB::disableQueryLog();
 
         $response->assertOk()->assertJsonCount(10, 'data.pages');
-        $this->assertLessThanOrEqual(6, $queryCount);
+        // 7, bukan 6: +1 query dari ModuleAccessService::isUnlocked (lihat komentar
+        // sama di test_module_tree_resolves_mixed_content_within_query_budget).
+        $this->assertLessThanOrEqual(7, $queryCount);
     }
 
     public function test_module_tree_resolves_simulation_and_reflection_content(): void
@@ -155,6 +160,42 @@ final class ModuleContentTest extends TestCase
         $response->assertOk()->assertJsonCount(5, 'data.pages');
         $response->assertJsonPath('data.pages.3.content_type', 'simulation');
         $response->assertJsonPath('data.pages.4.content.sections.0.questions.0.question_type', 'open_question');
+    }
+
+    /**
+     * Regresi: ContentTreeService::loadModuleTree() meng-cache seluruh
+     * object graph Module (+pages+konten polimorfik) lewat Cache::remember().
+     * Tests lain semuanya jalan di CACHE_STORE=array (lihat phpunit.xml) yang
+     * TIDAK PERNAH benar-benar serialize/unserialize apa pun -- jadi bug di
+     * cache store "database" sungguhan (dipakai production & dev lokal lewat
+     * .env) tidak pernah ketahuan dari situ. Di sinilah satu-satunya test
+     * yang benar-benar memaksa round-trip serialize->DB->unserialize, persis
+     * yang terjadi di cache HIT sungguhan (lihat config/cache.php
+     * 'serializable_classes' -- tanpa entry yang benar di situ, ini akan
+     * gagal dengan "Return value must be of type Module,
+     * __PHP_Incomplete_Class returned" tepat di request KEDUA, bukan yang
+     * pertama).
+     */
+    public function test_module_tree_survives_a_real_database_cache_round_trip(): void
+    {
+        config(['cache.default' => 'database']);
+
+        $user = User::factory()->create();
+        $module = $this->createFullMixedModule();
+
+        // Panggilan pertama: cache miss, Cache::remember() menjalankan closure
+        // dan mengembalikan hasilnya langsung -- tidak pernah lewat
+        // serialize/unserialize, jadi tidak akan menangkap bug ini sendirian.
+        $this->actingAs($user)->getJson("/api/v1/modules/{$module->id}")
+            ->assertOk()->assertJsonCount(5, 'data.pages');
+
+        // Panggilan kedua: cache HIT -- inilah yang benar-benar unserialize
+        // dari tabel `cache`.
+        $this->actingAs($user)->getJson("/api/v1/modules/{$module->id}")
+            ->assertOk()->assertJsonCount(5, 'data.pages')
+            ->assertJsonPath('data.pages.0.content_type', 'video')
+            ->assertJsonPath('data.pages.2.content.segments.0.questions.0.choice_options.0.option_text', fn ($value) => is_string($value))
+            ->assertJsonPath('data.pages.4.content.sections.0.questions.0.question_type', 'open_question');
     }
 
     public function test_module_tree_merges_user_progress_per_page(): void
@@ -200,6 +241,114 @@ final class ModuleContentTest extends TestCase
         $this->assertStringNotContainsString('correct_position', (string) json_encode($response->json()));
     }
 
+    /**
+     * Filament's FileUpload menyimpan path relatif ("articles/blocks/x.jpg"),
+     * bukan URL absolut -- resource harus mengubahnya jadi URL yang benar-benar
+     * bisa dimuat client (regresi: sebelumnya path mentah dikirim apa adanya
+     * dan gambar gagal tampil di app -- lihat juga SimulationContentResource).
+     * Disk di-force ke "public" supaya deterministik terlepas dari
+     * FILAMENT_FILESYSTEM_DISK sungguhan di .env mesin yang menjalankan test
+     * (lihat MediaUrlTest untuk cakupan disk cloud/r2-nya).
+     */
+    public function test_article_block_image_url_is_resolved_to_an_absolute_url(): void
+    {
+        config(['filament.default_filesystem_disk' => 'public']);
+
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        $module = Module::factory()->create(['journey_id' => $journey->id]);
+
+        $article = ArticleContent::factory()->create();
+        ArticleBlock::factory()->create([
+            'article_content_id' => $article->id,
+            'block_type' => ArticleBlockType::Image,
+            'image_url' => 'articles/blocks/infografis.jpg',
+        ]);
+        ModulePage::factory()->create(['module_id' => $module->id, 'order' => 1, 'contentable_type' => 'article', 'contentable_id' => $article->id]);
+
+        $response = $this->actingAs($user)->getJson("/api/v1/modules/{$module->id}");
+
+        $response->assertOk();
+        $this->assertMatchesRegularExpression(
+            '#^https?://[^/]+/storage/articles/blocks/infografis\.jpg$#',
+            $response->json('data.pages.0.content.blocks.0.image_url'),
+        );
+    }
+
+    public function test_simulation_image_urls_are_resolved_to_absolute_urls(): void
+    {
+        config(['filament.default_filesystem_disk' => 'public']);
+
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        $module = Module::factory()->create(['journey_id' => $journey->id]);
+
+        $simulation = SimulationContent::factory()->create();
+        SimulationMatchingPair::factory()->create([
+            'simulation_content_id' => $simulation->id,
+            'left_image_url' => 'simulations/pairs/left.jpg',
+            'right_image_url' => 'simulations/pairs/right.jpg',
+        ]);
+        SimulationOrderingStep::factory()->create([
+            'simulation_content_id' => $simulation->id,
+            'image_url' => 'simulations/steps/step.jpg',
+        ]);
+        ModulePage::factory()->create(['module_id' => $module->id, 'order' => 1, 'contentable_type' => 'simulation', 'contentable_id' => $simulation->id]);
+
+        $response = $this->actingAs($user)->getJson("/api/v1/modules/{$module->id}");
+
+        $response->assertOk();
+        $this->assertMatchesRegularExpression(
+            '#^https?://[^/]+/storage/simulations/pairs/left\.jpg$#',
+            $response->json('data.pages.0.content.matching_pairs.0.left_image_url'),
+        );
+        $this->assertMatchesRegularExpression(
+            '#^https?://[^/]+/storage/simulations/pairs/right\.jpg$#',
+            $response->json('data.pages.0.content.matching_pairs.0.right_image_url'),
+        );
+        $this->assertMatchesRegularExpression(
+            '#^https?://[^/]+/storage/simulations/steps/step\.jpg$#',
+            $response->json('data.pages.0.content.ordering_steps.0.image_url'),
+        );
+    }
+
+    /**
+     * Di production disk default-nya "r2" (Cloudflare R2, object storage
+     * S3-compatible) -- URL yang dihasilkan harus ikut domain publik disk
+     * itu, bukan diasumsikan selalu lokal lewat /storage/. R2_PUBLIC_URL
+     * palsu di sini, bukan kredensial sungguhan -- Storage::url() cuma
+     * menyusun string, tidak pernah benar-benar menghubungi R2.
+     */
+    public function test_article_block_image_url_uses_the_cloud_disks_public_url_when_configured(): void
+    {
+        config([
+            'filament.default_filesystem_disk' => 'r2',
+            'filesystems.disks.r2.url' => 'https://media.example-cdn.test',
+        ]);
+
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        $module = Module::factory()->create(['journey_id' => $journey->id]);
+
+        $article = ArticleContent::factory()->create();
+        ArticleBlock::factory()->create([
+            'article_content_id' => $article->id,
+            'block_type' => ArticleBlockType::Image,
+            'image_url' => 'articles/blocks/infografis.jpg',
+        ]);
+        ModulePage::factory()->create(['module_id' => $module->id, 'order' => 1, 'contentable_type' => 'article', 'contentable_id' => $article->id]);
+
+        $response = $this->actingAs($user)->getJson("/api/v1/modules/{$module->id}");
+
+        $response->assertOk()->assertJsonPath(
+            'data.pages.0.content.blocks.0.image_url',
+            'https://media.example-cdn.test/articles/blocks/infografis.jpg',
+        );
+    }
+
     public function test_module_show_returns_404_for_unknown_module(): void
     {
         $user = User::factory()->create();
@@ -220,5 +369,47 @@ final class ModuleContentTest extends TestCase
         $response = $this->actingAs($user)->getJson("/api/v1/modules/{$module->id}");
 
         $response->assertStatus(403)->assertJsonPath('code', 'JOURNEY_LOCKED');
+    }
+
+    public function test_module_show_returns_403_when_previous_module_not_completed(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+
+        $first = Module::factory()->create(['journey_id' => $journey->id, 'order' => 1]);
+        $video = VideoContent::factory()->create();
+        ModulePage::factory()->create(['module_id' => $first->id, 'contentable_type' => 'video', 'contentable_id' => $video->id]);
+
+        $second = Module::factory()->create(['journey_id' => $journey->id, 'order' => 2]);
+        $secondVideo = VideoContent::factory()->create();
+        ModulePage::factory()->create(['module_id' => $second->id, 'contentable_type' => 'video', 'contentable_id' => $secondVideo->id]);
+
+        $response = $this->actingAs($user)->getJson("/api/v1/modules/{$second->id}");
+
+        $response->assertStatus(403)->assertJsonPath('code', 'MODULE_LOCKED');
+    }
+
+    public function test_module_show_unlocks_after_previous_module_completed(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+
+        $first = Module::factory()->create(['journey_id' => $journey->id, 'order' => 1]);
+        $video = VideoContent::factory()->create();
+        $firstPage = ModulePage::factory()->create(['module_id' => $first->id, 'contentable_type' => 'video', 'contentable_id' => $video->id]);
+
+        $second = Module::factory()->create(['journey_id' => $journey->id, 'order' => 2]);
+        $secondVideo = VideoContent::factory()->create();
+        ModulePage::factory()->create(['module_id' => $second->id, 'contentable_type' => 'video', 'contentable_id' => $secondVideo->id]);
+
+        ModuleProgress::factory()->create([
+            'user_id' => $user->id,
+            'module_page_id' => $firstPage->id,
+            'status' => ProgressStatus::Completed,
+        ]);
+
+        $this->actingAs($user)->getJson("/api/v1/modules/{$second->id}")->assertOk();
     }
 }
