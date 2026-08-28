@@ -20,6 +20,7 @@ class VideoContentForm
             TextInput::make('youtube_url')
                 ->label('URL YouTube')
                 ->url()
+                ->trim()
                 ->required(),
             Textarea::make('prompt_question')
                 ->label('Pertanyaan Pemantik'),
