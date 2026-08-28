@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\UserRole;
-use App\Notifications\Auth\ResetPasswordNotification;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -51,17 +50,20 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmailContr
         return $this->role === UserRole::Admin;
     }
 
-    public function sendPasswordResetNotification($token): void
-    {
-        $this->notify(new ResetPasswordNotification($token));
-    }
-
     /**
      * @return HasOne<EmailVerificationOtp, $this>
      */
     public function emailVerificationOtp(): HasOne
     {
         return $this->hasOne(EmailVerificationOtp::class);
+    }
+
+    /**
+     * @return HasOne<PasswordResetOtp, $this>
+     */
+    public function passwordResetOtp(): HasOne
+    {
+        return $this->hasOne(PasswordResetOtp::class);
     }
 
     protected function casts(): array

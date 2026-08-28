@@ -8,9 +8,9 @@ use App\Data\Auth\AuthResultData;
 use App\Data\Auth\RegisterData;
 use App\Models\User;
 use App\Notifications\Auth\OtpVerificationNotification;
+use App\Notifications\Auth\PasswordResetOtpNotification;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
 final readonly class AuthService
@@ -20,6 +20,8 @@ final readonly class AuthService
     public const string EMAIL_NOT_VERIFIED = 'email_not_verified';
 
     public const string INVALID_OTP = 'invalid_otp';
+
+    public const string INVALID_RESET_OTP = 'invalid_reset_otp';
 
     private const int OTP_LENGTH = 6;
 
@@ -142,28 +144,77 @@ final readonly class AuthService
         $user->currentAccessToken()->delete();
     }
 
-    public function sendPasswordResetLink(string $email): string
+    /**
+     * Always a no-op for unknown emails so the endpoint can't be used to
+     * enumerate registered addresses.
+     */
+    public function sendPasswordResetOtp(string $email): void
     {
-        return Password::sendResetLink(['email' => $email]);
+        $user = $this->findByEmail($email);
+
+        if ($user !== null) {
+            $this->generateAndSendPasswordResetOtp($user);
+        }
     }
 
     /**
-     * @return string One of Password::PASSWORD_RESET or an error status constant.
+     * @return true|self::INVALID_RESET_OTP
      */
-    public function resetPassword(string $email, string $token, string $password): string
+    public function resetPassword(string $email, string $otp, string $password): bool|string
     {
-        return Password::reset(
-            ['email' => $email, 'token' => $token, 'password' => $password],
-            function (User $user, string $password): void {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                    'remember_token' => Str::random(60),
-                ])->save();
+        $user = $this->findByEmail($email);
 
-                $user->tokens()->delete();
+        if ($user === null) {
+            return self::INVALID_RESET_OTP;
+        }
 
-                event(new PasswordReset($user));
-            },
-        );
+        $record = $user->passwordResetOtp;
+
+        if ($record === null || $record->isExpired()) {
+            return self::INVALID_RESET_OTP;
+        }
+
+        if ($record->attempts >= self::OTP_MAX_ATTEMPTS) {
+            $record->delete();
+
+            return self::INVALID_RESET_OTP;
+        }
+
+        if (! Hash::check($otp, $record->otp_hash)) {
+            $record->increment('attempts');
+
+            return self::INVALID_RESET_OTP;
+        }
+
+        $record->delete();
+
+        $user->forceFill([
+            'password' => Hash::make($password),
+            'remember_token' => Str::random(60),
+        ])->save();
+
+        $user->tokens()->delete();
+
+        event(new PasswordReset($user));
+
+        return true;
+    }
+
+    /**
+     * Only one reset OTP is ever valid per user — generating a new one
+     * invalidates whatever was issued before (an earlier forgot-password call).
+     */
+    private function generateAndSendPasswordResetOtp(User $user): void
+    {
+        $otp = str_pad((string) random_int(0, 10 ** self::OTP_LENGTH - 1), self::OTP_LENGTH, '0', STR_PAD_LEFT);
+
+        $user->passwordResetOtp()->delete();
+
+        $user->passwordResetOtp()->create([
+            'otp_hash' => Hash::make($otp),
+            'expires_at' => now()->addMinutes(self::OTP_TTL_MINUTES),
+        ]);
+
+        $user->notify(new PasswordResetOtpNotification($otp, self::OTP_TTL_MINUTES));
     }
 }

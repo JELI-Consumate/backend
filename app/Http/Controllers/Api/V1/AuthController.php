@@ -19,7 +19,6 @@ use App\Services\Auth\SocialAuthService;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
 
 final class AuthController extends Controller
 {
@@ -86,21 +85,21 @@ final class AuthController extends Controller
 
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
-        $this->authService->sendPasswordResetLink($request->string('email')->toString());
+        $this->authService->sendPasswordResetOtp($request->string('email')->toString());
 
-        return ApiResponse::success(null, ['message' => 'Jika email terdaftar, tautan reset kata sandi telah dikirim.']);
+        return ApiResponse::success(null, ['message' => 'Jika email terdaftar, kode reset kata sandi telah dikirim.']);
     }
 
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-        $status = $this->authService->resetPassword(
+        $result = $this->authService->resetPassword(
             $request->string('email')->toString(),
-            $request->string('token')->toString(),
+            $request->string('otp')->toString(),
             $request->string('password')->toString(),
         );
 
-        if ($status !== Password::PASSWORD_RESET) {
-            return ApiResponse::error('Token reset kata sandi tidak valid atau sudah kedaluwarsa.', 422, code: 'INVALID_RESET_TOKEN');
+        if ($result === AuthService::INVALID_RESET_OTP) {
+            return ApiResponse::error('Kode reset kata sandi tidak valid atau sudah kedaluwarsa.', 422, code: 'INVALID_RESET_OTP');
         }
 
         return ApiResponse::success(null, ['message' => 'Kata sandi berhasil direset.']);
