@@ -7,6 +7,7 @@ namespace App\Http\Resources\V1;
 use App\Enums\ProgressStatus;
 use App\Models\Sector;
 use App\Models\SectorProgress;
+use App\Support\MediaUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -28,7 +29,7 @@ final class SectorResource extends JsonResource
             'slug' => $this->slug,
             'name' => $this->name,
             'description' => $this->description,
-            'icon_url' => $this->icon_url,
+            'icon_url' => MediaUrl::resolve($this->icon_url),
             'color' => $this->color,
             'order' => $this->order,
             'progress' => [

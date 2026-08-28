@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources\V1\Content;
 
 use App\Models\ArticleContent;
+use App\Support\MediaUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,7 +26,7 @@ final class ArticleContentResource extends JsonResource
                 'id' => $block->id,
                 'block_type' => $block->block_type->value,
                 'text_article' => $block->text_article,
-                'image_url' => $block->image_url,
+                'image_url' => MediaUrl::resolve($block->image_url),
                 'alt_text' => $block->alt_text,
                 'order' => $block->order,
             ])),

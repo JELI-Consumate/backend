@@ -28,6 +28,62 @@ final class SectorCatalogTest extends TestCase
         $response->assertJsonPath('data.0.progress.percent', 0);
     }
 
+    /**
+     * Filament's FileUpload menyimpan path relatif ("sectors/icons/x.png"),
+     * bukan URL absolut -- resource harus mengubahnya jadi URL yang benar-benar
+     * bisa dimuat client (regresi: sebelumnya path mentah dikirim apa adanya
+     * dan gambar gagal tampil di app). Disk di-force ke "public" di sini
+     * supaya deterministik terlepas dari FILAMENT_FILESYSTEM_DISK sungguhan
+     * di .env mesin yang menjalankan test (lihat MediaUrlTest untuk cakupan
+     * disk cloud/r2-nya).
+     */
+    public function test_sector_icon_url_is_resolved_to_an_absolute_url(): void
+    {
+        config(['filament.default_filesystem_disk' => 'public']);
+
+        $user = User::factory()->create();
+        Sector::factory()->create([
+            'is_active' => true,
+            'icon_url' => 'sectors/icons/e-commerce.png',
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/api/v1/sectors');
+
+        $response->assertOk();
+        $this->assertMatchesRegularExpression(
+            '#^https?://[^/]+/storage/sectors/icons/e-commerce\.png$#',
+            $response->json('data.0.icon_url'),
+        );
+    }
+
+    /**
+     * Di production disk default-nya "r2" (Cloudflare R2, object storage
+     * S3-compatible) -- URL yang dihasilkan harus ikut domain publik disk
+     * itu, bukan diasumsikan selalu lokal lewat /storage/. R2_PUBLIC_URL
+     * palsu di sini, bukan kredensial sungguhan -- Storage::url() cuma
+     * menyusun string, tidak pernah benar-benar menghubungi R2.
+     */
+    public function test_sector_icon_url_uses_the_cloud_disks_public_url_when_configured(): void
+    {
+        config([
+            'filament.default_filesystem_disk' => 'r2',
+            'filesystems.disks.r2.url' => 'https://media.example-cdn.test',
+        ]);
+
+        $user = User::factory()->create();
+        Sector::factory()->create([
+            'is_active' => true,
+            'icon_url' => 'sectors/icons/e-commerce.png',
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/api/v1/sectors');
+
+        $response->assertOk()->assertJsonPath(
+            'data.0.icon_url',
+            'https://media.example-cdn.test/sectors/icons/e-commerce.png',
+        );
+    }
+
     public function test_sector_show_returns_journeys_with_lock_status(): void
     {
         $user = User::factory()->create();

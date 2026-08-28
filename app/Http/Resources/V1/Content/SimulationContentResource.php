@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources\V1\Content;
 
 use App\Models\SimulationContent;
+use App\Support\MediaUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -30,16 +31,16 @@ final class SimulationContentResource extends JsonResource
                 'id' => $pair->id,
                 'left_label' => $pair->left_label,
                 'left_description' => $pair->left_description,
-                'left_image_url' => $pair->left_image_url,
+                'left_image_url' => MediaUrl::resolve($pair->left_image_url),
                 'right_label' => $pair->right_label,
                 'right_description' => $pair->right_description,
-                'right_image_url' => $pair->right_image_url,
+                'right_image_url' => MediaUrl::resolve($pair->right_image_url),
                 'order' => $pair->order,
             ])),
             'ordering_steps' => $this->whenLoaded('orderingSteps', fn () => $this->orderingSteps->map(fn ($step): array => [
                 'id' => $step->id,
                 'label' => $step->label,
-                'image_url' => $step->image_url,
+                'image_url' => MediaUrl::resolve($step->image_url),
                 'order' => $step->order,
             ])),
         ];
