@@ -87,6 +87,36 @@ final class QuizAttemptApiDocs
     )]
     public function submit(): void {}
 
+    #[OA\Post(
+        path: '/quiz-attempts/{id}/check',
+        summary: 'Cek 1 pertanyaan per panggilan (gaya ujian, bukan Duolingo-style)',
+        description: 'BR-08: attempt immutable setelah completed. Jawaban SALAH tetap disimpan permanen (soal langsung terkunci untuk attempt ini, tidak seperti simulasi yang boleh dicoba lagi). Attempt otomatis completed begitu seluruh pertanyaan pernah dicek.',
+        tags: ['Kuis'],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'), description: 'quiz_attempt id'),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['type', 'quiz_question_id'],
+                properties: [
+                    new OA\Property(property: 'type', type: 'string', enum: ['multiple_choice', 'likert']),
+                    new OA\Property(property: 'quiz_question_id', type: 'integer'),
+                    new OA\Property(property: 'quiz_choice_option_id', type: 'integer', description: 'wajib kalau type=multiple_choice'),
+                    new OA\Property(property: 'likert_scale_option_id', type: 'integer', description: 'wajib kalau type=likert'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: '`data.correct`/`correct_option_id`/`explanation` + state attempt terkini', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 401, description: 'Belum login'),
+            new OA\Response(response: 403, description: 'Attempt bukan milik user ini'),
+            new OA\Response(response: 409, description: 'Attempt sudah selesai (`ATTEMPT_ALREADY_COMPLETED`)'),
+            new OA\Response(response: 422, description: 'Pertanyaan/jawaban tidak valid untuk kuis ini'),
+        ]
+    )]
+    public function checkAnswer(): void {}
+
     #[OA\Get(
         path: '/quiz-attempts/{id}',
         summary: 'Detail attempt (mode "pembahasan" kalau sudah selesai)',

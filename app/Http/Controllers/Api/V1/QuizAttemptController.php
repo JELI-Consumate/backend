@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\QuizKind;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Quiz\CheckQuizAnswerRequest;
 use App\Http\Requests\Quiz\SubmitQuizAttemptRequest;
 use App\Http\Resources\V1\Content\QuizContentResource;
 use App\Http\Resources\V1\QuizAttemptResource;
@@ -54,6 +55,23 @@ final class QuizAttemptController extends Controller
         $attempt->load(['choiceAnswers.quizQuestion.choiceOptions']);
 
         return ApiResponse::success(new QuizAttemptResource($attempt));
+    }
+
+    public function checkAnswer(CheckQuizAnswerRequest $request, int $id): JsonResponse
+    {
+        $attempt = QuizAttempt::query()->with(['user', 'quizContent.modulePage.module.journey'])->findOrFail($id);
+
+        Gate::authorize('check', $attempt);
+
+        $result = $this->scoring->checkAnswer($attempt, $request->toData());
+        $result->attempt->load(['choiceAnswers.quizQuestion.choiceOptions']);
+
+        return ApiResponse::success([
+            'correct' => $result->correct,
+            'correct_option_id' => $result->correctOptionId,
+            'explanation' => $result->explanation,
+            'attempt' => new QuizAttemptResource($result->attempt),
+        ]);
     }
 
     public function showAttempt(int $id): JsonResponse

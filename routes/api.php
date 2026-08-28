@@ -53,6 +53,9 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/quizzes/{id}', [QuizAttemptController::class, 'showQuiz']);
         Route::post('/quizzes/{id}/attempts', [QuizAttemptController::class, 'startAttempt']);
         Route::post('/quiz-attempts/{id}/submit', [QuizAttemptController::class, 'submit'])->middleware('throttle:20,1');
+        // Cek 1 pertanyaan per panggilan (gaya ujian, lihat QuizScoringService::checkAnswer)
+        // -> limit lebih longgar dari submit batch, sama seperti simulation-attempts/check.
+        Route::post('/quiz-attempts/{id}/check', [QuizAttemptController::class, 'checkAnswer'])->middleware('throttle:60,1');
         Route::get('/quiz-attempts/{id}', [QuizAttemptController::class, 'showAttempt']);
         Route::get('/sectors/{slug}/pretest', [QuizAttemptController::class, 'pretest']);
         Route::get('/sectors/{slug}/posttest', [QuizAttemptController::class, 'posttest']);

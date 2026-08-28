@@ -10,6 +10,7 @@ use App\Enums\QuizKind;
 use App\Enums\QuizSegmentType;
 use App\Models\Journey;
 use App\Models\JourneyProgress;
+use App\Models\LikertScaleOption;
 use App\Models\Module;
 use App\Models\ModulePage;
 use App\Models\QuizChoiceOption;
@@ -301,5 +302,197 @@ final class QuizAttemptTest extends TestCase
         [$bigQueryCount] = $this->submitFreshQuizAndCountQueries(10);
 
         $this->assertSame($smallQueryCount, $bigQueryCount);
+    }
+
+    public function test_checking_correct_answer_returns_correct_option_and_explanation(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        [$quiz, , $questions] = $this->createJourneyQuiz($journey, 2);
+
+        $attemptId = $this->actingAs($user)->postJson("/api/v1/quizzes/{$quiz->id}/attempts")
+            ->assertCreated()->json('data.attempt_id');
+
+        $response = $this->actingAs($user)->postJson("/api/v1/quiz-attempts/{$attemptId}/check", [
+            'type' => 'multiple_choice',
+            'quiz_question_id' => $questions[0]->id,
+            'quiz_choice_option_id' => $this->correctOptionIdFor($questions[0]),
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.correct', true)
+            ->assertJsonPath('data.correct_option_id', $this->correctOptionIdFor($questions[0]))
+            ->assertJsonPath('data.explanation', $questions[0]->explanation)
+            // Baru 1 dari 2 pertanyaan dicek -- attempt belum selesai.
+            ->assertJsonPath('data.attempt.completed_at', null);
+    }
+
+    /**
+     * BEDA dari simulasi (`SimulationScoringService::checkAnswer`): jawaban
+     * SALAH di kuis tetap disimpan permanen begitu dicek -- soal itu terkunci
+     * untuk attempt ini, tidak boleh dicoba lagi sampai benar.
+     */
+    public function test_checking_wrong_answer_is_persisted_and_locked(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        [$quiz, , $questions] = $this->createJourneyQuiz($journey, 2);
+
+        $attemptId = $this->actingAs($user)->postJson("/api/v1/quizzes/{$quiz->id}/attempts")
+            ->assertCreated()->json('data.attempt_id');
+
+        $wrongOptionId = $this->wrongOptionIdFor($questions[0]);
+
+        $this->actingAs($user)->postJson("/api/v1/quiz-attempts/{$attemptId}/check", [
+            'type' => 'multiple_choice',
+            'quiz_question_id' => $questions[0]->id,
+            'quiz_choice_option_id' => $wrongOptionId,
+        ])->assertOk()->assertJsonPath('data.correct', false);
+
+        $this->assertDatabaseHas('quiz_choice_answers', [
+            'quiz_attempt_id' => $attemptId,
+            'quiz_question_id' => $questions[0]->id,
+            'quiz_choice_option_id' => $wrongOptionId,
+            'is_correct' => 0,
+        ]);
+
+        // Coba lagi dengan jawaban yang BENAR untuk soal yang sama -- tetap
+        // dianggap salah, soal ini sudah terkunci ke jawaban pertama.
+        $retry = $this->actingAs($user)->postJson("/api/v1/quiz-attempts/{$attemptId}/check", [
+            'type' => 'multiple_choice',
+            'quiz_question_id' => $questions[0]->id,
+            'quiz_choice_option_id' => $this->correctOptionIdFor($questions[0]),
+        ]);
+
+        $retry->assertOk()->assertJsonPath('data.correct', false);
+        $this->assertDatabaseCount('quiz_choice_answers', 1);
+    }
+
+    public function test_attempt_completes_and_marks_module_page_once_all_questions_checked(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        [$quiz, $page, $questions] = $this->createJourneyQuiz($journey, 2);
+
+        $attemptId = $this->actingAs($user)->postJson("/api/v1/quizzes/{$quiz->id}/attempts")
+            ->assertCreated()->json('data.attempt_id');
+
+        $this->actingAs($user)->postJson("/api/v1/quiz-attempts/{$attemptId}/check", [
+            'type' => 'multiple_choice',
+            'quiz_question_id' => $questions[0]->id,
+            'quiz_choice_option_id' => $this->correctOptionIdFor($questions[0]),
+        ])->assertJsonPath('data.attempt.completed_at', null);
+
+        $final = $this->actingAs($user)->postJson("/api/v1/quiz-attempts/{$attemptId}/check", [
+            'type' => 'multiple_choice',
+            'quiz_question_id' => $questions[1]->id,
+            'quiz_choice_option_id' => $this->wrongOptionIdFor($questions[1]),
+        ]);
+
+        $final->assertOk()
+            ->assertJsonPath('data.correct', false)
+            ->assertJsonPath('data.attempt.choice_score', 1)
+            ->assertJsonPath('data.attempt.choice_max_score', 2)
+            ->assertJsonPath('data.attempt.percentage', 50)
+            // Sudah completed -- review penuh (kedua soal) langsung ikut di
+            // respons check TERAKHIR ini, tidak perlu panggilan submit terpisah.
+            ->assertJsonPath('data.attempt.review.0.is_correct', true)
+            ->assertJsonPath('data.attempt.review.1.is_correct', false);
+        $this->assertNotNull($final->json('data.attempt.completed_at'));
+
+        $progressResponse = $this->actingAs($user)->getJson("/api/v1/module-pages/{$page->id}");
+        $progressResponse->assertOk()->assertJsonPath('data.progress.status', 'completed');
+    }
+
+    /**
+     * Segmen `likert` tidak ada benar/salah -- `correct`/`correct_option_id`/
+     * `explanation` semuanya null, tapi tetap ikut dihitung ke total
+     * pertanyaan buat penentuan attempt selesai.
+     */
+    public function test_likert_answer_has_no_correctness_but_counts_toward_completion(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+
+        $quiz = QuizContent::factory()->create(['journey_id' => $journey->id]);
+        $choiceSegment = QuizSegment::factory()->create(['quiz_content_id' => $quiz->id, 'order' => 1]);
+        $choiceQuestion = QuizQuestion::factory()->create(['quiz_segment_id' => $choiceSegment->id]);
+        QuizChoiceOption::factory()->create(['quiz_question_id' => $choiceQuestion->id, 'is_correct' => true]);
+        QuizChoiceOption::factory()->create(['quiz_question_id' => $choiceQuestion->id, 'is_correct' => false]);
+
+        $likertSegment = QuizSegment::factory()->likert()->create(['quiz_content_id' => $quiz->id, 'order' => 2]);
+        $likertQuestion = QuizQuestion::factory()->create(['quiz_segment_id' => $likertSegment->id]);
+        $likertOption = LikertScaleOption::factory()->create(['quiz_segment_id' => $likertSegment->id, 'value' => 4]);
+
+        $attemptId = $this->actingAs($user)->postJson("/api/v1/quizzes/{$quiz->id}/attempts")
+            ->assertCreated()->json('data.attempt_id');
+
+        $this->actingAs($user)->postJson("/api/v1/quiz-attempts/{$attemptId}/check", [
+            'type' => 'multiple_choice',
+            'quiz_question_id' => $choiceQuestion->id,
+            'quiz_choice_option_id' => $this->correctOptionIdFor($choiceQuestion),
+        ]);
+
+        $final = $this->actingAs($user)->postJson("/api/v1/quiz-attempts/{$attemptId}/check", [
+            'type' => 'likert',
+            'quiz_question_id' => $likertQuestion->id,
+            'likert_scale_option_id' => $likertOption->id,
+        ]);
+
+        $final->assertOk()
+            ->assertJsonPath('data.correct', null)
+            ->assertJsonPath('data.correct_option_id', null)
+            ->assertJsonPath('data.explanation', null)
+            ->assertJsonPath('data.attempt.likert_average', 4);
+        $this->assertNotNull($final->json('data.attempt.completed_at'));
+    }
+
+    /**
+     * BR-08: attempt yang sudah completed_at != null bersifat immutable.
+     */
+    public function test_checking_answer_on_completed_attempt_returns_409(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        [$quiz, , $questions] = $this->createJourneyQuiz($journey, 1);
+
+        $attemptId = $this->actingAs($user)->postJson("/api/v1/quizzes/{$quiz->id}/attempts")
+            ->assertCreated()->json('data.attempt_id');
+
+        $payload = [
+            'type' => 'multiple_choice',
+            'quiz_question_id' => $questions[0]->id,
+            'quiz_choice_option_id' => $this->correctOptionIdFor($questions[0]),
+        ];
+
+        $first = $this->actingAs($user)->postJson("/api/v1/quiz-attempts/{$attemptId}/check", $payload);
+        $this->assertNotNull($first->json('data.attempt.completed_at'));
+
+        $response = $this->actingAs($user)->postJson("/api/v1/quiz-attempts/{$attemptId}/check", $payload);
+
+        $response->assertStatus(409)->assertJsonPath('code', 'ATTEMPT_ALREADY_COMPLETED');
+    }
+
+    public function test_other_user_cannot_check_someone_elses_quiz_attempt(): void
+    {
+        $owner = User::factory()->create();
+        $intruder = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        [$quiz, , $questions] = $this->createJourneyQuiz($journey, 1);
+
+        $attemptId = $this->actingAs($owner)->postJson("/api/v1/quizzes/{$quiz->id}/attempts")
+            ->assertCreated()->json('data.attempt_id');
+
+        $this->actingAs($intruder)->postJson("/api/v1/quiz-attempts/{$attemptId}/check", [
+            'type' => 'multiple_choice',
+            'quiz_question_id' => $questions[0]->id,
+            'quiz_choice_option_id' => $this->correctOptionIdFor($questions[0]),
+        ])->assertForbidden();
     }
 }
