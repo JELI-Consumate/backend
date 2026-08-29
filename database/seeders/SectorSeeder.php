@@ -16,7 +16,7 @@ class SectorSeeder extends Seeder
             [
                 'name' => 'E-Commerce',
                 'description' => 'Edukasi perlindungan konsumen untuk transaksi jual-beli online (e-commerce), mencakup hak & kewajiban konsumen, cara berbelanja aman, perlindungan dari penipuan digital, dan prosedur penyelesaian sengketa.',
-                'icon_url' => null,
+                'icon_url' => 'https://placehold.co/256x256?text=E-Commerce',
                 'color' => null,
                 'order' => 1,
                 'is_active' => true,

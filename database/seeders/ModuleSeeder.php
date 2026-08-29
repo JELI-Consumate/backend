@@ -21,6 +21,7 @@ use App\Models\QuizChoiceOption;
 use App\Models\QuizContent;
 use App\Models\QuizQuestion;
 use App\Models\QuizSegment;
+use App\Models\ReflectionChecklistItem;
 use App\Models\ReflectionContent;
 use App\Models\ReflectionQuestion;
 use App\Models\ReflectionSection;
@@ -33,14 +34,25 @@ use Illuminate\Database\Seeder;
 /**
  * Seeder konten sektor E-Commerce (4 journey lengkap).
  *
- * Catatan penting untuk Faqih (perlu direview manual):
- * - Modul yang cuma punya judul di brief riset (tanpa isi paragraf) diisi
- *   paragraph block placeholder bertanda "[PLACEHOLDER]" — cari string ini
- *   untuk daftar semua bagian yang masih perlu diisi teks asli.
- * - Seluruh soal kuis (5 soal/journey) adalah DUMMY, bukan soal final riset.
- * - Baris simulation_ordering_steps / simulation_matching_pairs adalah
- *   4-6 contoh yang disusun masuk akal dari deskripsi skenario game,
+ * Status per 2026-08-29 (disinkronkan dari materi riil yang sudah diisi tim
+ * lewat admin panel — lihat dump-jeli-202608291151.sql):
+ * - Journey 1 (Kenali Hakmu sebagai Konsumen) SUDAH berisi teks materi,
+ *   gambar, dan referensi asli (bukan placeholder lagi). Dua modul materi
+ *   ("Mengenal Aturan Hukum Saat Belanja Online" dan "Apa yang Bisa
+ *   Dipelajari dari Komik Ini?") digabung tim jadi halaman kedua (extra_pages)
+ *   dari modul Video dan modul Komik, bukan modul berdiri sendiri lagi.
+ *   3 soal pertama kuis Journey 1 juga sudah dapat field `explanation` asli.
+ *   Refleksi Journey 1 judul/isi juga sudah final ("Mari Nilai Kesadaran
+ *   Hukummu") dan menambah section checklist sikap konsumen.
+ * - Journey 2, 3, 4: modul materi/infografis MASIH placeholder bertanda
+ *   "[PLACEHOLDER]" — cari string ini untuk daftar bagian yang masih perlu
+ *   diisi teks asli oleh tim peneliti.
+ * - Seluruh soal kuis journey 2-4 (dan soal 4-5 journey 1) masih DUMMY,
+ *   bukan soal final riset.
+ * - Baris simulation_ordering_steps / simulation_matching_pairs journey 2-4
+ *   masih 4-6 contoh yang disusun masuk akal dari deskripsi skenario game,
  *   BUKAN data final — perlu direview/diganti sesuai desain game asli.
+ *   Journey 1 ordering steps sudah dapat gambar asli per langkah.
  * - Journey 4 tidak menyeed modul "Role Play" (belum ada tabel/morph type
  *   untuk simulasi chat) sesuai keputusan Faqih; modul simulasi journey 4
  *   yang diseed adalah "Game Susun Jalur Solusi: Misi Ganti Rugi Utama" (matching).
@@ -66,7 +78,13 @@ class ModuleSeeder extends Seeder
                     ]
                 );
 
-                $this->attachContent($module, $spec['content']);
+                $this->attachContent($module, 1, $spec['content']);
+
+                $pageOrder = 2;
+                foreach ($spec['extra_pages'] ?? [] as $extraContent) {
+                    $this->attachContent($module, $pageOrder, $extraContent);
+                    $pageOrder++;
+                }
 
                 $order++;
             }
@@ -76,7 +94,7 @@ class ModuleSeeder extends Seeder
     /**
      * @param  array{kind: string}  $content
      */
-    private function attachContent(Module $module, array $content): void
+    private function attachContent(Module $module, int $pageOrder, array $content): void
     {
         $contentable = match ($content['kind']) {
             'article' => $this->buildArticle($content),
@@ -88,7 +106,7 @@ class ModuleSeeder extends Seeder
         };
 
         ModulePage::updateOrCreate(
-            ['module_id' => $module->id, 'order' => 1],
+            ['module_id' => $module->id, 'order' => $pageOrder],
             [
                 'contentable_type' => ContentableType::from($content['kind'] === 'article' ? 'article'
                     : ($content['kind'] === 'video' ? 'video'
@@ -192,10 +210,11 @@ class ModuleSeeder extends Seeder
         );
 
         $order = 1;
-        foreach ($content['steps'] as $label) {
+        foreach ($content['steps'] as $step) {
+            $step = is_array($step) ? $step : ['label' => $step];
             SimulationOrderingStep::query()->updateOrCreate(
                 ['simulation_content_id' => $simulation->id, 'order' => $order],
-                ['label' => $label, 'image_url' => null, 'correct_position' => $order]
+                ['label' => $step['label'], 'image_url' => $step['image_url'] ?? null, 'correct_position' => $order]
             );
             $order++;
         }
@@ -255,10 +274,26 @@ class ModuleSeeder extends Seeder
 
             $qOrder = 1;
             foreach ($section['questions'] as $question) {
-                ReflectionQuestion::query()->updateOrCreate(
-                    ['reflection_section_id' => $sectionModel->id, 'order' => $qOrder],
-                    ['question_type' => ReflectionQuestionType::OpenQuestion, 'question_text' => $question]
-                );
+                if (is_array($question)) {
+                    $questionModel = ReflectionQuestion::query()->updateOrCreate(
+                        ['reflection_section_id' => $sectionModel->id, 'order' => $qOrder],
+                        ['question_type' => ReflectionQuestionType::Checklist, 'question_text' => $question['text']]
+                    );
+
+                    $iOrder = 1;
+                    foreach ($question['items'] as $item) {
+                        ReflectionChecklistItem::query()->updateOrCreate(
+                            ['reflection_question_id' => $questionModel->id, 'order' => $iOrder],
+                            ['label' => $item]
+                        );
+                        $iOrder++;
+                    }
+                } else {
+                    ReflectionQuestion::query()->updateOrCreate(
+                        ['reflection_section_id' => $sectionModel->id, 'order' => $qOrder],
+                        ['question_type' => ReflectionQuestionType::OpenQuestion, 'question_text' => $question]
+                    );
+                }
                 $qOrder++;
             }
 
@@ -285,30 +320,38 @@ class ModuleSeeder extends Seeder
                 ],
                 [
                     'type' => ModuleType::Video, 'title' => 'Pentingnya Perlindungan Konsumen dalam E-Commerce', 'minutes' => 10,
-                    'content' => ['kind' => 'video', 'title' => 'Pentingnya Perlindungan Konsumen dalam E-Commerce', 'youtube_url' => 'https://www.youtube.com/watch?v=PLACEHOLDER_J1V1'],
-                ],
-                [
-                    'type' => ModuleType::Materi, 'title' => 'Mengenal Aturan Hukum Saat Belanja Online', 'minutes' => 5,
-                    'content' => ['kind' => 'article', 'title' => 'Mengenal Aturan Hukum Saat Belanja Online', 'blocks' => [
-                        ['type' => ArticleBlockType::Paragraph, 'text' => $placeholder],
-                    ]],
+                    'content' => ['kind' => 'video', 'title' => 'Pentingnya Perlindungan Konsumen dalam E-Commerce', 'youtube_url' => 'https://youtu.be/BCGj0uJoujI?si=7Wfj-TgubtSEN2MP'],
+                    // Materi "Mengenal Aturan Hukum Saat Belanja Online" digabung jadi page 2 modul ini
+                    // (modul standalone-nya dihapus tim di admin panel setelah konten riilnya masuk).
+                    'extra_pages' => [
+                        ['kind' => 'article', 'title' => 'Mengenal Aturan Hukum Saat Belanja Online', 'blocks' => [
+                            ['type' => ArticleBlockType::Paragraph, 'text' => "Belanja online memang memberikan banyak kemudahan, tetapi sistem ini juga memiliki risiko nyata dalam kehidupan sehari-hari. Kita semua bisa saja mengalami masalah kurang menyenangkan seperti menerima barang rusak, paket tidak sesuai dengan foto iklan, atau bahkan terkena penipuan. Itulah mengapa negara kita membuat aturan hukum yang kuat, salah satunya melalui Undang-Undang Perlindungan Konsumen untuk menjamin agar kita bisa merasa aman, nyaman, dan tenang saat bertransaksi lewat internet.\n\nMenjaga keamanan saat berbelanja online sebenarnya bukan hanya menjadi tugas pemerintah atau pihak aplikasi saja. Kita sebagai pembeli justru memiliki peran yang paling utama untuk melindungi diri sendiri. Memahami aturan hukum dasar ini adalah langkah awal yang sangat baik agar kita bisa menjadi pembeli yang lebih cerdas, tahu cara mengamankan uang kita, dan tidak mudah dirugikan oleh penjual yang nakal.\n"],
+                            ['type' => ArticleBlockType::Reference, 'text' => 'IPB TV. 2022. IPB Podcast: Perlindungan Konsumen di Bidang E-          Commerce. Tautan Video: youtu.be.'],
+                        ]],
+                    ],
                 ],
                 [
                     'type' => ModuleType::Materi, 'title' => 'Kenali Peran Penting Kita sebagai Konsumen di Era Digital', 'minutes' => 5,
                     'content' => ['kind' => 'article', 'title' => 'Kenali Peran Penting Kita sebagai Konsumen di Era Digital', 'blocks' => [
-                        ['type' => ArticleBlockType::Paragraph, 'text' => $placeholder],
+                        ['type' => ArticleBlockType::Image, 'image_url' => 'https://placehold.co/800x1200?text=Microlearning+1', 'alt_text' => 'Microlearning 1'],
+                        ['type' => ArticleBlockType::Paragraph, 'text' => "Pernahkah kamu membeli pakaian di marketplace, memesan makanan lewat aplikasi, atau berlangganan layanan digital? Jika pernah, berarti kamu adalah konsumen. Menurut Pasal 1 angka 2 Undang-Undang Nomor 8 Tahun 1999, konsumen adalah setiap orang yang menggunakan barang atau jasa untuk memenuhi kebutuhan diri sendiri atau keluarga, dan tidak untuk dijual kembali. Kita semua berinteraksi dengan penjual setiap hari, sehingga penting bagi kita untuk memahami peran ini agar bisa bertransaksi dengan lebih aman dan bertanggung jawab.\n\nNamun, belanja online tidak selalu mulus. Kita bisa saja menerima produk rusak atau tergiur barang yang tidak sesuai foto iklan. Di sinilah pentingnya Perlindungan Konsumen. Berdasarkan pasal 1 angka 1 di undang-undang yang sama, perlindungan konsumen adalah segala upaya untuk memberikan kepastian hukum agar kita merasa aman, nyaman, dan tidak dirugikan. Aturan ini ada untuk mencegah kita dari kerugian sejak awal dengan cara memaksa penjual memberikan informasi jujur dan pelayanan yang adil.\n\nTahukah kamu bahwa kamu tidak harus selalu membeli barang dengan uang sendiri untuk disebut sebagai konsumen yang dilindungi hukum? Jika kamu menerima hadiah baju dari teman lalu kamu memakainya untuk keperluan pribadi, para ahli hukum menjelaskan bahwa kamu tetap sah dikategorikan sebagai konsumen akhir. Memahami siapa diri kita dan bagaimana hukum melindungi kita adalah langkah awal yang paling penting sebelum kita mempelajari hak serta kewajiban kita saat berbelanja.\n"],
+                        ['type' => ArticleBlockType::Reference, 'text' => "Indonesia. 1999. Undang-Undang No. 8 Tahun 1999 tentang Perlindungan Konsumen. Jakarta: Sekretariat Negara.\nMiru A, Yodo S. 2011. Hukum Perlindungan Konsumen. Jakarta: Rajawali Pers.\nShidarta. 2006. Hukum Perlindungan Konsumen Indonesia. Jakarta: Grasindo."],
                     ]],
                 ],
                 [
                     'type' => ModuleType::Materi, 'title' => 'Memahami Keseimbangan Hak dan Kewajiban Konsumen Cerdas', 'minutes' => 5,
                     'content' => ['kind' => 'article', 'title' => 'Memahami Keseimbangan Hak dan Kewajiban Konsumen Cerdas', 'blocks' => [
-                        ['type' => ArticleBlockType::Paragraph, 'text' => $placeholder],
+                        ['type' => ArticleBlockType::Image, 'image_url' => 'https://placehold.co/800x1200?text=Microlearning+2', 'alt_text' => 'Microlearning 2'],
+                        ['type' => ArticleBlockType::Paragraph, 'text' => "Saat membeli barang atau menggunakan jasa di e-commerce, kamu memiliki hak sekaligus kewajiban yang diatur resmi dalam Pasal 4 dan Pasal 5 Undang-Undang Nomor 8 Tahun 1999 tentang Perlindungan Konsumen. Kedua hal ini wajib berjalan beriringan agar ekosistem belanja digital tetap aman dan adil bagi pembeli maupun penjual.\nSebagai konsumen, kamu memiliki hak utama untuk mendapatkan informasi yang benar, jelas, dan jujur mengenai spesifikasi hingga garansi produk sebelum membeli. Kamu juga berhak menerima barang yang sesuai dengan deskripsi foto iklan, menyampaikan keluhan jika pelayanan buruk, serta memperoleh ganti rugi berupa pengembalian dana atau barang baru apabila produk yang diterima rusak akibat kelalaian penjual.\nNamun, untuk mendapatkan hak tersebut, kamu wajib melaksanakan kewajiban sebagai konsumen yang bertanggung jawab. Kewajiban pertamamu adalah membaca deskripsi produk dengan teliti sebelum checkout agar terhindar dari salah beli. Kamu juga wajib mengikuti prosedur transaksi resmi dan menggunakan metode pembayaran sah di aplikasi guna menghindari modus penipuan. Terakhir, periksalah paket saat tiba, lalu berikan ulasan yang jujur atau sampaikan komplain menggunakan bahasa yang sopan jika ada masalah.\nTahukah kamu bahwa konsumen yang tertib menjalankan kewajibannya akan memiliki posisi hukum yang jauh lebih kuat? Ketika kamu mengikuti prosedur aplikasi dan memiliki bukti transaksi yang sah, platform e-commerce akan jauh lebih mudah untuk membantumu memproses tuntutan ganti rugi terhadap penjual yang curang.\n"],
+                        ['type' => ArticleBlockType::Reference, 'text' => "Indonesia. 1999. Undang-Undang No. 8 Tahun 1999 tentang Perlindungan Konsumen. Jakarta: Sekretariat Negara.\nMiru A, Yodo S. 2011. Hukum Perlindungan Konsumen. Jakarta: Rajawali Pers.\n"],
                     ]],
                 ],
                 [
                     'type' => ModuleType::Materi, 'title' => 'Langkah Bijak dan Cerdas Sebelum Membeli Produk', 'minutes' => 5,
                     'content' => ['kind' => 'article', 'title' => 'Langkah Bijak dan Cerdas Sebelum Membeli Produk', 'blocks' => [
-                        ['type' => ArticleBlockType::Paragraph, 'text' => $placeholder],
+                        ['type' => ArticleBlockType::Image, 'image_url' => 'https://placehold.co/800x1200?text=Microlearning+3', 'alt_text' => 'Microlearning 3'],
+                        ['type' => ArticleBlockType::Paragraph, 'text' => "Sebelum membeli produk di e-commerce, jangan terburu-buru menekan tombol checkout. Luangkan waktu beberapa menit untuk memastikan produk dan toko yang dipilih benar-benar sesuai dengan kebutuhanmu. Kebiasaan sederhana ini sangat ampuh dalam mengurangi risiko penipuan, barang tidak sesuai pesanan, atau rasa kecewa setelah berbelanja online.\nLangkah pertama yang paling krusial adalah membaca deskripsi produk dengan teliti mengenai ukuran, bahan, spesifikasi, dan ketentuan garansi. Langkah kedua, periksa reputasi toko dengan melihat rating keseluruhan, jumlah transaksi sukses, serta ulasan nyata dari pembeli lain. Setelah itu, langkah ketiga adalah membandingkan produk dan harga dari beberapa toko serupa agar kamu mendapatkan kualitas terbaik yang paling ramah di kantong.\nLangkah keempat, selalu pilih metode pembayaran resmi yang disediakan oleh platform e-commerce dan hindari transfer uang langsung ke rekening pribadi penjual di luar aplikasi. Terakhir, langkah kelima adalah selalu menyimpan bukti transaksimu dengan baik, seperti invoice digital dan riwayat percakapan dengan penjual, sebagai bukti sah jika di kemudian hari kamu perlu mengajukan komplain atau meminta pengembalian dana.\nTahukah kamu bahwa tidak semua produk dengan harga paling murah merupakan pilihan yang terbaik di dunia digital? Terkadang, harga yang terlampau jauh di bawah pasaran justru menjadi indikasi awal dari barang tiruan atau kualitas yang buruk. Oleh karena itu, membandingkan informasi produk dan ulasan pembeli lain secara objektif akan sangat membantumu membuat keputusan belanja yang tepat dan aman.\n"],
+                        ['type' => ArticleBlockType::Reference, 'text' => "Indonesia. 2019. Peraturan Pemerintah Nomor 80 Tahun 2019 tentang Perdagangan Melalui Sistem Elektronik. Jakarta: Sekretariat Negara [Indonesia. 2019].\nNugroho AZ. 2018. Panduan Menjadi Konsumen Cerdas di Era Digital. Jakarta: Direktorat Jenderal Perlindungan Konsumen dan Tertib Niaga, Kementerian Perdagangan RI [Nugroho AZ. 2018]."],
                     ]],
                 ],
                 [
@@ -324,29 +367,30 @@ class ModuleSeeder extends Seeder
                         ['type' => ArticleBlockType::Paragraph, 'text' => 'Pernah menerima barang yang tidak sesuai? Atau bingung harus berbuat apa ketika pesanan bermasalah? Temukan jawabannya melalui cerita komik yang ringan, seru, dan dekat dengan pengalaman sehari-hari.'],
                         ['type' => ArticleBlockType::Image, 'image_url' => 'https://placehold.co/800x1200?text=Komik+Yuk+Belajar+Bareng', 'alt_text' => 'Komik Yuk, Belajar Bareng!'],
                     ]],
-                ],
-                [
-                    'type' => ModuleType::Materi, 'title' => 'Apa yang Bisa Dipelajari dari Komik Ini?', 'minutes' => 5,
-                    'content' => ['kind' => 'article', 'title' => 'Pembahasan Komik J1: Apa yang Bisa Dipelajari dari Komik Ini?', 'blocks' => [
-                        ['type' => ArticleBlockType::Paragraph, 'text' => 'Komik ini menggambarkan situasi yang sering dihadapi konsumen saat berbelanja melalui e-commerce. Melalui cerita tersebut, pengguna diajak memahami bahwa setiap konsumen memiliki hak untuk memperoleh produk dan layanan yang sesuai, sekaligus memiliki kewajiban untuk bertransaksi secara bijak dan bertanggung jawab.'],
-                        ['type' => ArticleBlockType::Paragraph, 'text' => 'Selain itu, komik ini menunjukkan pentingnya membaca informasi produk, memeriksa reputasi penjual, serta menyimpan bukti transaksi sebagai langkah pencegahan apabila terjadi permasalahan. Ketika mengalami kerugian, konsumen juga berhak menyampaikan keluhan dan memperoleh penyelesaian sesuai dengan ketentuan yang berlaku.'],
-                        ['type' => ArticleBlockType::Paragraph, 'text' => 'Pesan Utama: Perlindungan konsumen tidak hanya bergantung pada aturan, tetapi juga dimulai dari kesadaran setiap individu.'],
-                        ['type' => ArticleBlockType::ListItem, 'text' => 'Memahami hak dan kewajiban sebagai konsumen.'],
-                        ['type' => ArticleBlockType::ListItem, 'text' => 'Menerapkan langkah-langkah berbelanja yang aman.'],
-                        ['type' => ArticleBlockType::ListItem, 'text' => 'Mengetahui tindakan yang tepat saat mengalami kerugian.'],
-                        ['type' => ArticleBlockType::ListItem, 'text' => 'Menjadi konsumen yang cerdas, bijak, dan bertanggung jawab.'],
-                    ]],
+                    // "Apa yang Bisa Dipelajari dari Komik Ini?" digabung jadi page 2 modul ini
+                    // (modul standalone-nya dihapus tim di admin panel; teks sama seperti semula).
+                    'extra_pages' => [
+                        ['kind' => 'article', 'title' => 'Pembahasan Komik J1: Apa yang Bisa Dipelajari dari Komik Ini?', 'blocks' => [
+                            ['type' => ArticleBlockType::Paragraph, 'text' => 'Komik ini menggambarkan situasi yang sering dihadapi konsumen saat berbelanja melalui e-commerce. Melalui cerita tersebut, pengguna diajak memahami bahwa setiap konsumen memiliki hak untuk memperoleh produk dan layanan yang sesuai, sekaligus memiliki kewajiban untuk bertransaksi secara bijak dan bertanggung jawab.'],
+                            ['type' => ArticleBlockType::Paragraph, 'text' => 'Selain itu, komik ini menunjukkan pentingnya membaca informasi produk, memeriksa reputasi penjual, serta menyimpan bukti transaksi sebagai langkah pencegahan apabila terjadi permasalahan. Ketika mengalami kerugian, konsumen juga berhak menyampaikan keluhan dan memperoleh penyelesaian sesuai dengan ketentuan yang berlaku.'],
+                            ['type' => ArticleBlockType::Paragraph, 'text' => 'Pesan Utama: Perlindungan konsumen tidak hanya bergantung pada aturan, tetapi juga dimulai dari kesadaran setiap individu.'],
+                            ['type' => ArticleBlockType::ListItem, 'text' => 'Memahami hak dan kewajiban sebagai konsumen.'],
+                            ['type' => ArticleBlockType::ListItem, 'text' => 'Menerapkan langkah-langkah berbelanja yang aman.'],
+                            ['type' => ArticleBlockType::ListItem, 'text' => 'Mengetahui tindakan yang tepat saat mengalami kerugian.'],
+                            ['type' => ArticleBlockType::ListItem, 'text' => 'Menjadi konsumen yang cerdas, bijak, dan bertanggung jawab.'],
+                        ]],
+                    ],
                 ],
                 [
                     'type' => ModuleType::Simulasi, 'title' => 'Game Pilah Cepat: Keranjang Belanja Berdaya', 'minutes' => 8,
                     'content' => ['kind' => 'simulation_ordering', 'title' => 'Game Pilah Cepat: Keranjang Belanja Berdaya',
                         'scenario' => 'Susun urutan langkah yang benar seorang konsumen cerdas sebelum, saat, dan setelah membeli produk di e-commerce agar transaksi tetap aman.',
                         'steps' => [
-                            'Baca deskripsi produk dan syarat penjual dengan teliti',
-                            'Periksa reputasi dan ulasan toko',
-                            'Bandingkan harga dan metode pembayaran yang aman',
-                            'Lakukan checkout dan simpan bukti transaksi',
-                            'Periksa barang saat diterima dan laporkan bila tidak sesuai',
+                            ['label' => 'Baca deskripsi produk dan syarat penjual dengan teliti', 'image_url' => 'https://placehold.co/400x300?text=Baca+Deskripsi+Produk'],
+                            ['label' => 'Periksa reputasi dan ulasan toko', 'image_url' => 'https://placehold.co/400x300?text=Periksa+Reputasi+Toko'],
+                            ['label' => 'Bandingkan harga dan metode pembayaran yang aman', 'image_url' => 'https://placehold.co/400x300?text=Bandingkan+Harga'],
+                            ['label' => 'Lakukan checkout dan simpan bukti transaksi', 'image_url' => 'https://placehold.co/400x300?text=Checkout+%26+Bukti+Transaksi'],
+                            ['label' => 'Periksa barang saat diterima dan laporkan bila tidak sesuai', 'image_url' => 'https://placehold.co/400x300?text=Periksa+Barang+Diterima'],
                         ],
                     ],
                 ],
@@ -355,16 +399,30 @@ class ModuleSeeder extends Seeder
                     'content' => ['kind' => 'quiz', 'title' => 'Kuis Evaluasi Journey 1', 'questions' => $this->dummyQuestionsJ1()],
                 ],
                 [
-                    'type' => ModuleType::Refleksi, 'title' => 'Lembar Pemahaman Hak Dasar', 'minutes' => 5,
-                    'content' => ['kind' => 'reflection', 'title' => 'Lembar Pemahaman Hak Dasar',
-                        'opening' => 'Sebelum lanjut ke journey berikutnya, coba refleksikan pemahamanmu tentang hak dasar sebagai konsumen.',
-                        'sections' => [[
-                            'title' => 'Pemahaman Hak Dasar',
-                            'instruction' => 'Jawab dengan jujur sesuai pengalamanmu.',
-                            'questions' => [
-                                'Menurutmu, apa hak konsumen paling penting yang perlu kamu ingat saat belanja online, dan mengapa?',
+                    'type' => ModuleType::Refleksi, 'title' => 'Mari Nilai Kesadaran Hukummu', 'minutes' => 5,
+                    'content' => ['kind' => 'reflection', 'title' => 'Mari Nilai Kesadaran Hukummu',
+                        'opening' => "Selamat karena kamu telah menyelesaikan seluruh materi pada minggu pertama ini. Sekarang, mari kita lihat kembali seberapa paham kamu mengenai posisi konsumen di mata hukum. Lembar ini tidak mencari jawaban benar atau salah, jadi silakan isi sesuai pendapatmu sendiri.\n",
+                        'closing_title' => 'Kata Penutup',
+                        'closing_message' => "Terima kasih telah mengisi lembar pemahaman ini. Memahami siapa dirimu dan bagaimana aturan hukum melindungimu adalah modal awal yang paling penting agar kamu bisa bertransaksi dengan penuh percaya diri.\n",
+                        'sections' => [
+                            [
+                                'title' => 'Pemahaman Hak Dasar',
+                                'instruction' => 'Jawab dengan jujur sesuai pengalamanmu.',
+                                'questions' => [
+                                    'Setelah membaca materi minggu ini, mengapa posisi kita sebagai konsumen perlu dilindungi secara kuat oleh undang-undang?',
+                                    "Menurut pendapatmu, mengapa hak untuk mendapatkan ganti rugi baru bisa kita tuntut setelah kita memenuhi kewajiban membaca deskripsi produk?\n",
+                                ],
                             ],
-                        ]],
+                            [
+                                'title' => 'Daftar Sikap Konsumen',
+                                'instruction' => 'Beri tanda centang pada kebiasaan yang siap kamu terapkan mulai hari ini',
+                                'questions' => [
+                                    ['text' => 'Saya memahami bahwa menggunakan barang hadiah dari orang lain tetap dilindungi oleh hukum konsumen.', 'items' => ['Yes']],
+                                    ['text' => 'Saya akan selalu mengingat hak saya untuk mendapatkan informasi produk yang jelas sebelum membeli.', 'items' => ['Yes']],
+                                    ['text' => 'Saya berkomitmen untuk membaca informasi transaksi toko agar posisi hukum saya tetap aman.', 'items' => ['Yes']],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
             ]],
@@ -634,19 +692,19 @@ class ModuleSeeder extends Seeder
     private function dummyQuestionsJ1(): array
     {
         return [
-            ['question' => 'Apa yang dimaksud dengan hak konsumen dalam transaksi e-commerce?', 'options' => [
+            ['question' => 'Apa yang dimaksud dengan hak konsumen dalam transaksi e-commerce?', 'explanation' => "Konsumen adalah setiap orang yang menggunakan barang atau jasa untuk memenuhi kebutuhan diri sendiri, keluarga, atau orang lain, dan produk tersebut tidak untuk diperdagangkan kembali. Saat kamu membeli pakaian, memesan makanan, atau berlangganan layanan digital untuk kebutuhan sehari-hari, kamu sedang berperan sebagai konsumen akhir yang sah. Ingat, kamu tidak harus selalu membeli barang dengan uang sendiri untuk disebut sebagai konsumen, karena orang yang memanfaatkan barang dari hasil hadiah pemberian orang lain juga tetap dilindungi oleh hukum.\n", 'options' => [
                 ['text' => 'Hak untuk selalu mendapat diskon', 'correct' => false],
                 ['text' => 'Hak untuk memperoleh produk/layanan sesuai informasi yang dijanjikan', 'correct' => true],
                 ['text' => 'Hak untuk membatalkan pesanan tanpa alasan setelah barang diterima', 'correct' => false],
                 ['text' => 'Hak untuk memaksa penjual memberi hadiah', 'correct' => false],
             ]],
-            ['question' => 'Berikut yang termasuk kewajiban konsumen saat berbelanja online adalah...', 'options' => [
+            ['question' => 'Berikut yang termasuk kewajiban konsumen saat berbelanja online adalah...', 'explanation' => "Perlindungan konsumen adalah segala upaya untuk memberikan kepastian hukum dan melindungi hak-hak kita sebagai pembeli agar merasa aman, nyaman, dan tenang saat menggunakan barang atau jasa. Kehadiran aturan ini sangat penting di dunia digital untuk menyeimbangkan posisi kita dengan pelaku usaha. Ingat, perlindungan konsumen tidak hanya berlaku ketika kita sudah mengalami masalah, tetapi juga bertujuan untuk mencegah kerugian sejak awal dengan cara memaksa penjual memberikan pelayanan yang jujur.\n", 'options' => [
                 ['text' => 'Membaca informasi produk dengan teliti sebelum membeli', 'correct' => true],
                 ['text' => 'Menghindari membaca syarat dan ketentuan', 'correct' => false],
                 ['text' => 'Membayar tanpa memeriksa reputasi penjual', 'correct' => false],
                 ['text' => 'Mengabaikan bukti transaksi', 'correct' => false],
             ]],
-            ['question' => 'Langkah apa yang sebaiknya dilakukan sebelum membeli produk secara online?', 'options' => [
+            ['question' => 'Langkah apa yang sebaiknya dilakukan sebelum membeli produk secara online?', 'explanation' => "Sebagai konsumen, kamu memiliki hak istimewa yang dijamin oleh undang-undang untuk mendapatkan informasi yang benar, jelas, dan jujur mengenai kondisi dan jaminan barang yang akan kamu beli. Informasi yang lengkap mengenai spesifikasi, ukuran, hingga ketentuan garansi akan sangat membantumu dalam mengambil keputusan yang tepat. Ingat, hak untuk mendapatkan informasi jujur ini adalah modal awal kita agar terhindar dari rasa kecewa atau merasa tertipu oleh foto iklan.\n", 'options' => [
                 ['text' => 'Langsung transfer tanpa cek apa pun', 'correct' => false],
                 ['text' => 'Memeriksa reputasi penjual dan membaca deskripsi produk', 'correct' => true],
                 ['text' => 'Mengabaikan ulasan pembeli lain', 'correct' => false],
