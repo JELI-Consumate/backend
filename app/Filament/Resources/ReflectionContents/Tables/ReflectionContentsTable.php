@@ -24,7 +24,7 @@ class ReflectionContentsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with('sections.questions'))
+            ->modifyQueryUsing(fn ($query) => $query->with('sections.questions.checklistItems'))
             ->columns([
                 TextColumn::make('title')->searchable(),
                 ...ParentContextColumns::forModulePage(),
