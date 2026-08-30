@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\ProgressStatus;
+use App\Enums\QuizKind;
 use App\Exceptions\JourneyLockedException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\JourneyDetailResource;
@@ -13,6 +14,8 @@ use App\Models\JourneyProgress;
 use App\Models\Module;
 use App\Models\ModulePage;
 use App\Models\ModuleProgress;
+use App\Models\QuizAttempt;
+use App\Models\QuizContent;
 use App\Models\User;
 use App\Services\Learning\JourneyAccessService;
 use App\Support\ApiResponse;
@@ -38,8 +41,38 @@ final class JourneyController extends Controller
         );
 
         $this->attachModuleProgress($request->user(), $journey);
+        $this->attachQuizScore($request->user(), $journey);
 
         return ApiResponse::success(new JourneyDetailResource($journey));
+    }
+
+    /**
+     * Skor kuis evaluasi journey ini (mis. buat kartu "Ringkasan Journey" di
+     * layar perayaan begitu journey selesai) -- diambil dari attempt TERAKHIR
+     * user (bukan yang terbaik, konsisten dengan cara empowerment index
+     * mengambil attempt posttest terakhir), dalam persen 0-100. `null` kalau
+     * journey ini tidak punya module kuis, atau user belum pernah
+     * menyelesaikan satu attempt pun.
+     */
+    private function attachQuizScore(User $user, Journey $journey): void
+    {
+        $quiz = QuizContent::query()
+            ->where('journey_id', $journey->id)
+            ->where('kind', QuizKind::Quiz)
+            ->first();
+
+        $attempt = $quiz === null ? null : QuizAttempt::query()
+            ->where('user_id', $user->id)
+            ->where('quiz_content_id', $quiz->id)
+            ->whereNotNull('completed_at')
+            ->orderByDesc('attempt_number')
+            ->first();
+
+        $score = $attempt !== null && $attempt->choice_max_score > 0
+            ? (int) round($attempt->choice_score / $attempt->choice_max_score * 100)
+            : null;
+
+        $journey->setAttribute('quiz_score', $score);
     }
 
     /**

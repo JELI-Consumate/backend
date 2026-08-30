@@ -16,6 +16,7 @@ final class JourneyDetailResource extends JourneyResource
         return [
             ...parent::toArray($request),
             'modules' => ModuleResource::collection($this->whenLoaded('modules')),
+            'quiz_score' => $this->quiz_score,
         ];
     }
 }
