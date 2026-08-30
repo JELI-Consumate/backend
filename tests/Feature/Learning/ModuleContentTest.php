@@ -99,7 +99,9 @@ final class ModuleContentTest extends TestCase
 
     public function test_module_tree_resolves_mixed_content_within_query_budget(): void
     {
-        $user = User::factory()->create();
+        // last_active_at diisi supaya UpdateLastActive middleware tidak ikut
+        // menulis (throttle 5 menit) -- budget ini murni ContentTreeService.
+        $user = User::factory()->create(['last_active_at' => now()]);
         $module = $this->createVideoArticleModule();
 
         DB::enableQueryLog();
@@ -129,7 +131,9 @@ final class ModuleContentTest extends TestCase
 
     public function test_module_tree_query_count_does_not_scale_with_page_count(): void
     {
-        $user = User::factory()->create();
+        // last_active_at diisi supaya UpdateLastActive middleware tidak ikut
+        // menulis (throttle 5 menit) -- budget ini murni ContentTreeService.
+        $user = User::factory()->create(['last_active_at' => now()]);
         $sector = Sector::factory()->create();
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         $module = Module::factory()->create(['journey_id' => $journey->id]);
