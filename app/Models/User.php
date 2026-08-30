@@ -20,7 +20,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'phone', 'date_of_birth', 'password', 'google_id', 'avatar_url'])]
+#[Fillable(['name', 'email', 'phone', 'date_of_birth', 'password', 'google_id', 'avatar_url', 'last_active_at', 'last_inactive_notified_at'])]
 #[Hidden(['password', 'remember_token', 'google_id'])]
 class User extends Authenticatable implements FilamentUser, MustVerifyEmailContract
 {
@@ -73,6 +73,8 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmailContr
             'date_of_birth' => 'date',
             'password' => 'hashed',
             'role' => UserRole::class,
+            'last_active_at' => 'datetime',
+            'last_inactive_notified_at' => 'datetime',
         ];
     }
 
@@ -101,5 +103,25 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmailContr
     public function journeyProgress(): HasMany
     {
         return $this->hasMany(JourneyProgress::class);
+    }
+
+    /**
+     * @return HasMany<DeviceToken, $this>
+     */
+    public function deviceTokens(): HasMany
+    {
+        return $this->hasMany(DeviceToken::class);
+    }
+
+    /**
+     * Dibaca package laravel-notification-channels/fcm untuk resolve token
+     * tujuan kirim. Nama method WAJIB persis `routeNotificationForFcm` —
+     * konvensi package, bukan bebas dinamai.
+     *
+     * @return array<int, string>
+     */
+    public function routeNotificationForFcm(): array
+    {
+        return $this->deviceTokens()->pluck('fcm_token')->all();
     }
 }

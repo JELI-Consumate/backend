@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BadgeController;
+use App\Http\Controllers\Api\V1\DeviceTokenController;
 use App\Http\Controllers\Api\V1\EmpowermentIndexController;
 use App\Http\Controllers\Api\V1\JourneyController;
 use App\Http\Controllers\Api\V1\ModuleController;
@@ -49,6 +50,9 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/progress/sectors/{slug}', [ProgressController::class, 'sectorProgress']);
         Route::get('/progress/journeys/{id}', [ProgressController::class, 'journeyProgress']);
         Route::get('/progress/summary', [ProgressController::class, 'summary']);
+        Route::get('/progress/next', [ProgressController::class, 'next']);
+
+        Route::post('/device-tokens', [DeviceTokenController::class, 'store']);
 
         Route::get('/quizzes/{id}', [QuizAttemptController::class, 'showQuiz']);
         Route::post('/quizzes/{id}/attempts', [QuizAttemptController::class, 'startAttempt']);
