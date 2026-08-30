@@ -16,6 +16,7 @@ use App\Models\ModulePage;
 use App\Models\Sector;
 use App\Models\SectorProgress;
 use App\Services\Learning\JourneyAccessService;
+use App\Services\Progress\ProgressResolverService;
 use App\Services\Progress\ProgressService;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -27,7 +28,13 @@ final class ProgressController extends Controller
     public function __construct(
         private readonly ProgressService $progress,
         private readonly JourneyAccessService $journeyAccess,
+        private readonly ProgressResolverService $resolver,
     ) {}
+
+    public function next(Request $request): JsonResponse
+    {
+        return ApiResponse::success($this->resolver->resolveNext($request->user()));
+    }
 
     public function complete(Request $request, int $id): JsonResponse
     {
