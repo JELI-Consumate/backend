@@ -21,14 +21,24 @@ final readonly class SocialAuthService
                 ->first();
 
             if ($user === null) {
-                return User::create([
+                $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
                     'avatar_url' => $googleUser->getAvatar(),
                     'password' => null,
-                    'email_verified_at' => now(),
                 ]);
+
+                // `email_verified_at` isn't in User's #[Fillable] on purpose
+                // (it must never be settable via mass assignment from
+                // request input elsewhere), so passing it through
+                // User::create() above silently drops it instead of saving
+                // it — markEmailAsVerified() uses forceFill() and bypasses
+                // that guard correctly, same as the existing-user branch
+                // below.
+                $user->markEmailAsVerified();
+
+                return $user;
             }
 
             if ($user->google_id === null) {

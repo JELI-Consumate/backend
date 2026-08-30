@@ -56,6 +56,19 @@ final class GoogleLoginTest extends TestCase
             'google_id' => 'google-sub-1',
             'password' => null,
         ]);
+
+        // email_verified_at isn't in User's #[Fillable] (must never be mass
+        // assignable), so a regression that passes it through User::create()
+        // instead of markEmailAsVerified() would silently leave it null —
+        // assertDatabaseHas above can't catch that (it doesn't assert the
+        // column at all), so check it explicitly.
+        $user = User::where('email', 'newuser@example.com')->firstOrFail();
+        $this->assertNotNull($user->email_verified_at);
+
+        // Prove it end-to-end: the token from this response must actually
+        // pass the `verified` middleware, not just have a non-null column.
+        $token = $response->json('data.token');
+        $this->withToken($token)->getJson('/api/v1/sectors')->assertOk();
     }
 
     /**
