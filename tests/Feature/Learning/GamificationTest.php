@@ -61,6 +61,32 @@ final class GamificationTest extends TestCase
             ->assertJsonPath('data.0.earned', true);
     }
 
+    /**
+     * BadgeResource harus mengekspos konten layar "badge diperoleh"
+     * (ucapan selamat + pesan motivasi) dan me-resolve icon_url lewat
+     * MediaUrl, bukan path mentah (lihat App\Support\MediaUrl).
+     */
+    public function test_badges_endpoint_exposes_achievement_screen_content(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        $badge = Badge::factory()->create([
+            'journey_id' => $journey->id,
+            'congratulation_message' => 'Selamat! Kamu telah menuntaskan Journey 1.',
+            'motivational_message' => 'Yuk lanjut ke Journey 2!',
+            'icon_url' => 'https://cdn.example.test/badges/explorer.png',
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/api/v1/badges');
+
+        $response->assertOk()
+            ->assertJsonPath('data.0.id', $badge->id)
+            ->assertJsonPath('data.0.congratulation_message', 'Selamat! Kamu telah menuntaskan Journey 1.')
+            ->assertJsonPath('data.0.motivational_message', 'Yuk lanjut ke Journey 2!')
+            ->assertJsonPath('data.0.icon_url', 'https://cdn.example.test/badges/explorer.png');
+    }
+
     public function test_journey_without_badge_completes_without_error(): void
     {
         $user = User::factory()->create();

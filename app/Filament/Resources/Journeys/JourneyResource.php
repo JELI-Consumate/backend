@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Journeys;
 use App\Filament\Resources\Journeys\Pages\CreateJourney;
 use App\Filament\Resources\Journeys\Pages\EditJourney;
 use App\Filament\Resources\Journeys\Pages\ListJourneys;
+use App\Filament\Resources\Journeys\RelationManagers\BadgeRelationManager;
 use App\Filament\Resources\Journeys\RelationManagers\ModulesRelationManager;
 use App\Filament\Resources\Journeys\Schemas\JourneyForm;
 use App\Filament\Resources\Journeys\Tables\JourneysTable;
@@ -44,6 +45,7 @@ class JourneyResource extends Resource
     {
         return [
             ModulesRelationManager::class,
+            BadgeRelationManager::class,
         ];
     }
 

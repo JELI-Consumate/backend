@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['journey_id', 'name', 'description', 'icon_url'])]
+#[Fillable(['journey_id', 'name', 'description', 'congratulation_message', 'motivational_message', 'icon_url'])]
 class Badge extends Model
 {
     /** @use HasFactory<BadgeFactory> */

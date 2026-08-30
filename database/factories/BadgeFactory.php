@@ -24,6 +24,8 @@ class BadgeFactory extends Factory
             'journey_id' => Journey::factory(),
             'name' => fake()->words(2, true),
             'description' => fake()->sentence(),
+            'congratulation_message' => fake()->paragraph(),
+            'motivational_message' => fake()->paragraph(),
             'icon_url' => fake()->imageUrl(),
         ];
     }
