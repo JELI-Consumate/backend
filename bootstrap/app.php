@@ -5,6 +5,7 @@ use App\Exceptions\InvalidSubmissionException;
 use App\Exceptions\JourneyLockedException;
 use App\Exceptions\ModuleLockedException;
 use App\Exceptions\QuizNotEligibleException;
+use App\Exceptions\SurveyNotConfiguredException;
 use App\Http\Middleware\EnsureEmailIsVerified;
 use App\Http\Middleware\UpdateLastActive;
 use App\Support\ApiResponse;
@@ -59,5 +60,11 @@ return Application::configure(basePath: dirname(__DIR__))
             $e->getMessage(),
             409,
             code: 'ATTEMPT_ALREADY_COMPLETED',
+        ));
+
+        $exceptions->render(fn (SurveyNotConfiguredException $e) => ApiResponse::error(
+            $e->getMessage(),
+            404,
+            code: 'SURVEY_NOT_CONFIGURED',
         ));
     })->create();

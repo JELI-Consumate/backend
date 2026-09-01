@@ -11,7 +11,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'sector_id', 'status', 'progress_percent', 'completed_at'])]
+#[Fillable([
+    'user_id',
+    'sector_id',
+    'status',
+    'progress_percent',
+    'completed_at',
+    'pretest_survey_completed_at',
+    'posttest_survey_completed_at',
+])]
 class SectorProgress extends Model
 {
     /** @use HasFactory<SectorProgressFactory> */
@@ -23,6 +31,8 @@ class SectorProgress extends Model
             'status' => ProgressStatus::class,
             'progress_percent' => 'integer',
             'completed_at' => 'datetime',
+            'pretest_survey_completed_at' => 'datetime',
+            'posttest_survey_completed_at' => 'datetime',
         ];
     }
 

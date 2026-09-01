@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['slug', 'name', 'description', 'icon_url', 'color', 'order', 'is_active'])]
+#[Fillable(['slug', 'name', 'description', 'icon_url', 'color', 'order', 'is_active', 'pretest_survey_link', 'posttest_survey_link'])]
 class Sector extends Model
 {
     /** @use HasFactory<SectorFactory> */

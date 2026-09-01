@@ -30,6 +30,16 @@ final class SectorProgressResource extends JsonResource
             'status' => $progress?->status->value ?? ProgressStatus::NotStarted->value,
             'progress_percent' => $progress?->progress_percent ?? 0,
             'completed_at' => $progress?->completed_at?->toIso8601String(),
+            'surveys' => [
+                'pretest' => [
+                    'link' => $this->pretest_survey_link,
+                    'completed_at' => $progress?->pretest_survey_completed_at?->toIso8601String(),
+                ],
+                'posttest' => [
+                    'link' => $this->posttest_survey_link,
+                    'completed_at' => $progress?->posttest_survey_completed_at?->toIso8601String(),
+                ],
+            ],
         ];
     }
 }

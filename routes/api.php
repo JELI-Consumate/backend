@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\ProgressController;
 use App\Http\Controllers\Api\V1\QuizAttemptController;
 use App\Http\Controllers\Api\V1\ReflectionEntryController;
 use App\Http\Controllers\Api\V1\SectorController;
+use App\Http\Controllers\Api\V1\SectorSurveyController;
 use App\Http\Controllers\Api\V1\SimulationAttemptController;
 use Illuminate\Support\Facades\Route;
 
@@ -63,6 +64,13 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/quiz-attempts/{id}', [QuizAttemptController::class, 'showAttempt']);
         Route::get('/sectors/{slug}/pretest', [QuizAttemptController::class, 'pretest']);
         Route::get('/sectors/{slug}/posttest', [QuizAttemptController::class, 'posttest']);
+
+        // Survei eksternal (Google Form) per sektor -- terpisah dari kuis
+        // in-app di atas. Link diisi admin lewat Filament; endpoint di bawah
+        // cuma menandai self-report user sudah mengisinya (lihat
+        // SectorSurveyService, tidak ada verifikasi isi form yang sesungguhnya).
+        Route::post('/sectors/{slug}/pretest-survey/complete', [SectorSurveyController::class, 'completePretest']);
+        Route::post('/sectors/{slug}/posttest-survey/complete', [SectorSurveyController::class, 'completePosttest']);
 
         Route::get('/simulations/{id}', [SimulationAttemptController::class, 'show']);
         Route::post('/simulations/{id}/attempts', [SimulationAttemptController::class, 'startAttempt']);

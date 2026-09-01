@@ -36,6 +36,16 @@ final class SectorResource extends JsonResource
                 'status' => $progress?->status->value ?? ProgressStatus::NotStarted->value,
                 'percent' => $progress?->progress_percent ?? 0,
             ],
+            'surveys' => [
+                'pretest' => [
+                    'link' => $this->pretest_survey_link,
+                    'completed_at' => $progress?->pretest_survey_completed_at?->toIso8601String(),
+                ],
+                'posttest' => [
+                    'link' => $this->posttest_survey_link,
+                    'completed_at' => $progress?->posttest_survey_completed_at?->toIso8601String(),
+                ],
+            ],
             'journeys' => $this->when(
                 array_key_exists('journey_list', $this->resource->getAttributes()),
                 fn () => JourneyResource::collection($this->journey_list)
