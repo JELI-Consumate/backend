@@ -30,6 +30,14 @@ class SectorProgressRelationManager extends RelationManager
                 TextColumn::make('status')->badge(),
                 TextColumn::make('progress_percent')->label('Persen')->suffix('%'),
                 TextColumn::make('completed_at')->dateTime(),
+                TextColumn::make('pretest_survey_completed_at')
+                    ->label('Pretest (survei)')
+                    ->dateTime()
+                    ->placeholder('Belum diisi'),
+                TextColumn::make('posttest_survey_completed_at')
+                    ->label('Posttest (survei)')
+                    ->dateTime()
+                    ->placeholder('Belum diisi'),
             ])
             ->headerActions([])
             ->recordActions([])

@@ -37,6 +37,14 @@ class SectorForm
                 ->default(0),
             Checkbox::make('is_active')
                 ->default(true),
+            TextInput::make('pretest_survey_link')
+                ->label('Link survei pretest (Google Form)')
+                ->url()
+                ->maxLength(2048),
+            TextInput::make('posttest_survey_link')
+                ->label('Link survei posttest (Google Form)')
+                ->url()
+                ->maxLength(2048),
         ]);
     }
 }
