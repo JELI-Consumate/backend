@@ -24,7 +24,7 @@ final class ModuleObserver
         $this->resync($module->journey_id);
     }
 
-    private function resync(int $journeyId): void
+    private function resync(string $journeyId): void
     {
         $total = Module::query()->where('journey_id', $journeyId)->sum('estimated_minutes');
 

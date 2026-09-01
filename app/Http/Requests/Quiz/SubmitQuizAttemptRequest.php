@@ -24,11 +24,11 @@ final class SubmitQuizAttemptRequest extends FormRequest
     {
         return [
             'choice_answers' => ['array'],
-            'choice_answers.*.quiz_question_id' => ['required', 'integer'],
-            'choice_answers.*.quiz_choice_option_id' => ['required', 'integer'],
+            'choice_answers.*.quiz_question_id' => ['required', 'string', 'ulid'],
+            'choice_answers.*.quiz_choice_option_id' => ['required', 'string', 'ulid'],
             'likert_answers' => ['array'],
-            'likert_answers.*.quiz_question_id' => ['required', 'integer'],
-            'likert_answers.*.likert_scale_option_id' => ['required', 'integer'],
+            'likert_answers.*.quiz_question_id' => ['required', 'string', 'ulid'],
+            'likert_answers.*.likert_scale_option_id' => ['required', 'string', 'ulid'],
         ];
     }
 

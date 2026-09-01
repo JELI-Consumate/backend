@@ -20,7 +20,7 @@ final class ReflectionEntryController extends Controller
 {
     public function __construct(private readonly ReflectionService $reflection) {}
 
-    public function show(Request $request, int $id): JsonResponse
+    public function show(Request $request, string $id): JsonResponse
     {
         $content = ReflectionContent::query()->with('sections.questions.checklistItems')->findOrFail($id);
 
@@ -29,7 +29,7 @@ final class ReflectionEntryController extends Controller
         return ApiResponse::success(new ReflectionDetailResource($content));
     }
 
-    public function updateEntries(StoreReflectionEntriesRequest $request, int $id): JsonResponse
+    public function updateEntries(StoreReflectionEntriesRequest $request, string $id): JsonResponse
     {
         $content = ReflectionContent::query()->with('sections.questions.checklistItems')->findOrFail($id);
 

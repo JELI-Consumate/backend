@@ -15,7 +15,7 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'User',
     properties: [
-        new OA\Property(property: 'id', type: 'integer', example: 1),
+        new OA\Property(property: 'id', type: 'string', example: '01hz...'),
         new OA\Property(property: 'name', type: 'string', example: 'Budi Santoso'),
         new OA\Property(property: 'email', type: 'string', format: 'email', example: 'budi@example.com'),
         new OA\Property(property: 'phone', type: 'string', nullable: true, example: '081234567890'),

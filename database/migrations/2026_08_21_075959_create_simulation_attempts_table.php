@@ -11,9 +11,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('simulation_attempts', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('simulation_content_id')->constrained('simulation_contents')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('simulation_content_id')->constrained('simulation_contents')->cascadeOnDelete();
             $table->unsignedSmallInteger('score')->nullable();
             $table->unsignedSmallInteger('max_score')->nullable();
             $table->boolean('is_passed')->nullable();

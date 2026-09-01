@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('simulation_ordering_steps', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('simulation_content_id')->constrained('simulation_contents')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('simulation_content_id')->constrained('simulation_contents')->cascadeOnDelete();
             $table->text('label');
             $table->string('image_url')->nullable();
             $table->smallInteger('correct_position')->unsigned();

@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
 
 namespace App\Http\Requests\DeviceToken;
 
@@ -19,7 +19,7 @@ final class StoreDeviceTokenRequest extends FormRequest
     {
         return [
             'fcm_token' => ['required', 'string'],
-            'platform' => ['required', new Enum(DevicePlatform::class)]
+            'platform' => ['required', new Enum(DevicePlatform::class)],
         ];
     }
 }

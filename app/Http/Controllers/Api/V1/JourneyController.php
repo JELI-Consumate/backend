@@ -26,7 +26,7 @@ final class JourneyController extends Controller
 {
     public function __construct(private readonly JourneyAccessService $journeyAccess) {}
 
-    public function show(Request $request, int $id): JsonResponse
+    public function show(Request $request, string $id): JsonResponse
     {
         $journey = Journey::query()->with('modules.pages')->findOrFail($id);
 

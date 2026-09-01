@@ -19,6 +19,7 @@ use App\Models\QuizQuestion;
 use App\Services\Progress\ProgressService;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 final readonly class QuizScoringService
 {
@@ -47,6 +48,7 @@ final readonly class QuizScoringService
                 $choiceScore += $isCorrect ? 1 : 0;
 
                 $choiceRows[] = [
+                    'id' => (string) Str::ulid(),
                     'quiz_attempt_id' => $attempt->id,
                     'quiz_question_id' => $answer['quiz_question_id'],
                     'quiz_choice_option_id' => $answer['quiz_choice_option_id'],
@@ -60,6 +62,7 @@ final readonly class QuizScoringService
 
             foreach ($data->likertAnswers as $answer) {
                 $likertRows[] = [
+                    'id' => (string) Str::ulid(),
                     'quiz_attempt_id' => $attempt->id,
                     'quiz_question_id' => $answer['quiz_question_id'],
                     'likert_scale_option_id' => $answer['likert_scale_option_id'],

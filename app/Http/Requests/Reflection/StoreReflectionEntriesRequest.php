@@ -23,10 +23,10 @@ final class StoreReflectionEntriesRequest extends FormRequest
     {
         return [
             'entries' => ['array'],
-            'entries.*.reflection_question_id' => ['required', 'integer'],
+            'entries.*.reflection_question_id' => ['required', 'string', 'ulid'],
             'entries.*.answer_text' => ['nullable', 'string'],
             'checklist_answers' => ['array'],
-            'checklist_answers.*.reflection_checklist_item_id' => ['required', 'integer'],
+            'checklist_answers.*.reflection_checklist_item_id' => ['required', 'string', 'ulid'],
             'checklist_answers.*.is_checked' => ['required', 'boolean'],
         ];
     }

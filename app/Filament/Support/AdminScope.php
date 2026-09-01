@@ -38,7 +38,7 @@ final class AdminScope
      * ID sector yang membatasi admin saat ini, atau null kalau tidak
      * dibatasi (super admin, atau belum ada user login).
      */
-    public static function restrictedSectorId(): ?int
+    public static function restrictedSectorId(): ?string
     {
         $user = self::user();
 

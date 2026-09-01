@@ -11,10 +11,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('simulation_matching_answers', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('simulation_attempt_id')->constrained('simulation_attempts')->cascadeOnDelete();
-            $table->foreignId('simulation_matching_pair_id')->constrained('simulation_matching_pairs')->cascadeOnDelete();
-            $table->foreignId('submitted_right_pair_id')->constrained('simulation_matching_pairs')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('simulation_attempt_id')->constrained('simulation_attempts')->cascadeOnDelete();
+            $table->foreignUlid('simulation_matching_pair_id')->constrained('simulation_matching_pairs')->cascadeOnDelete();
+            $table->foreignUlid('submitted_right_pair_id')->constrained('simulation_matching_pairs')->cascadeOnDelete();
             $table->boolean('is_correct');
             $table->timestamps();
 

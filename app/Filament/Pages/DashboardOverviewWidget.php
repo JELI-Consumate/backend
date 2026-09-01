@@ -33,15 +33,15 @@ class DashboardOverviewWidget extends StatsOverviewWidget
         $sectorId = AdminScope::restrictedSectorId();
 
         $sectorCount = Sector::query()
-            ->when($sectorId, fn (Builder $query, int $sectorId) => $query->whereKey($sectorId))
+            ->when($sectorId, fn (Builder $query, string $sectorId) => $query->whereKey($sectorId))
             ->count();
 
         $journeyCount = Journey::withoutGlobalScopes()
-            ->when($sectorId, fn (Builder $query, int $sectorId) => $query->where('sector_id', $sectorId))
+            ->when($sectorId, fn (Builder $query, string $sectorId) => $query->where('sector_id', $sectorId))
             ->count();
 
         $moduleCount = Module::withoutGlobalScopes()
-            ->when($sectorId, fn (Builder $query, int $sectorId) => $query->whereHas(
+            ->when($sectorId, fn (Builder $query, string $sectorId) => $query->whereHas(
                 'journey',
                 fn (Builder $journeyQuery) => $journeyQuery->withoutGlobalScopes()->where('sector_id', $sectorId)
             ))

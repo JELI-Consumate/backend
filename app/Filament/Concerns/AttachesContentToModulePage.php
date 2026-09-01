@@ -27,7 +27,7 @@ trait AttachesContentToModulePage
      * form (wire:submit) adalah request Livewire terpisah yang tidak lagi
      * membawa query string halaman aslinya.
      */
-    public ?int $attachToModuleId = null;
+    public ?string $attachToModuleId = null;
 
     public function mount(): void
     {
@@ -35,7 +35,7 @@ trait AttachesContentToModulePage
 
         $moduleId = request()->query('module_id');
 
-        $this->attachToModuleId = filled($moduleId) ? (int) $moduleId : null;
+        $this->attachToModuleId = filled($moduleId) ? (string) $moduleId : null;
     }
 
     protected function getRedirectUrl(): string
@@ -81,7 +81,7 @@ trait AttachesContentToModulePage
             ->whereKey($this->attachToModuleId)
             ->when(
                 AdminScope::restrictedSectorId(),
-                fn (Builder $query, int $sectorId) => $query->whereHas(
+                fn (Builder $query, string $sectorId) => $query->whereHas(
                     'journey',
                     fn (Builder $journeyQuery) => $journeyQuery->withoutGlobalScopes()->where('sector_id', $sectorId)
                 )

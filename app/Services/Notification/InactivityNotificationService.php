@@ -19,7 +19,7 @@ final readonly class InactivityNotificationService
                     ->orWhereColumn('last_inactive_notified_at', '<', 'last_active_at');
             })
             ->whereHas('deviceTokens')
-            ->chunkById(200, function ($users): void{
+            ->chunkById(200, function ($users): void {
                 foreach ($users as $user) {
                     $this->sendTo($user);
                 }

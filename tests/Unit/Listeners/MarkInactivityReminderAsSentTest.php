@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\InactivityReminderNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\Events\NotificationSent;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Collection;
 use Kreait\Firebase\Exception\Messaging\NotFound;
 use Kreait\Firebase\Messaging\MessageTarget;
@@ -79,7 +80,7 @@ final class MarkInactivityReminderAsSentTest extends TestCase
 
         $event = new NotificationSent(
             $user,
-            new \Illuminate\Notifications\Notification,
+            new Notification,
             'mail',
             null,
         );

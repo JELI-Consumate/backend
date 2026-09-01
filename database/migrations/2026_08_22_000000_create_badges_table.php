@@ -11,12 +11,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('badges', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('journey_id')->unique()->constrained('journeys')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('journey_id')->index()->constrained('journeys')->cascadeOnDelete();
             $table->string('name', 150);
             $table->text('description');
+            $table->text('congratulation_message')->nullable();
+            $table->text('motivational_message')->nullable();
             $table->string('icon_url');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

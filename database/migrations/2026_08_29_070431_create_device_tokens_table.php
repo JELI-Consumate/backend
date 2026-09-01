@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('device_tokens', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('user_id')->constrained()->cascadeOnDelete();
             $table->string('fcm_token')->unique();
             $table->string('platform', 10);
             $table->timestamps();

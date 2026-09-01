@@ -13,7 +13,7 @@ final readonly class DeviceTokenService
     public function registerToken(User $user, string $fcmToken, DevicePlatform $platform): DeviceToken
     {
         return DeviceToken::query()->updateOrCreate(
-            ['fcm_token'=> $fcmToken],
+            ['fcm_token' => $fcmToken],
             ['user_id' => $user->id, 'platform' => $platform]
         );
     }

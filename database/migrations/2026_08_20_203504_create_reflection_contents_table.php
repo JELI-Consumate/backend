@@ -11,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reflection_contents', function (Blueprint $table): void {
-            $table->id();
+            $table->ulid('id')->primary();
             $table->string('title', 200);
             $table->text('opening_message');
             $table->string('closing_title')->nullable();

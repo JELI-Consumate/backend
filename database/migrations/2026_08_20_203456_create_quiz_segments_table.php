@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('quiz_segments', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('quiz_content_id')->constrained('quiz_contents')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('quiz_content_id')->constrained('quiz_contents')->cascadeOnDelete();
             $table->string('segment_type');
             $table->string('title', 200);
             $table->text('instruction')->nullable();

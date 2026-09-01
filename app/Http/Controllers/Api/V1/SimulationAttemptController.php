@@ -20,14 +20,14 @@ final class SimulationAttemptController extends Controller
 {
     public function __construct(private readonly SimulationScoringService $scoring) {}
 
-    public function show(int $id): JsonResponse
+    public function show(string $id): JsonResponse
     {
         $simulation = SimulationContent::query()->with(['matchingPairs', 'orderingSteps'])->findOrFail($id);
 
         return ApiResponse::success(new SimulationContentResource($simulation));
     }
 
-    public function startAttempt(Request $request, int $id): JsonResponse
+    public function startAttempt(Request $request, string $id): JsonResponse
     {
         $simulation = SimulationContent::query()->findOrFail($id);
 
@@ -36,7 +36,7 @@ final class SimulationAttemptController extends Controller
         return ApiResponse::success(['attempt_id' => $attempt->id], status: 201);
     }
 
-    public function checkAnswer(CheckSimulationAnswerRequest $request, int $id): JsonResponse
+    public function checkAnswer(CheckSimulationAnswerRequest $request, string $id): JsonResponse
     {
         $attempt = SimulationAttempt::query()->with(['user', 'simulationContent.modulePage.module.journey'])->findOrFail($id);
 

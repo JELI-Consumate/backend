@@ -21,7 +21,7 @@ final class ModulePageController extends Controller
         private readonly JourneyAccessService $journeyAccess,
     ) {}
 
-    public function show(Request $request, int $id): JsonResponse
+    public function show(Request $request, string $id): JsonResponse
     {
         $page = $this->contentTree->loadPage($id);
 

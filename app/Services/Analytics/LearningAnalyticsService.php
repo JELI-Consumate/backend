@@ -29,11 +29,11 @@ final readonly class LearningAnalyticsService
 {
     public function __construct(private EmpowermentIndexService $empowermentIndex) {}
 
-    public function activeUsersCount(?int $sectorId, int $days = 30): int
+    public function activeUsersCount(?string $sectorId, int $days = 30): int
     {
         return ModuleProgress::query()
             ->where('updated_at', '>=', now()->subDays($days))
-            ->when($sectorId, fn (Builder $query, int $sectorId) => $query->whereHas(
+            ->when($sectorId, fn (Builder $query, string $sectorId) => $query->whereHas(
                 'modulePage',
                 fn (Builder $mq) => $mq->whereHas(
                     'module',
@@ -47,7 +47,7 @@ final readonly class LearningAnalyticsService
             ->count('user_id');
     }
 
-    public function averageQuizScore(?int $sectorId): ?float
+    public function averageQuizScore(?string $sectorId): ?float
     {
         $value = $this->completedQuizAttempts($sectorId)
             ->selectRaw('avg(choice_score * 100.0 / choice_max_score) as avg_pct')
@@ -56,7 +56,7 @@ final readonly class LearningAnalyticsService
         return $value === null ? null : round((float) $value, 1);
     }
 
-    public function quizPassRate(?int $sectorId): ?float
+    public function quizPassRate(?string $sectorId): ?float
     {
         $attempts = $this->completedQuizAttempts($sectorId);
 
@@ -74,11 +74,11 @@ final readonly class LearningAnalyticsService
     /**
      * @return array<int, array{sector: string, title: string, total: int, completed: int, percent: int}>
      */
-    public function journeyCompletion(?int $sectorId): array
+    public function journeyCompletion(?string $sectorId): array
     {
         $journeys = Journey::withoutGlobalScopes()
             ->with('sector')
-            ->when($sectorId, fn (Builder $query, int $sectorId) => $query->where('sector_id', $sectorId))
+            ->when($sectorId, fn (Builder $query, string $sectorId) => $query->where('sector_id', $sectorId))
             ->get()
             ->sortBy([
                 ['sector.order', 'asc'],
@@ -106,17 +106,17 @@ final readonly class LearningAnalyticsService
     /**
      * @return array{'0-25': int, '25-50': int, '50-75': int, '75-100': int}
      */
-    public function empowermentIndexDistribution(?int $sectorId): array
+    public function empowermentIndexDistribution(?string $sectorId): array
     {
         $buckets = ['0-25' => 0, '25-50' => 0, '50-75' => 0, '75-100' => 0];
 
         $userIds = SectorProgress::query()
-            ->when($sectorId, fn (Builder $query, int $sectorId) => $query->where('sector_id', $sectorId))
+            ->when($sectorId, fn (Builder $query, string $sectorId) => $query->where('sector_id', $sectorId))
             ->distinct()
             ->pluck('user_id');
 
         $sectors = Sector::query()->active()
-            ->when($sectorId, fn (Builder $query, int $sectorId) => $query->whereKey($sectorId))
+            ->when($sectorId, fn (Builder $query, string $sectorId) => $query->whereKey($sectorId))
             ->get();
 
         if ($userIds->isEmpty() || $sectors->isEmpty()) {
@@ -143,12 +143,12 @@ final readonly class LearningAnalyticsService
         return $buckets;
     }
 
-    private function completedQuizAttempts(?int $sectorId): Builder
+    private function completedQuizAttempts(?string $sectorId): Builder
     {
         return QuizAttempt::query()
             ->whereNotNull('completed_at')
             ->where('choice_max_score', '>', 0)
-            ->when($sectorId, fn (Builder $query, int $sectorId) => $query->whereHas(
+            ->when($sectorId, fn (Builder $query, string $sectorId) => $query->whereHas(
                 'quizContent',
                 fn (Builder $q) => $q->forSector($sectorId)
             ));

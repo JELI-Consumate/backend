@@ -10,9 +10,9 @@ final readonly class SimulationAnswerCheckData
 {
     public function __construct(
         public SimulationType $type,
-        public ?int $simulationMatchingPairId = null,
-        public ?int $submittedRightPairId = null,
-        public ?int $simulationOrderingStepId = null,
+        public ?string $simulationMatchingPairId = null,
+        public ?string $submittedRightPairId = null,
+        public ?string $simulationOrderingStepId = null,
         public ?int $submittedPosition = null,
     ) {}
 }

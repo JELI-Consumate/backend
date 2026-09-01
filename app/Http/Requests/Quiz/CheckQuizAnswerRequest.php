@@ -24,9 +24,9 @@ final class CheckQuizAnswerRequest extends FormRequest
     {
         return [
             'type' => ['required', 'in:multiple_choice,likert'],
-            'quiz_question_id' => ['required', 'integer'],
-            'quiz_choice_option_id' => ['required_if:type,multiple_choice', 'integer'],
-            'likert_scale_option_id' => ['required_if:type,likert', 'integer'],
+            'quiz_question_id' => ['required', 'string', 'ulid'],
+            'quiz_choice_option_id' => ['required_if:type,multiple_choice', 'string', 'ulid'],
+            'likert_scale_option_id' => ['required_if:type,likert', 'string', 'ulid'],
         ];
     }
 
@@ -88,7 +88,7 @@ final class CheckQuizAnswerRequest extends FormRequest
     {
         return new QuizAnswerCheckData(
             type: QuizSegmentType::from($this->validated('type')),
-            quizQuestionId: (int) $this->validated('quiz_question_id'),
+            quizQuestionId: $this->validated('quiz_question_id'),
             quizChoiceOptionId: $this->validated('quiz_choice_option_id'),
             likertScaleOptionId: $this->validated('likert_scale_option_id'),
         );

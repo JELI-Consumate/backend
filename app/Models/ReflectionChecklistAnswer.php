@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Database\Factories\ReflectionChecklistAnswerFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ReflectionChecklistAnswer extends Model
 {
     /** @use HasFactory<ReflectionChecklistAnswerFactory> */
-    use HasFactory;
+    use HasFactory, HasUlids;
 
     protected function casts(): array
     {

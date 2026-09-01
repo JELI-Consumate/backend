@@ -10,8 +10,8 @@ final readonly class QuizAnswerCheckData
 {
     public function __construct(
         public QuizSegmentType $type,
-        public int $quizQuestionId,
-        public ?int $quizChoiceOptionId = null,
-        public ?int $likertScaleOptionId = null,
+        public string $quizQuestionId,
+        public ?string $quizChoiceOptionId = null,
+        public ?string $likertScaleOptionId = null,
     ) {}
 }

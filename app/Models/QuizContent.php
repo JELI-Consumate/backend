@@ -8,6 +8,7 @@ use App\Enums\QuizKind;
 use Database\Factories\QuizContentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,7 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class QuizContent extends Model
 {
     /** @use HasFactory<QuizContentFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasUlids, SoftDeletes;
 
     protected function casts(): array
     {
@@ -69,7 +70,7 @@ class QuizContent extends Model
      * @param  Builder<QuizContent>  $query
      * @return Builder<QuizContent>
      */
-    public function scopeForSector(Builder $query, int $sectorId): Builder
+    public function scopeForSector(Builder $query, string $sectorId): Builder
     {
         return $query->where(function (Builder $q) use ($sectorId): void {
             $q->where('sector_id', $sectorId)

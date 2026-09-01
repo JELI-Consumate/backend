@@ -22,8 +22,8 @@ final class BadgeApiDocs
                 description: 'OK',
                 content: new OA\JsonContent(properties: [
                     new OA\Property(property: 'data', type: 'array', items: new OA\Items(properties: [
-                        new OA\Property(property: 'id', type: 'integer'),
-                        new OA\Property(property: 'journey_id', type: 'integer'),
+                        new OA\Property(property: 'id', type: 'string'),
+                        new OA\Property(property: 'journey_id', type: 'string'),
                         new OA\Property(property: 'name', type: 'string'),
                         new OA\Property(property: 'description', type: 'string'),
                         new OA\Property(property: 'congratulation_message', type: 'string', nullable: true),

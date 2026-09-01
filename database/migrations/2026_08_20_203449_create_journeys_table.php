@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('journeys', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('sector_id')->constrained('sectors')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('sector_id')->constrained('sectors')->cascadeOnDelete();
             $table->string('slug', 100);
             $table->string('title', 200);
             $table->text('description')->nullable();

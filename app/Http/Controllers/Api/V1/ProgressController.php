@@ -36,7 +36,7 @@ final class ProgressController extends Controller
         return ApiResponse::success($this->resolver->resolveNext($request->user()));
     }
 
-    public function complete(Request $request, int $id): JsonResponse
+    public function complete(Request $request, string $id): JsonResponse
     {
         $page = ModulePage::query()->with('module.journey')->findOrFail($id);
 
@@ -49,7 +49,7 @@ final class ProgressController extends Controller
         return ApiResponse::success(new ModuleProgressResource($progress));
     }
 
-    public function position(UpdatePositionRequest $request, int $id): JsonResponse
+    public function position(UpdatePositionRequest $request, string $id): JsonResponse
     {
         $page = ModulePage::query()->with('module.journey')->findOrFail($id);
 
@@ -74,7 +74,7 @@ final class ProgressController extends Controller
         return ApiResponse::success(new SectorProgressResource($sector));
     }
 
-    public function journeyProgress(Request $request, int $id): JsonResponse
+    public function journeyProgress(Request $request, string $id): JsonResponse
     {
         $journey = Journey::query()->findOrFail($id);
 

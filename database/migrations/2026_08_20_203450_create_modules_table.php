@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('modules', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('journey_id')->constrained('journeys')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('journey_id')->constrained('journeys')->cascadeOnDelete();
             $table->string('type');
             $table->string('title', 200);
             $table->text('description')->nullable();
