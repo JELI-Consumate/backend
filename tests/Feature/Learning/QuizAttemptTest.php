@@ -73,12 +73,12 @@ final class QuizAttemptTest extends TestCase
         return [$quiz->fresh(), [$question->fresh()]];
     }
 
-    private function correctOptionIdFor(QuizQuestion $question): int
+    private function correctOptionIdFor(QuizQuestion $question): string
     {
         return QuizChoiceOption::query()->where('quiz_question_id', $question->id)->where('is_correct', true)->value('id');
     }
 
-    private function wrongOptionIdFor(QuizQuestion $question): int
+    private function wrongOptionIdFor(QuizQuestion $question): string
     {
         return QuizChoiceOption::query()->where('quiz_question_id', $question->id)->where('is_correct', false)->value('id');
     }

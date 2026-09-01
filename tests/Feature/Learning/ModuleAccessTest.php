@@ -27,7 +27,7 @@ final class ModuleAccessTest extends TestCase
     /**
      * @return array{0: Module, 1: ModulePage}
      */
-    private function createModuleWithPage(int $journeyId, int $order): array
+    private function createModuleWithPage(string $journeyId, int $order): array
     {
         $module = Module::factory()->create(['journey_id' => $journeyId, 'order' => $order]);
         $video = VideoContent::factory()->create();

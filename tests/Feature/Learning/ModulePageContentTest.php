@@ -11,6 +11,7 @@ use App\Models\Sector;
 use App\Models\User;
 use App\Models\VideoContent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 final class ModulePageContentTest extends TestCase
@@ -43,7 +44,7 @@ final class ModulePageContentTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->getJson('/api/v1/module-pages/999999')->assertNotFound();
+        $this->actingAs($user)->getJson('/api/v1/module-pages/'.Str::ulid())->assertNotFound();
     }
 
     public function test_module_page_show_returns_403_when_journey_locked(): void
