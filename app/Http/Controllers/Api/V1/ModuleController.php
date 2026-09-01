@@ -25,7 +25,7 @@ final class ModuleController extends Controller
         private readonly ModuleAccessService $moduleAccess,
     ) {}
 
-    public function show(Request $request, int $id): JsonResponse
+    public function show(Request $request, string $id): JsonResponse
     {
         $module = $this->contentTree->loadModuleTree($id);
 

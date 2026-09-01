@@ -89,7 +89,7 @@ final readonly class SimulationScoringService
         });
     }
 
-    private function correctPosition(?int $stepId): ?int
+    private function correctPosition(?string $stepId): ?int
     {
         if ($stepId === null) {
             return null;

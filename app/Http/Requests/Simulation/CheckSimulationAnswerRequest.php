@@ -24,9 +24,9 @@ final class CheckSimulationAnswerRequest extends FormRequest
     {
         return [
             'type' => ['required', 'in:matching,ordering'],
-            'simulation_matching_pair_id' => ['required_if:type,matching', 'integer'],
-            'submitted_right_pair_id' => ['required_if:type,matching', 'integer'],
-            'simulation_ordering_step_id' => ['required_if:type,ordering', 'integer'],
+            'simulation_matching_pair_id' => ['required_if:type,matching', 'string', 'ulid'],
+            'submitted_right_pair_id' => ['required_if:type,matching', 'string', 'ulid'],
+            'simulation_ordering_step_id' => ['required_if:type,ordering', 'string', 'ulid'],
             'submitted_position' => ['required_if:type,ordering', 'integer', 'min:1'],
         ];
     }

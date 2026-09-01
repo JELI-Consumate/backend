@@ -17,7 +17,7 @@ final class ReflectionEntryApiDocs
         summary: 'Struktur pertanyaan refleksi + jawaban user sebelumnya (jurnal)',
         tags: ['Refleksi'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),
@@ -33,7 +33,7 @@ final class ReflectionEntryApiDocs
         description: 'Idempotent by unique index. Module refleksi selesai begitu semua open_question terisi — checklist tidak menghalangi completion (tidak ada benar/salah, murni penanda personal).',
         tags: ['Refleksi'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         requestBody: new OA\RequestBody(
             required: true,
@@ -43,7 +43,7 @@ final class ReflectionEntryApiDocs
                     type: 'array',
                     description: 'Jawaban question_type=open_question',
                     items: new OA\Items(properties: [
-                        new OA\Property(property: 'reflection_question_id', type: 'integer'),
+                        new OA\Property(property: 'reflection_question_id', type: 'string'),
                         new OA\Property(property: 'answer_text', type: 'string', nullable: true),
                     ], type: 'object')
                 ),
@@ -52,7 +52,7 @@ final class ReflectionEntryApiDocs
                     type: 'array',
                     description: 'Status centang item question_type=checklist (multi-item, tidak ada benar/salah)',
                     items: new OA\Items(properties: [
-                        new OA\Property(property: 'reflection_checklist_item_id', type: 'integer'),
+                        new OA\Property(property: 'reflection_checklist_item_id', type: 'string'),
                         new OA\Property(property: 'is_checked', type: 'boolean'),
                     ], type: 'object')
                 ),

@@ -17,7 +17,7 @@ final class ModulePageApiDocs
         summary: 'Lazy-load 1 halaman module (konten penuh, tidak di-cache)',
         tags: ['Katalog Pembelajaran'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),

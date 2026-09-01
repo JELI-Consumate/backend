@@ -17,7 +17,7 @@ final class ProgressApiDocs
         summary: 'Tandai halaman selesai (BR-11: idempotent)',
         tags: ['Progres'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),
@@ -34,7 +34,7 @@ final class ProgressApiDocs
         description: 'Menaikkan status not_started→in_progress, tidak pernah menurunkan dari completed.',
         tags: ['Progres'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         requestBody: new OA\RequestBody(
             required: true,
@@ -72,7 +72,7 @@ final class ProgressApiDocs
         summary: 'Progres user pada satu journey',
         tags: ['Progres'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),

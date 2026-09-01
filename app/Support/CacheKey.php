@@ -6,12 +6,12 @@ namespace App\Support;
 
 final class CacheKey
 {
-    public static function moduleTree(int $moduleId, string $updatedAt): string
+    public static function moduleTree(string $moduleId, string $updatedAt): string
     {
         return "content:module:{$moduleId}:v{$updatedAt}";
     }
 
-    public static function empowermentIndex(int $userId, int $sectorId): string
+    public static function empowermentIndex(string $userId, string $sectorId): string
     {
         return "empowerment-index:user:{$userId}:sector:{$sectorId}";
     }

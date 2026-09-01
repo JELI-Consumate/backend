@@ -24,7 +24,7 @@ final class EmpowermentIndexApiDocs
                 content: new OA\JsonContent(properties: [
                     new OA\Property(property: 'data', properties: [
                         new OA\Property(property: 'sectors', type: 'array', items: new OA\Items(properties: [
-                            new OA\Property(property: 'sector_id', type: 'integer'),
+                            new OA\Property(property: 'sector_id', type: 'string'),
                             new OA\Property(property: 'sector_slug', type: 'string'),
                             new OA\Property(property: 'sector_name', type: 'string'),
                             new OA\Property(property: 'empowerment_index', type: 'integer', minimum: 0, maximum: 100),

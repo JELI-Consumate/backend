@@ -27,7 +27,7 @@ final class QuizAttemptController extends Controller
         private readonly QuizScoringService $scoring,
     ) {}
 
-    public function showQuiz(int $id): JsonResponse
+    public function showQuiz(string $id): JsonResponse
     {
         $quiz = QuizContent::query()
             ->with(['segments.questions.choiceOptions', 'segments.likertScaleOptions'])
@@ -36,7 +36,7 @@ final class QuizAttemptController extends Controller
         return ApiResponse::success(new QuizContentResource($quiz));
     }
 
-    public function startAttempt(Request $request, int $id): JsonResponse
+    public function startAttempt(Request $request, string $id): JsonResponse
     {
         $quiz = QuizContent::query()->findOrFail($id);
 
@@ -45,7 +45,7 @@ final class QuizAttemptController extends Controller
         return ApiResponse::success(['attempt_id' => $attempt->id], status: 201);
     }
 
-    public function submit(SubmitQuizAttemptRequest $request, int $id): JsonResponse
+    public function submit(SubmitQuizAttemptRequest $request, string $id): JsonResponse
     {
         $attempt = QuizAttempt::query()->with(['user', 'quizContent.modulePage.module.journey'])->findOrFail($id);
 
@@ -57,7 +57,7 @@ final class QuizAttemptController extends Controller
         return ApiResponse::success(new QuizAttemptResource($attempt));
     }
 
-    public function checkAnswer(CheckQuizAnswerRequest $request, int $id): JsonResponse
+    public function checkAnswer(CheckQuizAnswerRequest $request, string $id): JsonResponse
     {
         $attempt = QuizAttempt::query()->with(['user', 'quizContent.modulePage.module.journey'])->findOrFail($id);
 
@@ -74,7 +74,7 @@ final class QuizAttemptController extends Controller
         ]);
     }
 
-    public function showAttempt(int $id): JsonResponse
+    public function showAttempt(string $id): JsonResponse
     {
         $attempt = QuizAttempt::query()->with(['choiceAnswers.quizQuestion.choiceOptions'])->findOrFail($id);
 

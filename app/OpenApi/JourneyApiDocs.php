@@ -17,7 +17,7 @@ final class JourneyApiDocs
         summary: 'Detail journey + daftar module (BR-01: 403 kalau terkunci)',
         tags: ['Katalog Pembelajaran'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),

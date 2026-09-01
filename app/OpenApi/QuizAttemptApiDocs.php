@@ -17,7 +17,7 @@ final class QuizAttemptApiDocs
         summary: 'Soal kuis journey (mode "soal", tidak ada is_correct)',
         tags: ['Kuis'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),
@@ -33,14 +33,14 @@ final class QuizAttemptApiDocs
         description: 'BR-01: journey harus unlocked. BR-05: pretest sekali, posttest butuh seluruh journey wajib selesai.',
         tags: ['Kuis'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'), description: 'quiz_content id'),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string'), description: 'quiz_content id'),
         ],
         responses: [
             new OA\Response(
                 response: 201,
                 description: 'Attempt dibuat',
                 content: new OA\JsonContent(properties: [
-                    new OA\Property(property: 'data', properties: [new OA\Property(property: 'attempt_id', type: 'integer')], type: 'object'),
+                    new OA\Property(property: 'data', properties: [new OA\Property(property: 'attempt_id', type: 'string')], type: 'object'),
                 ])
             ),
             new OA\Response(response: 401, description: 'Belum login'),
@@ -54,7 +54,7 @@ final class QuizAttemptApiDocs
         summary: 'Submit jawaban kuis (BR-08: attempt immutable setelah selesai)',
         tags: ['Kuis'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'), description: 'quiz_attempt id'),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string'), description: 'quiz_attempt id'),
         ],
         requestBody: new OA\RequestBody(
             required: true,
@@ -63,16 +63,16 @@ final class QuizAttemptApiDocs
                     property: 'choice_answers',
                     type: 'array',
                     items: new OA\Items(properties: [
-                        new OA\Property(property: 'quiz_question_id', type: 'integer'),
-                        new OA\Property(property: 'quiz_choice_option_id', type: 'integer'),
+                        new OA\Property(property: 'quiz_question_id', type: 'string'),
+                        new OA\Property(property: 'quiz_choice_option_id', type: 'string'),
                     ], type: 'object')
                 ),
                 new OA\Property(
                     property: 'likert_answers',
                     type: 'array',
                     items: new OA\Items(properties: [
-                        new OA\Property(property: 'quiz_question_id', type: 'integer'),
-                        new OA\Property(property: 'likert_scale_option_id', type: 'integer'),
+                        new OA\Property(property: 'quiz_question_id', type: 'string'),
+                        new OA\Property(property: 'likert_scale_option_id', type: 'string'),
                     ], type: 'object')
                 ),
             ])
@@ -93,7 +93,7 @@ final class QuizAttemptApiDocs
         description: 'BR-08: attempt immutable setelah completed. Jawaban SALAH tetap disimpan permanen (soal langsung terkunci untuk attempt ini, tidak seperti simulasi yang boleh dicoba lagi). Attempt otomatis completed begitu seluruh pertanyaan pernah dicek.',
         tags: ['Kuis'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'), description: 'quiz_attempt id'),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string'), description: 'quiz_attempt id'),
         ],
         requestBody: new OA\RequestBody(
             required: true,
@@ -101,9 +101,9 @@ final class QuizAttemptApiDocs
                 required: ['type', 'quiz_question_id'],
                 properties: [
                     new OA\Property(property: 'type', type: 'string', enum: ['multiple_choice', 'likert']),
-                    new OA\Property(property: 'quiz_question_id', type: 'integer'),
-                    new OA\Property(property: 'quiz_choice_option_id', type: 'integer', description: 'wajib kalau type=multiple_choice'),
-                    new OA\Property(property: 'likert_scale_option_id', type: 'integer', description: 'wajib kalau type=likert'),
+                    new OA\Property(property: 'quiz_question_id', type: 'string'),
+                    new OA\Property(property: 'quiz_choice_option_id', type: 'string', description: 'wajib kalau type=multiple_choice'),
+                    new OA\Property(property: 'likert_scale_option_id', type: 'string', description: 'wajib kalau type=likert'),
                 ]
             )
         ),
@@ -123,7 +123,7 @@ final class QuizAttemptApiDocs
         description: 'is_correct/explanation hanya muncul kalau completed_at != null. Hanya pemilik attempt yang bisa akses.',
         tags: ['Kuis'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),

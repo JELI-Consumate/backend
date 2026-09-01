@@ -25,7 +25,7 @@ final readonly class ContentTreeService
      * & ModulePageObserver), jadi 1 query murah selalu dijalankan untuk cek versi
      * sebelum menyentuh cache.
      */
-    public function loadModuleTree(int $moduleId): Module
+    public function loadModuleTree(string $moduleId): Module
     {
         $module = Module::query()->with('journey')->findOrFail($moduleId);
 
@@ -45,7 +45,7 @@ final readonly class ContentTreeService
      * Muat satu module_page + konten polimorfik ter-resolve, untuk lazy load per halaman.
      * Tidak di-cache (spesifikasi cache hanya untuk module tree penuh).
      */
-    public function loadPage(int $modulePageId): ModulePage
+    public function loadPage(string $modulePageId): ModulePage
     {
         return ModulePage::query()
             ->with([

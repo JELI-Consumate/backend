@@ -17,7 +17,7 @@ final class SimulationAttemptApiDocs
         summary: 'Skenario + item simulasi (correct_position disembunyikan)',
         tags: ['Simulasi'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),
@@ -32,14 +32,14 @@ final class SimulationAttemptApiDocs
         summary: 'Mulai attempt simulasi baru (BR-01: journey harus unlocked)',
         tags: ['Simulasi'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'), description: 'simulation_content id'),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string'), description: 'simulation_content id'),
         ],
         responses: [
             new OA\Response(
                 response: 201,
                 description: 'Attempt dibuat',
                 content: new OA\JsonContent(properties: [
-                    new OA\Property(property: 'data', properties: [new OA\Property(property: 'attempt_id', type: 'integer')], type: 'object'),
+                    new OA\Property(property: 'data', properties: [new OA\Property(property: 'attempt_id', type: 'string')], type: 'object'),
                 ])
             ),
             new OA\Response(response: 401, description: 'Belum login'),
@@ -54,7 +54,7 @@ final class SimulationAttemptApiDocs
         description: 'BR-08: attempt immutable setelah completed. Jawaban salah dibalas `correct=false` tanpa mengubah attempt — client boleh retry item yang sama. Attempt otomatis completed begitu seluruh item simulasi ini pernah dijawab benar.',
         tags: ['Simulasi'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'), description: 'simulation_attempt id'),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string'), description: 'simulation_attempt id'),
         ],
         requestBody: new OA\RequestBody(
             required: true,
@@ -62,9 +62,9 @@ final class SimulationAttemptApiDocs
                 required: ['type'],
                 properties: [
                     new OA\Property(property: 'type', type: 'string', enum: ['matching', 'ordering']),
-                    new OA\Property(property: 'simulation_matching_pair_id', type: 'integer', description: 'wajib kalau type=matching'),
-                    new OA\Property(property: 'submitted_right_pair_id', type: 'integer', description: 'wajib kalau type=matching'),
-                    new OA\Property(property: 'simulation_ordering_step_id', type: 'integer', description: 'wajib kalau type=ordering'),
+                    new OA\Property(property: 'simulation_matching_pair_id', type: 'string', description: 'wajib kalau type=matching'),
+                    new OA\Property(property: 'submitted_right_pair_id', type: 'string', description: 'wajib kalau type=matching'),
+                    new OA\Property(property: 'simulation_ordering_step_id', type: 'string', description: 'wajib kalau type=ordering'),
                     new OA\Property(property: 'submitted_position', type: 'integer', minimum: 1, description: 'wajib kalau type=ordering'),
                 ]
             )

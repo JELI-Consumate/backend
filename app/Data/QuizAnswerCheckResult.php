@@ -15,7 +15,7 @@ final readonly class QuizAnswerCheckResult
      */
     public function __construct(
         public ?bool $correct,
-        public ?int $correctOptionId,
+        public ?string $correctOptionId,
         public ?string $explanation,
         public QuizAttempt $attempt,
     ) {}
