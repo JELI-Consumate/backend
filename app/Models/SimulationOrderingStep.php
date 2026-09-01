@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Database\Factories\SimulationOrderingStepFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class SimulationOrderingStep extends Model
 {
     /** @use HasFactory<SimulationOrderingStepFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasUlids, SoftDeletes;
 
     /**
      * @return BelongsTo<SimulationContent, $this>

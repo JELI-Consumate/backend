@@ -7,6 +7,7 @@ namespace App\Models;
 use Database\Factories\VideoContentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class VideoContent extends Model
 {
     /** @use HasFactory<VideoContentFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasUlids, SoftDeletes;
 
     /**
      * @return MorphOne<ModulePage, $this>
