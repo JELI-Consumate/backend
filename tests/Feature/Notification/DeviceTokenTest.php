@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Notification;
 
 use App\Enums\DevicePlatform;
+use App\Models\DeviceToken;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -44,7 +45,7 @@ final class DeviceTokenTest extends TestCase
             'platform' => DevicePlatform::Android->value,
         ])->assertStatus(201);
 
-        $this->assertSame(1, \App\Models\DeviceToken::query()->where('fcm_token', 'token-abc')->count());
+        $this->assertSame(1, DeviceToken::query()->where('fcm_token', 'token-abc')->count());
     }
 
     public function test_rejects_request_without_fcm_token(): void

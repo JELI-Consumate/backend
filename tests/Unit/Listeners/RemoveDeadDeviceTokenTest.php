@@ -75,7 +75,8 @@ final class RemoveDeadDeviceTokenTest extends TestCase
         ]);
 
         $target = MessageTarget::with(MessageTarget::TOKEN, 'still-alive-token');
-        $report = SendReport::failure($target, new class('server unavailable') extends \Exception implements MessagingException {
+        $report = SendReport::failure($target, new class('server unavailable') extends \Exception implements MessagingException
+        {
             public function errors(): array
             {
                 return [];
