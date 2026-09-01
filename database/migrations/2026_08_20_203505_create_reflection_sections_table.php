@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reflection_sections', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('reflection_content_id')->constrained('reflection_contents')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('reflection_content_id')->constrained('reflection_contents')->cascadeOnDelete();
             $table->string('title', 200);
             $table->text('instruction')->nullable();
             $table->smallInteger('order')->unsigned();

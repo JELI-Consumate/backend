@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('quiz_choice_options', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('quiz_question_id')->constrained('quiz_questions')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('quiz_question_id')->constrained('quiz_questions')->cascadeOnDelete();
             $table->text('option_text');
             $table->boolean('is_correct')->default(false);
             $table->smallInteger('order')->unsigned();

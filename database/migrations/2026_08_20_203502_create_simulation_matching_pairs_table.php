@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('simulation_matching_pairs', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('simulation_content_id')->constrained('simulation_contents')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('simulation_content_id')->constrained('simulation_contents')->cascadeOnDelete();
             $table->text('left_label');
             $table->text('left_description')->nullable();
             $table->string('left_image_url')->nullable();

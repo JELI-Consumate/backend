@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('likert_scale_options', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('quiz_segment_id')->constrained('quiz_segments')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('quiz_segment_id')->constrained('quiz_segments')->cascadeOnDelete();
             $table->tinyInteger('value')->unsigned();
             $table->string('label', 100);
             $table->smallInteger('order')->unsigned();

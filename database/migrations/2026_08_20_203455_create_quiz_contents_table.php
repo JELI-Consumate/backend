@@ -11,10 +11,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('quiz_contents', function (Blueprint $table): void {
-            $table->id();
+            $table->ulid('id')->primary();
             $table->string('kind');
-            $table->foreignId('journey_id')->nullable()->constrained('journeys')->cascadeOnDelete();
-            $table->foreignId('sector_id')->nullable()->constrained('sectors')->cascadeOnDelete();
+            $table->foreignUlid('journey_id')->nullable()->constrained('journeys')->cascadeOnDelete();
+            $table->foreignUlid('sector_id')->nullable()->constrained('sectors')->cascadeOnDelete();
             $table->tinyInteger('passing_score')->unsigned()->default(70);
             $table->boolean('shuffle_questions')->default(false);
             $table->timestamps();

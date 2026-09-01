@@ -11,10 +11,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('quiz_likert_answers', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('quiz_attempt_id')->constrained('quiz_attempts')->cascadeOnDelete();
-            $table->foreignId('quiz_question_id')->constrained('quiz_questions')->cascadeOnDelete();
-            $table->foreignId('likert_scale_option_id')->constrained('likert_scale_options')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('quiz_attempt_id')->constrained('quiz_attempts')->cascadeOnDelete();
+            $table->foreignUlid('quiz_question_id')->constrained('quiz_questions')->cascadeOnDelete();
+            $table->foreignUlid('likert_scale_option_id')->constrained('likert_scale_options')->cascadeOnDelete();
             $table->timestamps();
 
             $table->unique(['quiz_attempt_id', 'quiz_question_id']);

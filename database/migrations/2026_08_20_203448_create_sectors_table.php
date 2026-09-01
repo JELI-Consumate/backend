@@ -11,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sectors', function (Blueprint $table): void {
-            $table->id();
+            $table->ulid('id')->primary();
             $table->string('slug', 100)->unique();
             $table->string('name', 150);
             $table->text('description')->nullable();

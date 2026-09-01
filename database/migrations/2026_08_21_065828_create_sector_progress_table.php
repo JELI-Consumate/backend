@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sector_progress', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('sector_id')->constrained('sectors')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('sector_id')->constrained('sectors')->cascadeOnDelete();
             $table->string('status', 20)->default(ProgressStatus::NotStarted->value);
             $table->unsignedTinyInteger('progress_percent')->default(0);
             $table->timestamp('completed_at')->nullable();

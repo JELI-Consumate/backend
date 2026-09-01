@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reflection_questions', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('reflection_section_id')->constrained('reflection_sections')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('reflection_section_id')->constrained('reflection_sections')->cascadeOnDelete();
             $table->string('question_type');
             $table->text('question_text');
             $table->smallInteger('order')->unsigned();

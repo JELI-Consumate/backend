@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('article_blocks', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('article_content_id')->constrained('article_contents')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('article_content_id')->constrained('article_contents')->cascadeOnDelete();
             $table->string('block_type');
             $table->text('text_article')->nullable();
             $table->string('image_url')->nullable();

@@ -11,9 +11,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reflection_checklist_answers', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('reflection_checklist_item_id');
+            $table->ulid('id')->primary();
+            $table->foreignUlid('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('reflection_checklist_item_id');
             $table->boolean('is_checked')->default(false);
             $table->timestamps();
 

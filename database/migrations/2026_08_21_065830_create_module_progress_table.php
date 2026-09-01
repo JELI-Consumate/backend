@@ -16,9 +16,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('module_progress', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('module_page_id')->constrained('module_pages')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('module_page_id')->constrained('module_pages')->cascadeOnDelete();
             $table->string('status', 20)->default(ProgressStatus::NotStarted->value);
             $table->unsignedSmallInteger('last_position')->default(0);
             $table->timestamp('completed_at')->nullable();
