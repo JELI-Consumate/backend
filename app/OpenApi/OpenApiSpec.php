@@ -17,6 +17,7 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'Katalog Pembelajaran', description: 'Sektor, journey, module, module page')]
 #[OA\Tag(name: 'Progres', description: 'Tandai halaman selesai, posisi terakhir, ringkasan progres')]
 #[OA\Tag(name: 'Kuis', description: 'Pretest/posttest/kuis journey, attempt, submit jawaban')]
+#[OA\Tag(name: 'Survei Sektor', description: 'Link survei pretest/posttest eksternal (Google Form) per sektor dan tracking self-report selesainya')]
 #[OA\Tag(name: 'Simulasi', description: 'Skenario matching/ordering, attempt, submit jawaban')]
 #[OA\Tag(name: 'Refleksi', description: 'Jurnal refleksi open-ended/checklist')]
 #[OA\Tag(name: 'Gamifikasi', description: 'Badge per journey dan Indeks Keberdayaan per sektor')]
