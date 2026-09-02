@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['sector_id', 'slug', 'title', 'description', 'order', 'status', 'published_at'])]
+#[Fillable(['sector_id', 'slug', 'title', 'description', 'image_url', 'order', 'status', 'published_at'])]
 class Journey extends Model
 {
     /** @use HasFactory<JourneyFactory> */

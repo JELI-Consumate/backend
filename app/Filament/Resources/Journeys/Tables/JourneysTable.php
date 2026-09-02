@@ -11,6 +11,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -23,6 +24,10 @@ class JourneysTable
     {
         return $table
             ->columns([
+                ImageColumn::make('image_url')
+                    ->label('Foto')
+                    ->disk(config('filament.default_filesystem_disk'))
+                    ->height(40),
                 TextColumn::make('sector.name')->label('Sector')->sortable(),
                 TextColumn::make('order')->sortable(),
                 TextColumn::make('title')->searchable(),

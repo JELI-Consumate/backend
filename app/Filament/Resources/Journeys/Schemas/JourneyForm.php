@@ -7,6 +7,7 @@ namespace App\Filament\Resources\Journeys\Schemas;
 use App\Enums\PublishStatus;
 use App\Filament\Support\AdminScope;
 use App\Models\Sector;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -39,6 +40,13 @@ class JourneyForm
                 ->required()
                 ->maxLength(100),
             Textarea::make('description'),
+            FileUpload::make('image_url')
+                ->label('Foto depan journey')
+                ->image()
+                ->imageEditor()
+                ->maxSize(5120)
+                ->directory('journeys/covers')
+                ->helperText('Tampil sebagai sampul kartu journey di aplikasi. Rasio ~4:3.'),
             TextInput::make('order')
                 ->numeric()
                 ->required()

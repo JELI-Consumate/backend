@@ -7,6 +7,7 @@ namespace App\Http\Resources\V1;
 use App\Enums\ProgressStatus;
 use App\Models\Journey;
 use App\Models\JourneyProgress;
+use App\Support\MediaUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -30,6 +31,7 @@ class JourneyResource extends JsonResource
             'slug' => $this->slug,
             'title' => $this->title,
             'description' => $this->description,
+            'image_url' => MediaUrl::resolve($this->image_url),
             'order' => $this->order,
             'estimated_minutes' => $this->estimated_minutes,
             'is_unlocked' => (bool) $this->is_unlocked,
