@@ -14,13 +14,14 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class QuizContentForm
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(2)->components([
             Select::make('kind')
                 ->options(collect(QuizKind::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value]))
                 ->live()
@@ -54,52 +55,61 @@ class QuizContentForm
                 ->default(70),
             Toggle::make('shuffle_questions')
                 ->default(false),
-            Repeater::make('segments')
-                ->relationship()
-                ->orderColumn('order')
-                ->reorderable()
-                ->collapsible()
-                ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
-                ->components([
-                    Select::make('segment_type')
-                        ->options(collect(QuizSegmentType::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value]))
-                        ->live()
-                        ->required(),
-                    TextInput::make('title')
-                        ->required()
-                        ->maxLength(200),
-                    Textarea::make('instruction'),
-                    Repeater::make('questions')
+            Section::make('Segments')
+                ->columnSpanFull()
+                ->schema([
+                    Repeater::make('segments')
+                        ->hiddenLabel()
                         ->relationship()
                         ->orderColumn('order')
                         ->reorderable()
                         ->collapsible()
-                        ->itemLabel(fn (array $state): ?string => $state['question'] ?? null)
-                        ->visible(fn ($get) => $get('segment_type') === QuizSegmentType::MultipleChoice->value)
+                        ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
+                        ->columns(2)
                         ->components([
-                            Textarea::make('question')->required(),
-                            Textarea::make('explanation'),
-                            Repeater::make('choiceOptions')
+                            Select::make('segment_type')
+                                ->options(collect(QuizSegmentType::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value]))
+                                ->live()
+                                ->required(),
+                            TextInput::make('title')
+                                ->required()
+                                ->maxLength(200),
+                            Textarea::make('instruction')
+                                ->columnSpanFull(),
+                            Repeater::make('questions')
                                 ->relationship()
                                 ->orderColumn('order')
                                 ->reorderable()
                                 ->collapsible()
-                                ->itemLabel(fn (array $state): ?string => $state['option_text'] ?? null)
+                                ->itemLabel(fn (array $state): ?string => $state['question'] ?? null)
+                                ->visible(fn ($get) => $get('segment_type') === QuizSegmentType::MultipleChoice->value)
+                                ->columnSpanFull()
                                 ->components([
-                                    TextInput::make('option_text')->required(),
-                                    Toggle::make('is_correct'),
+                                    Textarea::make('question')->required(),
+                                    Textarea::make('explanation'),
+                                    Repeater::make('choiceOptions')
+                                        ->relationship()
+                                        ->orderColumn('order')
+                                        ->reorderable()
+                                        ->collapsible()
+                                        ->itemLabel(fn (array $state): ?string => $state['option_text'] ?? null)
+                                        ->components([
+                                            TextInput::make('option_text')->required(),
+                                            Toggle::make('is_correct'),
+                                        ]),
                                 ]),
-                        ]),
-                    Repeater::make('likertScaleOptions')
-                        ->relationship()
-                        ->orderColumn('order')
-                        ->reorderable()
-                        ->collapsible()
-                        ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
-                        ->visible(fn ($get) => $get('segment_type') === QuizSegmentType::Likert->value)
-                        ->components([
-                            TextInput::make('value')->numeric()->required(),
-                            TextInput::make('label')->required(),
+                            Repeater::make('likertScaleOptions')
+                                ->relationship()
+                                ->orderColumn('order')
+                                ->reorderable()
+                                ->collapsible()
+                                ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
+                                ->visible(fn ($get) => $get('segment_type') === QuizSegmentType::Likert->value)
+                                ->columnSpanFull()
+                                ->components([
+                                    TextInput::make('value')->numeric()->required(),
+                                    TextInput::make('label')->required(),
+                                ]),
                         ]),
                 ]),
         ]);

@@ -10,13 +10,14 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class SimulationContentForm
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(2)->components([
             TextInput::make('title')
                 ->required()
                 ->maxLength(200),
@@ -25,33 +26,46 @@ class SimulationContentForm
                 ->live()
                 ->required(),
             Textarea::make('scenario')
-                ->required(),
-            Repeater::make('matchingPairs')
-                ->relationship()
-                ->orderColumn('order')
-                ->reorderable()
-                ->collapsible()
-                ->itemLabel(fn (array $state): ?string => $state['left_label'] ?? null)
+                ->required()
+                ->columnSpanFull(),
+            Section::make('Matching Pairs')
+                ->columnSpanFull()
                 ->visible(fn ($get) => $get('simulation_type') === SimulationType::Matching->value)
-                ->components([
-                    Textarea::make('left_label')->required(),
-                    Textarea::make('left_description'),
-                    FileUpload::make('left_image_url')->image()->maxSize(5120)->directory('simulations/matching'),
-                    Textarea::make('right_label')->required(),
-                    Textarea::make('right_description'),
-                    FileUpload::make('right_image_url')->image()->maxSize(5120)->directory('simulations/matching'),
+                ->schema([
+                    Repeater::make('matchingPairs')
+                        ->hiddenLabel()
+                        ->relationship()
+                        ->orderColumn('order')
+                        ->reorderable()
+                        ->collapsible()
+                        ->itemLabel(fn (array $state): ?string => $state['left_label'] ?? null)
+                        ->columns(2)
+                        ->components([
+                            Textarea::make('left_label')->required(),
+                            Textarea::make('right_label')->required(),
+                            Textarea::make('left_description'),
+                            Textarea::make('right_description'),
+                            FileUpload::make('left_image_url')->image()->maxSize(5120)->directory('simulations/matching'),
+                            FileUpload::make('right_image_url')->image()->maxSize(5120)->directory('simulations/matching'),
+                        ]),
                 ]),
-            Repeater::make('orderingSteps')
-                ->relationship()
-                ->orderColumn('order')
-                ->reorderable()
-                ->collapsible()
-                ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
+            Section::make('Ordering Steps')
+                ->columnSpanFull()
                 ->visible(fn ($get) => $get('simulation_type') === SimulationType::Ordering->value)
-                ->components([
-                    Textarea::make('label')->required(),
-                    FileUpload::make('image_url')->image()->maxSize(5120)->directory('simulations/ordering'),
-                    TextInput::make('correct_position')->numeric()->required(),
+                ->schema([
+                    Repeater::make('orderingSteps')
+                        ->hiddenLabel()
+                        ->relationship()
+                        ->orderColumn('order')
+                        ->reorderable()
+                        ->collapsible()
+                        ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
+                        ->columns(1)
+                        ->components([
+                            Textarea::make('label')->required(),
+                            FileUpload::make('image_url')->image()->maxSize(5120)->directory('simulations/ordering'),
+                            TextInput::make('correct_position')->numeric()->required(),
+                        ]),
                 ]),
         ]);
     }
