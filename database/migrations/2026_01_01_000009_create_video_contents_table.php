@@ -1,0 +1,26 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('video_contents', function (Blueprint $table) {
+            $table->ulid('id')->primary();
+            $table->string('title', 200);
+            $table->text('description')->nullable();
+            $table->string('youtube_url');
+            $table->text('prompt_question')->nullable();
+            $table->softDeletes();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('video_contents');
+    }
+};
