@@ -11,31 +11,34 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Read-only: progres dihasilkan otomatis oleh ProgressService, bukan diedit
- * manual lewat admin panel.
+ * Read-only, drill-down level halaman modul (BR-11) — dipakai admin bisnis
+ * untuk melihat halaman mana persisnya yang macet, bukan cuma persen journey.
  */
-class JourneyProgressRelationManager extends RelationManager
+class ModuleProgressRelationManager extends RelationManager
 {
-    protected static string $relationship = 'journeyProgress';
+    protected static string $relationship = 'moduleProgress';
 
-    protected static ?string $title = 'Progres Journey';
+    protected static ?string $title = 'Progres Modul';
 
     public function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(function (Builder $query): Builder {
                 if ($sectorId = AdminScope::restrictedSectorId()) {
-                    $query->whereHas('journey', fn (Builder $q) => $q->withoutGlobalScopes()->where('sector_id', $sectorId));
+                    $query->whereHas(
+                        'modulePage.module.journey',
+                        fn (Builder $q) => $q->withoutGlobalScopes()->where('sector_id', $sectorId)
+                    );
                 }
 
                 return $query;
             })
             ->recordTitleAttribute('id')
             ->columns([
-                TextColumn::make('journey.title')->label('Journey'),
-                TextColumn::make('journey.sector.name')->label('Sektor'),
+                TextColumn::make('modulePage.module.journey.title')->label('Journey'),
+                TextColumn::make('modulePage.module.title')->label('Module'),
+                TextColumn::make('modulePage.order')->label('Halaman ke-'),
                 TextColumn::make('status')->badge(),
-                TextColumn::make('progress_percent')->label('Persen')->suffix('%'),
                 TextColumn::make('completed_at')->dateTime(),
             ])
             ->headerActions([])
