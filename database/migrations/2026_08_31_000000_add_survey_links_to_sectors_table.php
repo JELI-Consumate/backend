@@ -18,8 +18,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sectors', function (Blueprint $table): void {
-            $table->string('pretest_survey_link')->nullable()->after('color');
-            $table->string('posttest_survey_link')->nullable()->after('pretest_survey_link');
+            $table->string('pretest_survey_link', 2048)->nullable()->after('color');
+            $table->string('posttest_survey_link', 2048)->nullable()->after('pretest_survey_link');
         });
     }
 
