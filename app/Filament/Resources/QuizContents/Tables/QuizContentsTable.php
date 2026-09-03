@@ -34,7 +34,7 @@ class QuizContentsTable
                 TextColumn::make('sector')
                     ->label('Sector')
                     ->state(fn (QuizContent $record): ?string => $record->sector?->name ?? $record->journey?->sector?->name),
-                TextColumn::make('journey.title')->label('Journey')->placeholder('—'),
+                TextColumn::make('journey.title')->label('Journey')->placeholder('-'),
                 TextColumn::make('modulePage.module.title')->label('Module')->placeholder('Belum ditempel'),
                 TextColumn::make('passing_score'),
                 TextColumn::make('segments_count')->counts('segments')->label('Segments'),
