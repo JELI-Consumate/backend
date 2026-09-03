@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('email_verification_otps', function (Blueprint $table) {
+            $table->ulid('id')->primary();
+            $table->ulid('user_id');
+            $table->foreign('user_id', 'email_verification_otps_user_id_foreign')->references('id')->on('users')->onDelete('cascade');
+            $table->string('otp_hash');
+            $table->unsignedTinyInteger('attempts')->default(0);
+            $table->timestamp('expires_at');
+            $table->timestamps();
+            $table->unique(['user_id'], 'email_verification_otps_user_id_unique');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('email_verification_otps');
+    }
+};
