@@ -123,6 +123,14 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmailContr
     }
 
     /**
+     * @return HasMany<UserBadge, $this>
+     */
+    public function badges(): HasMany
+    {
+        return $this->hasMany(UserBadge::class);
+    }
+
+    /**
      * @return HasMany<DeviceToken, $this>
      */
     public function deviceTokens(): HasMany

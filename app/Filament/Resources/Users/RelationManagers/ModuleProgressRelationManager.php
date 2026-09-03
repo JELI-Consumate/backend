@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
-use App\Filament\Support\AdminScope;
+use App\Filament\Exports\ModuleProgressExporter;
+use Filament\Actions\ExportAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -23,16 +24,7 @@ class ModuleProgressRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(function (Builder $query): Builder {
-                if ($sectorId = AdminScope::restrictedSectorId()) {
-                    $query->whereHas(
-                        'modulePage.module.journey',
-                        fn (Builder $q) => $q->withoutGlobalScopes()->where('sector_id', $sectorId)
-                    );
-                }
-
-                return $query;
-            })
+            ->modifyQueryUsing(fn (Builder $query): Builder => ModuleProgressExporter::modifyQuery($query))
             ->recordTitleAttribute('id')
             ->columns([
                 TextColumn::make('modulePage.module.journey.title')->label('Journey'),
@@ -41,7 +33,9 @@ class ModuleProgressRelationManager extends RelationManager
                 TextColumn::make('status')->badge(),
                 TextColumn::make('completed_at')->dateTime(),
             ])
-            ->headerActions([])
+            ->headerActions([
+                ExportAction::make()->exporter(ModuleProgressExporter::class),
+            ])
             ->recordActions([])
             ->toolbarActions([]);
     }

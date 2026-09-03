@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
-use App\Filament\Support\AdminScope;
+use App\Filament\Exports\QuizAttemptExporter;
 use App\Models\QuizAttempt;
 use App\Models\User;
+use Filament\Actions\ExportAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -32,37 +33,8 @@ class QuizAttemptsRelationManager extends RelationManager
         /** @var User $user */
         $user = $this->getOwnerRecord();
 
-        $bestAttemptIds = QuizAttempt::query()
-            ->where('user_id', $user->id)
-            ->whereNotNull('completed_at')
-            ->get(['id', 'quiz_content_id', 'choice_score', 'choice_max_score'])
-            ->groupBy('quiz_content_id')
-            ->map(fn ($attempts) => $attempts
-                ->sortByDesc(fn (QuizAttempt $attempt): float => $attempt->choice_max_score > 0
-                    ? $attempt->choice_score / $attempt->choice_max_score
-                    : 0.0)
-                ->first()
-                ->id)
-            ->values();
-
         return $table
-            ->modifyQueryUsing(function (Builder $query) use ($bestAttemptIds, $user): Builder {
-                $query->whereIn('quiz_attempts.id', $bestAttemptIds)
-                    ->addSelect([
-                        'total_attempts' => QuizAttempt::query()
-                            ->selectRaw('count(*)')
-                            ->whereColumn('quiz_content_id', 'quiz_attempts.quiz_content_id')
-                            ->where('user_id', $user->id),
-                        'last_attempt_at' => QuizAttempt::query()
-                            ->selectRaw('max(completed_at)')
-                            ->whereColumn('quiz_content_id', 'quiz_attempts.quiz_content_id')
-                            ->where('user_id', $user->id),
-                    ]);
-
-                $query->whereHas('quizContent', fn (Builder $q) => AdminScope::scopeQuizContentSector($q->withoutGlobalScopes()));
-
-                return $query;
-            })
+            ->modifyQueryUsing(fn (Builder $query): Builder => QuizAttemptExporter::modifyQuery($query->where('quiz_attempts.user_id', $user->id)))
             ->recordTitleAttribute('id')
             ->columns([
                 TextColumn::make('quizContent.kind')
@@ -83,7 +55,9 @@ class QuizAttemptsRelationManager extends RelationManager
                     ->color(fn (?bool $state): string => $state ? 'success' : 'danger'),
                 TextColumn::make('last_attempt_at')->label('Attempt Terakhir')->dateTime(),
             ])
-            ->headerActions([])
+            ->headerActions([
+                ExportAction::make()->exporter(QuizAttemptExporter::class),
+            ])
             ->recordActions([])
             ->toolbarActions([]);
     }

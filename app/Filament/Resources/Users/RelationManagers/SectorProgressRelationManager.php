@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
-use App\Filament\Support\AdminScope;
+use App\Filament\Exports\SectorProgressExporter;
+use Filament\Actions\ExportAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -23,7 +24,7 @@ class SectorProgressRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => AdminScope::scopeSectorColumn($query))
+            ->modifyQueryUsing(fn (Builder $query): Builder => SectorProgressExporter::modifyQuery($query))
             ->recordTitleAttribute('id')
             ->columns([
                 TextColumn::make('sector.name')->label('Sektor'),
@@ -39,7 +40,9 @@ class SectorProgressRelationManager extends RelationManager
                     ->dateTime()
                     ->placeholder('Belum diisi'),
             ])
-            ->headerActions([])
+            ->headerActions([
+                ExportAction::make()->exporter(SectorProgressExporter::class),
+            ])
             ->recordActions([])
             ->toolbarActions([]);
     }
