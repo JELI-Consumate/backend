@@ -34,7 +34,7 @@ class LearningAnalyticsStatsWidget extends StatsOverviewWidget
                 ->icon(Heroicon::OutlinedUsers)
                 ->color('info'),
 
-            Stat::make('Rata-rata Skor Kuis', $averageQuizScore === null ? '—' : "{$averageQuizScore}%")
+            Stat::make('Rata-rata Skor Kuis', $averageQuizScore === null ? '-' : "{$averageQuizScore}%")
                 ->description($averageQuizScore === null ? 'Belum ada attempt selesai' : 'Semua attempt kuis yang sudah selesai')
                 ->descriptionIcon(Heroicon::OutlinedAcademicCap)
                 ->icon(Heroicon::OutlinedChartBar)
@@ -45,7 +45,7 @@ class LearningAnalyticsStatsWidget extends StatsOverviewWidget
                     default => 'danger',
                 }),
 
-            Stat::make('Tingkat Kelulusan Kuis', $quizPassRate === null ? '—' : "{$quizPassRate}%")
+            Stat::make('Tingkat Kelulusan Kuis', $quizPassRate === null ? '-' : "{$quizPassRate}%")
                 ->description($quizPassRate === null ? 'Belum ada attempt selesai' : 'Attempt yang lulus passing score')
                 ->descriptionIcon(Heroicon::OutlinedCheckBadge)
                 ->icon(Heroicon::OutlinedClipboardDocumentCheck)

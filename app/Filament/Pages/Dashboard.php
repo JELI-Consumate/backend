@@ -25,18 +25,27 @@ class Dashboard extends BaseDashboard
     public function getSubheading(): ?string
     {
         if (AdminScope::isSuperAdmin()) {
-            return 'Super Admin — akses semua sector';
+            return 'Super Admin, akses semua sector';
         }
 
-        $sectorName = AdminScope::user()?->sector?->name ?? '—';
+        $sectorName = AdminScope::user()?->sector?->name ?? '-';
 
-        return "Admin Sector — {$sectorName}";
+        return "Admin Sector: {$sectorName}";
+    }
+
+    public function getColumns(): int|array
+    {
+        return 3;
     }
 
     public function getWidgets(): array
     {
         return [
             DashboardOverviewWidget::class,
+            DashboardRegistrationsChartWidget::class,
+            DashboardContentBreakdownWidget::class,
+            DashboardJourneyProgressWidget::class,
+            DashboardRecentActivityWidget::class,
         ];
     }
 }

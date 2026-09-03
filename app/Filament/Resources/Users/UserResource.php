@@ -8,6 +8,8 @@ use App\Enums\UserRole;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\Pages\ViewUser;
 use App\Filament\Resources\Users\RelationManagers\JourneyProgressRelationManager;
+use App\Filament\Resources\Users\RelationManagers\ModuleProgressRelationManager;
+use App\Filament\Resources\Users\RelationManagers\QuizAttemptsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\SectorProgressRelationManager;
 use App\Filament\Resources\Users\Tables\UsersTable;
 use App\Filament\Support\AdminScope;
@@ -49,6 +51,8 @@ class UserResource extends Resource
         return [
             SectorProgressRelationManager::class,
             JourneyProgressRelationManager::class,
+            ModuleProgressRelationManager::class,
+            QuizAttemptsRelationManager::class,
         ];
     }
 

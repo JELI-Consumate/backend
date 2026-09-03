@@ -9,6 +9,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
@@ -16,50 +17,59 @@ class ReflectionContentForm
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(2)->components([
             TextInput::make('title')
                 ->required()
                 ->maxLength(200),
+            TextInput::make('closing_title'),
             Textarea::make('opening_message')
                 ->required(),
-            TextInput::make('closing_title'),
             Textarea::make('closing_message'),
-            Repeater::make('sections')
-                ->relationship()
-                ->orderColumn('order')
-                ->reorderable()
-                ->collapsible()
-                ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
-                ->components([
-                    TextInput::make('title')
-                        ->required()
-                        ->maxLength(200),
-                    Textarea::make('instruction'),
-                    Repeater::make('questions')
+            Section::make('Sections')
+                ->columnSpanFull()
+                ->schema([
+                    Repeater::make('sections')
+                        ->hiddenLabel()
                         ->relationship()
                         ->orderColumn('order')
                         ->reorderable()
                         ->collapsible()
-                        ->itemLabel(fn (array $state): ?string => $state['question_text'] ?? null)
+                        ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
+                        ->columns(2)
                         ->components([
-                            Select::make('question_type')
-                                ->options(collect(ReflectionQuestionType::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value]))
+                            TextInput::make('title')
                                 ->required()
-                                ->live(),
-                            Textarea::make('question_text')
-                                ->required(),
-                            Repeater::make('checklistItems')
+                                ->maxLength(200)
+                                ->columnSpanFull(),
+                            Textarea::make('instruction')
+                                ->columnSpanFull(),
+                            Repeater::make('questions')
                                 ->relationship()
-                                ->label('Item checklist')
                                 ->orderColumn('order')
                                 ->reorderable()
                                 ->collapsible()
-                                ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
-                                ->visible(fn (Get $get): bool => $get('question_type') === ReflectionQuestionType::Checklist->value)
+                                ->itemLabel(fn (array $state): ?string => $state['question_text'] ?? null)
+                                ->columnSpanFull()
                                 ->components([
-                                    TextInput::make('label')
+                                    Select::make('question_type')
+                                        ->options(collect(ReflectionQuestionType::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value]))
                                         ->required()
-                                        ->maxLength(255),
+                                        ->live(),
+                                    Textarea::make('question_text')
+                                        ->required(),
+                                    Repeater::make('checklistItems')
+                                        ->relationship()
+                                        ->label('Item checklist')
+                                        ->orderColumn('order')
+                                        ->reorderable()
+                                        ->collapsible()
+                                        ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
+                                        ->visible(fn (Get $get): bool => $get('question_type') === ReflectionQuestionType::Checklist->value)
+                                        ->components([
+                                            TextInput::make('label')
+                                                ->required()
+                                                ->maxLength(255),
+                                        ]),
                                 ]),
                         ]),
                 ]),

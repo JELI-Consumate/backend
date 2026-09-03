@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
-use App\Filament\Support\AdminScope;
+use App\Filament\Exports\JourneyProgressExporter;
+use Filament\Actions\ExportAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -23,21 +24,18 @@ class JourneyProgressRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(function (Builder $query): Builder {
-                if ($sectorId = AdminScope::restrictedSectorId()) {
-                    $query->whereHas('journey', fn (Builder $q) => $q->withoutGlobalScopes()->where('sector_id', $sectorId));
-                }
-
-                return $query;
-            })
+            ->modifyQueryUsing(fn (Builder $query): Builder => JourneyProgressExporter::modifyQuery($query))
             ->recordTitleAttribute('id')
             ->columns([
                 TextColumn::make('journey.title')->label('Journey'),
+                TextColumn::make('journey.sector.name')->label('Sektor'),
                 TextColumn::make('status')->badge(),
                 TextColumn::make('progress_percent')->label('Persen')->suffix('%'),
                 TextColumn::make('completed_at')->dateTime(),
             ])
-            ->headerActions([])
+            ->headerActions([
+                ExportAction::make()->exporter(JourneyProgressExporter::class),
+            ])
             ->recordActions([])
             ->toolbarActions([]);
     }
