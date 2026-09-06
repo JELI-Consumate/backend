@@ -45,8 +45,11 @@ class JourneyForm
                 ->image()
                 ->imageEditor()
                 ->maxSize(5120)
+                ->imageResizeMode('contain')
+                ->imageResizeTargetWidth('1200')
+                ->imageResizeTargetHeight('900')
                 ->directory('journeys/covers')
-                ->helperText('Tampil sebagai sampul kartu journey di aplikasi. Rasio ~4:3.'),
+                ->helperText('Rasio ~4:3. Otomatis dikecilkan ke maks 1200px sebelum diunggah.'),
             TextInput::make('order')
                 ->numeric()
                 ->required()

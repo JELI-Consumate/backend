@@ -31,16 +31,16 @@ class ArticleContentForm
                         ->orderColumn('order')
                         ->reorderable()
                         ->collapsible()
-                        ->itemLabel(fn (array $state): ?string => $state['block_type'] ?? null)
+                        ->itemLabel(fn(array $state): ?string => $state['block_type'] ?? null)
                         ->columns(1)
                         ->components([
                             Select::make('block_type')
-                                ->options(collect(ArticleBlockType::cases())->mapWithKeys(fn ($case) => [$case->value => $case->value]))
+                                ->options(collect(ArticleBlockType::cases())->mapWithKeys(fn($case) => [$case->value => $case->value]))
                                 ->live()
                                 ->required(),
                             MarkdownEditor::make('text_article')
                                 ->label('Teks')
-                                ->visible(fn ($get) => in_array($get('block_type'), [
+                                ->visible(fn($get) => in_array($get('block_type'), [
                                     ArticleBlockType::Paragraph->value,
                                     ArticleBlockType::ListItem->value,
                                     ArticleBlockType::Reference->value,
@@ -53,12 +53,16 @@ class ArticleContentForm
                             FileUpload::make('image_url')
                                 ->image()
                                 ->maxSize(5120)
+                                ->imageResizeMode('contain')
+                                ->imageResizeTargetWidth('1600')
+                                ->imageResizeTargetHeight('1600')
                                 ->directory('articles/blocks')
-                                ->visible(fn ($get) => $get('block_type') === ArticleBlockType::Image->value)
+                                ->helperText('Otomatis dikecilkan ke maks 1600px sebelum diunggah supaya ringan dimuat di HP.')
+                                ->visible(fn($get) => $get('block_type') === ArticleBlockType::Image->value)
                                 ->requiredIf('block_type', ArticleBlockType::Image->value),
                             TextInput::make('alt_text')
                                 ->label('Alt Text')
-                                ->visible(fn ($get) => $get('block_type') === ArticleBlockType::Image->value)
+                                ->visible(fn($get) => $get('block_type') === ArticleBlockType::Image->value)
                                 ->requiredIf('block_type', ArticleBlockType::Image->value),
                         ]),
                 ]),
