@@ -4,63 +4,46 @@ declare(strict_types=1);
 
 namespace App\Services\Learning;
 
-use App\Enums\ProgressStatus;
 use App\Models\Journey;
-use App\Models\JourneyProgress;
 use App\Models\Sector;
+use App\Models\SectorProgress;
 use App\Models\User;
 
 final readonly class JourneyAccessService
 {
     /**
-     * BR-01: journey dengan order terkecil di sektornya selalu terbuka; journey
-     * berikutnya terbuka hanya kalau journey sebelumnya (order - 1) sudah completed.
+     * BR-01: journey tidak lagi sequential per-order. Journey manapun di sektor
+     * terbuka asal user sudah menyelesaikan survei pretest sektor tersebut
+     * (SectorProgress.pretest_survey_completed_at terisi).
      */
     public function isUnlocked(User $user, Journey $journey): bool
     {
-        $previous = Journey::query()
-            ->where('sector_id', $journey->sector_id)
-            ->where('order', '<', $journey->order)
-            ->orderByDesc('order')
-            ->first();
-
-        if ($previous === null) {
-            return true;
-        }
-
-        return JourneyProgress::query()
-            ->where('user_id', $user->id)
-            ->where('journey_id', $previous->id)
-            ->where('status', ProgressStatus::Completed)
-            ->exists();
+        return $this->hasCompletedPretestSurvey($user, $journey->sector_id);
     }
 
     /**
-     * Versi bulk untuk endpoint daftar journey — memuat seluruh journey_progress
-     * user di sektor ini sekali di awal, lalu menentukan status lock di memori
-     * (dilarang panggil isUnlocked() di dalam loop per journey).
+     * Versi bulk untuk endpoint daftar journey — satu query untuk seluruh
+     * journey di sektor ini, semua bernilai sama (tidak lagi dirantai per-order).
      *
      * @return array<int, bool> keyed by journey_id
      */
     public function unlockedMapForSector(User $user, Sector $sector): array
     {
-        $journeys = $sector->journeys()->orderBy('order')->get(['id', 'order']);
+        $unlocked = $this->hasCompletedPretestSurvey($user, $sector->id);
 
-        $completedJourneyIds = JourneyProgress::query()
-            ->where('user_id', $user->id)
-            ->whereIn('journey_id', $journeys->pluck('id'))
-            ->where('status', ProgressStatus::Completed)
-            ->pluck('journey_id')
+        return $sector->journeys()
+            ->orderBy('order')
+            ->pluck('id')
+            ->mapWithKeys(fn (string $journeyId) => [$journeyId => $unlocked])
             ->all();
+    }
 
-        $map = [];
-        $previousCompleted = true;
-
-        foreach ($journeys as $journey) {
-            $map[$journey->id] = $previousCompleted;
-            $previousCompleted = in_array($journey->id, $completedJourneyIds, true);
-        }
-
-        return $map;
+    private function hasCompletedPretestSurvey(User $user, string $sectorId): bool
+    {
+        return SectorProgress::query()
+            ->where('user_id', $user->id)
+            ->where('sector_id', $sectorId)
+            ->whereNotNull('pretest_survey_completed_at')
+            ->exists();
     }
 }
