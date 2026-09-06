@@ -7,7 +7,6 @@ namespace App\Services\Simulation;
 use App\Data\SimulationAnswerCheckData;
 use App\Data\SimulationAnswerCheckResult;
 use App\Enums\SimulationType;
-use App\Exceptions\InvalidSubmissionException;
 use App\Exceptions\JourneyLockedException;
 use App\Models\SimulationAttempt;
 use App\Models\SimulationContent;
@@ -46,22 +45,29 @@ final readonly class SimulationScoringService
      * (`correct=false`) dan TIDAK disimpan — user boleh coba lagi item yang
      * sama tanpa attempt-nya berubah status. Jawaban benar disimpan idempotent
      * (aman dipanggil ulang untuk item yang sama). Attempt otomatis completed
-     * (BR-08: immutable setelahnya) begitu seluruh item simulasi ini sudah
-     * pernah dijawab benar — tidak ada lagi konsep "submit gagal/lulus
-     * sebagian", karena satu-satunya cara selesai adalah menjawab semua benar.
+     * begitu seluruh item simulasi ini sudah pernah dijawab benar — tidak ada
+     * lagi konsep "submit gagal/lulus sebagian", karena satu-satunya cara
+     * selesai adalah menjawab semua benar.
+     *
+     * BR-08: attempt yang sudah completed bersifat immutable. Mengecek ULANG
+     * satu jawaban di atasnya tetap dilayani (operasi baca murni — TIDAK
+     * menulis apa pun), bukan ditolak 409. Alasannya: tombol "Cek Jalur" di
+     * simulasi ordering mengirim seluruh langkah dalam satu batch; salah satu
+     * panggilan di batch itu yang men-trigger completion, lalu sisa panggilan
+     * di batch yang sama mengenai attempt yang baru saja completed.
      */
     public function checkAnswer(SimulationAttempt $attempt, SimulationAnswerCheckData $data): SimulationAnswerCheckResult
     {
+        $isCorrect = match ($data->type) {
+            SimulationType::Matching => $data->submittedRightPairId === $data->simulationMatchingPairId,
+            SimulationType::Ordering => $this->correctPosition($data->simulationOrderingStepId) === $data->submittedPosition,
+        };
+
         if ($attempt->completed_at !== null) {
-            throw new InvalidSubmissionException('Attempt sudah pernah diselesaikan.');
+            return new SimulationAnswerCheckResult(correct: $isCorrect, attempt: $attempt);
         }
 
-        return DB::transaction(function () use ($attempt, $data): SimulationAnswerCheckResult {
-            $isCorrect = match ($data->type) {
-                SimulationType::Matching => $data->submittedRightPairId === $data->simulationMatchingPairId,
-                SimulationType::Ordering => $this->correctPosition($data->simulationOrderingStepId) === $data->submittedPosition,
-            };
-
+        return DB::transaction(function () use ($attempt, $data, $isCorrect): SimulationAnswerCheckResult {
             if (! $isCorrect) {
                 return new SimulationAnswerCheckResult(correct: false, attempt: $attempt);
             }

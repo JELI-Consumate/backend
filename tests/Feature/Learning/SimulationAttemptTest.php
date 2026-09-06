@@ -199,8 +199,13 @@ final class SimulationAttemptTest extends TestCase
 
     /**
      * BR-08: attempt yang sudah completed_at != null bersifat immutable.
+     * Mengecek ULANG jawaban di atasnya dilayani sebagai operasi baca (tidak
+     * menulis apa pun, tidak error) -- bukan ditolak 409. Ini yang menjaga
+     * tombol "Cek Jalur" simulasi ordering (mengirim seluruh langkah dalam
+     * satu batch) tidak nyangkut: panggilan setelah completion di batch yang
+     * sama tetap mengembalikan attempt yang completed, bukan crash.
      */
-    public function test_checking_answer_on_completed_attempt_returns_409(): void
+    public function test_checking_answer_on_completed_attempt_is_a_no_op_read(): void
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
@@ -218,10 +223,13 @@ final class SimulationAttemptTest extends TestCase
 
         $first = $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", $payload);
         $this->assertNotNull($first->json('data.attempt.completed_at'));
+        $this->assertDatabaseCount('simulation_matching_answers', 1);
 
-        $response = $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", $payload);
+        $again = $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", $payload);
 
-        $response->assertStatus(409)->assertJsonPath('code', 'ATTEMPT_ALREADY_COMPLETED');
+        $again->assertOk()->assertJsonPath('data.correct', true);
+        $this->assertNotNull($again->json('data.attempt.completed_at'));
+        $this->assertDatabaseCount('simulation_matching_answers', 1);
     }
 
     public function test_other_user_cannot_check_someone_elses_simulation_attempt(): void
