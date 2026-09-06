@@ -15,11 +15,12 @@ use App\Models\ReflectionSection;
 use App\Models\Sector;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\HasCompletedPretestSurvey;
 use Tests\TestCase;
 
 final class ReflectionEntryTest extends TestCase
 {
-    use RefreshDatabase;
+    use HasCompletedPretestSurvey, RefreshDatabase;
 
     /**
      * @return array{0: ReflectionContent, 1: ModulePage, 2: ReflectionQuestion, 3: ReflectionQuestion}
@@ -72,6 +73,7 @@ final class ReflectionEntryTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$content, $page, $q1, $q2] = $this->createReflectionWithTwoOpenQuestions($journey);
 
@@ -97,6 +99,7 @@ final class ReflectionEntryTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
 
         $content = ReflectionContent::factory()->create();
@@ -152,6 +155,7 @@ final class ReflectionEntryTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
 
         $content = ReflectionContent::factory()->create();

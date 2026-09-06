@@ -12,16 +12,18 @@ use App\Models\User;
 use App\Models\VideoContent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\Concerns\HasCompletedPretestSurvey;
 use Tests\TestCase;
 
 final class ModulePageContentTest extends TestCase
 {
-    use RefreshDatabase;
+    use HasCompletedPretestSurvey, RefreshDatabase;
 
     public function test_module_page_show_returns_single_resolved_page(): void
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         $module = Module::factory()->create(['journey_id' => $journey->id]);
         $video = VideoContent::factory()->create(['title' => 'Video Uji', 'description' => 'Deskripsi video uji.']);

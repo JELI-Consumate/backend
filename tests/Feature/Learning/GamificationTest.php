@@ -17,11 +17,12 @@ use App\Models\UserBadge;
 use App\Models\VideoContent;
 use App\Services\Gamification\BadgeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\HasCompletedPretestSurvey;
 use Tests\TestCase;
 
 final class GamificationTest extends TestCase
 {
-    use RefreshDatabase;
+    use HasCompletedPretestSurvey, RefreshDatabase;
 
     private function createPage(Module $module, int $order): ModulePage
     {
@@ -44,6 +45,7 @@ final class GamificationTest extends TestCase
         $sector = Sector::factory()->create();
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         $badge = Badge::factory()->create(['journey_id' => $journey->id]);
+        $this->completePretestSurvey($user, $sector);
 
         $module = Module::factory()->create(['journey_id' => $journey->id, 'is_required' => true]);
         $page = $this->createPage($module, 1);
@@ -92,6 +94,7 @@ final class GamificationTest extends TestCase
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        $this->completePretestSurvey($user, $sector);
 
         $module = Module::factory()->create(['journey_id' => $journey->id, 'is_required' => true]);
         $page = $this->createPage($module, 1);

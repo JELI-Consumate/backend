@@ -14,11 +14,12 @@ use App\Models\SimulationMatchingPair;
 use App\Models\SimulationOrderingStep;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\HasCompletedPretestSurvey;
 use Tests\TestCase;
 
 final class SimulationAttemptTest extends TestCase
 {
-    use RefreshDatabase;
+    use HasCompletedPretestSurvey, RefreshDatabase;
 
     /**
      * @return array{0: SimulationContent, 1: ModulePage, 2: list<SimulationMatchingPair>}
@@ -88,6 +89,7 @@ final class SimulationAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$simulation, , $pairs] = $this->createMatchingSimulation($journey, 2);
 
@@ -111,6 +113,7 @@ final class SimulationAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$simulation, , $pairs] = $this->createMatchingSimulation($journey, 2);
 
@@ -135,6 +138,7 @@ final class SimulationAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$simulation, $page, $pairs] = $this->createMatchingSimulation($journey, 2);
 
@@ -176,6 +180,7 @@ final class SimulationAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$simulation, , $steps] = $this->createOrderingSimulation($journey, 3);
 
@@ -209,6 +214,7 @@ final class SimulationAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$simulation, , $pairs] = $this->createMatchingSimulation($journey, 1);
 
@@ -237,6 +243,7 @@ final class SimulationAttemptTest extends TestCase
         $owner = User::factory()->create();
         $intruder = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($owner, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$simulation, , $pairs] = $this->createMatchingSimulation($journey, 1);
 

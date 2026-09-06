@@ -23,11 +23,12 @@ use App\Services\Quiz\QuizAttemptService;
 use App\Services\Quiz\QuizScoringService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Concerns\HasCompletedPretestSurvey;
 use Tests\TestCase;
 
 final class QuizAttemptTest extends TestCase
 {
-    use RefreshDatabase;
+    use HasCompletedPretestSurvey, RefreshDatabase;
 
     /**
      * @return array{0: QuizContent, 1: ModulePage, 2: list<QuizQuestion>}
@@ -100,6 +101,7 @@ final class QuizAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$quiz, $page, $questions] = $this->createJourneyQuiz($journey, 2);
 
@@ -134,6 +136,7 @@ final class QuizAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$quiz, , $questions] = $this->createJourneyQuiz($journey, 1);
 
@@ -155,6 +158,7 @@ final class QuizAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$quiz] = $this->createJourneyQuiz($journey, 1);
 
@@ -172,6 +176,7 @@ final class QuizAttemptTest extends TestCase
         $owner = User::factory()->create();
         $intruder = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($owner, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$quiz] = $this->createJourneyQuiz($journey, 1);
 
@@ -230,6 +235,7 @@ final class QuizAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$quiz, , $questions] = $this->createJourneyQuiz($journey, 2);
 
@@ -274,6 +280,7 @@ final class QuizAttemptTest extends TestCase
         // tiap pengukuran — satu-satunya variabel yang beda cuma jumlah soal.
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$quiz, , $questions] = $this->createJourneyQuiz($journey, $questionCount);
         $attemptId = $this->actingAs($user)->postJson("/api/v1/quizzes/{$quiz->id}/attempts")->json('data.attempt_id');
@@ -308,6 +315,7 @@ final class QuizAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$quiz, , $questions] = $this->createJourneyQuiz($journey, 2);
 
@@ -337,6 +345,7 @@ final class QuizAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$quiz, , $questions] = $this->createJourneyQuiz($journey, 2);
 
@@ -374,6 +383,7 @@ final class QuizAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$quiz, $page, $questions] = $this->createJourneyQuiz($journey, 2);
 
@@ -416,6 +426,7 @@ final class QuizAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
 
         $quiz = QuizContent::factory()->create(['journey_id' => $journey->id]);
@@ -458,6 +469,7 @@ final class QuizAttemptTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$quiz, , $questions] = $this->createJourneyQuiz($journey, 1);
 
@@ -483,6 +495,7 @@ final class QuizAttemptTest extends TestCase
         $owner = User::factory()->create();
         $intruder = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($owner, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         [$quiz, , $questions] = $this->createJourneyQuiz($journey, 1);
 

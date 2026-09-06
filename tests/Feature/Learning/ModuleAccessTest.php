@@ -13,16 +13,19 @@ use App\Models\Sector;
 use App\Models\User;
 use App\Models\VideoContent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\HasCompletedPretestSurvey;
 use Tests\TestCase;
 
 /**
  * Module ke-N dalam satu journey hanya terbuka kalau module ke-(N-1) di
  * journey yang sama sudah completed SELURUH halamannya. Module pertama
- * (order terkecil) selalu terbuka. Lihat ModuleAccessService.
+ * (order terkecil) selalu terbuka. Lihat ModuleAccessService. (Journey
+ * induknya sendiri tidak lagi sequential -- cukup pretest survei sektor
+ * completed, lihat JourneyAccessServiceTest.)
  */
 final class ModuleAccessTest extends TestCase
 {
-    use RefreshDatabase;
+    use HasCompletedPretestSurvey, RefreshDatabase;
 
     /**
      * @return array{0: Module, 1: ModulePage}
@@ -45,6 +48,7 @@ final class ModuleAccessTest extends TestCase
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        $this->completePretestSurvey($user, $sector);
 
         [$first] = $this->createModuleWithPage($journey->id, 1);
         [$second] = $this->createModuleWithPage($journey->id, 2);
@@ -66,6 +70,7 @@ final class ModuleAccessTest extends TestCase
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        $this->completePretestSurvey($user, $sector);
 
         [, $firstPage] = $this->createModuleWithPage($journey->id, 1);
         $this->createModuleWithPage($journey->id, 2);
@@ -91,6 +96,7 @@ final class ModuleAccessTest extends TestCase
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        $this->completePretestSurvey($user, $sector);
 
         $this->createModuleWithPage($journey->id, 1);
         [$second] = $this->createModuleWithPage($journey->id, 2);

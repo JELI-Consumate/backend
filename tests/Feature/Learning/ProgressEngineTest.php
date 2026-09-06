@@ -11,11 +11,12 @@ use App\Models\Sector;
 use App\Models\User;
 use App\Models\VideoContent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\HasCompletedPretestSurvey;
 use Tests\TestCase;
 
 final class ProgressEngineTest extends TestCase
 {
-    use RefreshDatabase;
+    use HasCompletedPretestSurvey, RefreshDatabase;
 
     private function createPage(Module $module, int $order): ModulePage
     {
@@ -36,6 +37,7 @@ final class ProgressEngineTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         $module = Module::factory()->create(['journey_id' => $journey->id, 'estimated_minutes' => 10]);
         $page = $this->createPage($module, 1);
@@ -56,6 +58,7 @@ final class ProgressEngineTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
 
         $moduleA = Module::factory()->create(['journey_id' => $journey->id, 'estimated_minutes' => 10, 'is_required' => true]);
@@ -95,6 +98,7 @@ final class ProgressEngineTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
 
         $journey1 = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         $module1 = Module::factory()->create(['journey_id' => $journey1->id, 'estimated_minutes' => 10]);
@@ -112,7 +116,8 @@ final class ProgressEngineTest extends TestCase
             ->assertJsonPath('data.progress_percent', 50)
             ->assertJsonPath('data.status', 'in_progress');
 
-        // journey2 baru unlocked setelah journey1 completed.
+        // journey2 sudah unlocked dari awal (pretest survei sektor completed,
+        // journey tidak lagi sequential per-order).
         $this->actingAs($user)->postJson("/api/v1/module-pages/{$page2->id}/complete")->assertOk();
 
         $response = $this->actingAs($user)->getJson("/api/v1/progress/sectors/{$sector->slug}");
@@ -138,6 +143,7 @@ final class ProgressEngineTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         $module = Module::factory()->create(['journey_id' => $journey->id]);
         $page = $this->createPage($module, 1);

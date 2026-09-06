@@ -28,20 +28,24 @@ use App\Models\VideoContent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Tests\Concerns\HasCompletedPretestSurvey;
 use Tests\TestCase;
 
 final class ModuleContentTest extends TestCase
 {
-    use RefreshDatabase;
+    use HasCompletedPretestSurvey, RefreshDatabase;
 
     /**
      * Kombinasi realistis satu module "materi": video + article — dipakai untuk
-     * assertion budget query ≤8 (06-nonfunctional-ops.md §8). Journey dibuat
-     * order=1 (selalu unlocked) supaya tidak menambah query cek journey sebelumnya.
+     * assertion budget query ≤8 (06-nonfunctional-ops.md §8). Pretest survei
+     * sektor langsung dianggap completed supaya journey-nya (order=1) unlocked
+     * tanpa menambah query cek journey (JourneyAccessService::isUnlocked masih
+     * 1 query, sama seperti sebelumnya).
      */
-    private function createVideoArticleModule(): Module
+    private function createVideoArticleModule(User $user): Module
     {
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         $module = Module::factory()->create(['journey_id' => $journey->id]);
 
@@ -61,9 +65,9 @@ final class ModuleContentTest extends TestCase
      * separuh budget 8 query sendirian, jadi diuji terpisah dari budget test (bukan
      * dicampur dengan video/article) dan tidak diberi assertion count ketat.
      */
-    private function createVideoArticleQuizModule(): Module
+    private function createVideoArticleQuizModule(User $user): Module
     {
-        $module = $this->createVideoArticleModule();
+        $module = $this->createVideoArticleModule($user);
         $journey = Journey::query()->findOrFail($module->journey_id);
 
         $quiz = QuizContent::factory()->create(['journey_id' => $journey->id]);
@@ -81,9 +85,9 @@ final class ModuleContentTest extends TestCase
      * tidak merepresentasikan module nyata; tiap ModuleType biasanya hanya berisi
      * 1-2 tipe konten, lihat 03-model-data.md §3.2 ModuleType).
      */
-    private function createFullMixedModule(): Module
+    private function createFullMixedModule(User $user): Module
     {
-        $module = $this->createVideoArticleQuizModule();
+        $module = $this->createVideoArticleQuizModule($user);
 
         $simulation = SimulationContent::factory()->create();
         SimulationMatchingPair::factory()->create(['simulation_content_id' => $simulation->id]);
@@ -103,7 +107,7 @@ final class ModuleContentTest extends TestCase
         // last_active_at diisi supaya UpdateLastActive middleware tidak ikut
         // menulis (throttle 5 menit) -- budget ini murni ContentTreeService.
         $user = User::factory()->create(['last_active_at' => now()]);
-        $module = $this->createVideoArticleModule();
+        $module = $this->createVideoArticleModule($user);
 
         DB::enableQueryLog();
         $response = $this->actingAs($user)->getJson("/api/v1/modules/{$module->id}");
@@ -122,7 +126,7 @@ final class ModuleContentTest extends TestCase
     public function test_quiz_module_resolves_full_segment_tree(): void
     {
         $user = User::factory()->create();
-        $module = $this->createVideoArticleQuizModule();
+        $module = $this->createVideoArticleQuizModule($user);
 
         $response = $this->actingAs($user)->getJson("/api/v1/modules/{$module->id}");
 
@@ -136,6 +140,7 @@ final class ModuleContentTest extends TestCase
         // menulis (throttle 5 menit) -- budget ini murni ContentTreeService.
         $user = User::factory()->create(['last_active_at' => now()]);
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         $module = Module::factory()->create(['journey_id' => $journey->id]);
 
@@ -158,7 +163,7 @@ final class ModuleContentTest extends TestCase
     public function test_module_tree_resolves_simulation_and_reflection_content(): void
     {
         $user = User::factory()->create();
-        $module = $this->createFullMixedModule();
+        $module = $this->createFullMixedModule($user);
 
         $response = $this->actingAs($user)->getJson("/api/v1/modules/{$module->id}");
 
@@ -186,7 +191,7 @@ final class ModuleContentTest extends TestCase
         config(['cache.default' => 'database']);
 
         $user = User::factory()->create();
-        $module = $this->createFullMixedModule();
+        $module = $this->createFullMixedModule($user);
 
         // Panggilan pertama: cache miss, Cache::remember() menjalankan closure
         // dan mengembalikan hasilnya langsung -- tidak pernah lewat
@@ -206,7 +211,7 @@ final class ModuleContentTest extends TestCase
     public function test_module_tree_merges_user_progress_per_page(): void
     {
         $user = User::factory()->create();
-        $module = $this->createVideoArticleQuizModule();
+        $module = $this->createVideoArticleQuizModule($user);
         $firstPage = $module->pages()->orderBy('order')->first();
 
         ModuleProgress::factory()->create([
@@ -227,7 +232,7 @@ final class ModuleContentTest extends TestCase
     public function test_quiz_content_does_not_leak_is_correct(): void
     {
         $user = User::factory()->create();
-        $module = $this->createVideoArticleQuizModule();
+        $module = $this->createVideoArticleQuizModule($user);
 
         $response = $this->actingAs($user)->getJson("/api/v1/modules/{$module->id}");
 
@@ -238,7 +243,7 @@ final class ModuleContentTest extends TestCase
     public function test_simulation_content_does_not_leak_correct_position(): void
     {
         $user = User::factory()->create();
-        $module = $this->createFullMixedModule();
+        $module = $this->createFullMixedModule($user);
 
         $response = $this->actingAs($user)->getJson("/api/v1/modules/{$module->id}");
 
@@ -261,6 +266,7 @@ final class ModuleContentTest extends TestCase
 
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         $module = Module::factory()->create(['journey_id' => $journey->id]);
 
@@ -287,6 +293,7 @@ final class ModuleContentTest extends TestCase
 
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         $module = Module::factory()->create(['journey_id' => $journey->id]);
 
@@ -335,6 +342,7 @@ final class ModuleContentTest extends TestCase
 
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         $module = Module::factory()->create(['journey_id' => $journey->id]);
 
@@ -380,6 +388,7 @@ final class ModuleContentTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
 
         $first = Module::factory()->create(['journey_id' => $journey->id, 'order' => 1]);
@@ -399,6 +408,7 @@ final class ModuleContentTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
 
         $first = Module::factory()->create(['journey_id' => $journey->id, 'order' => 1]);

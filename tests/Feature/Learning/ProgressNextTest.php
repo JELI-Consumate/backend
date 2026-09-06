@@ -10,11 +10,12 @@ use App\Models\ModulePage;
 use App\Models\Sector;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\HasCompletedPretestSurvey;
 use Tests\TestCase;
 
 final class ProgressNextTest extends TestCase
 {
-    use RefreshDatabase;
+    use HasCompletedPretestSurvey, RefreshDatabase;
 
     public function test_returns_the_next_incomplete_page(): void
     {
@@ -40,6 +41,7 @@ final class ProgressNextTest extends TestCase
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         $module = Module::factory()->create(['journey_id' => $journey->id]);
         $page1 = ModulePage::factory()->create(['module_id' => $module->id, 'order' => 1]);

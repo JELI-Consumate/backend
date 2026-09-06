@@ -9,11 +9,12 @@ use App\Models\Sector;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Concerns\HasCompletedPretestSurvey;
 use Tests\TestCase;
 
 final class SectorCatalogTest extends TestCase
 {
-    use RefreshDatabase;
+    use HasCompletedPretestSurvey, RefreshDatabase;
 
     public function test_sectors_index_lists_active_sectors_with_progress(): void
     {
@@ -84,7 +85,7 @@ final class SectorCatalogTest extends TestCase
         );
     }
 
-    public function test_sector_show_returns_journeys_with_lock_status(): void
+    public function test_sector_show_locks_all_journeys_when_pretest_survey_not_completed(): void
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create(['is_active' => true]);
@@ -94,8 +95,23 @@ final class SectorCatalogTest extends TestCase
         $response = $this->actingAs($user)->getJson("/api/v1/sectors/{$sector->slug}");
 
         $response->assertOk()
-            ->assertJsonPath('data.journeys.0.is_unlocked', true)
+            ->assertJsonPath('data.journeys.0.is_unlocked', false)
             ->assertJsonPath('data.journeys.1.is_unlocked', false);
+    }
+
+    public function test_sector_show_unlocks_all_journeys_once_pretest_survey_completed(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create(['is_active' => true]);
+        Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        Journey::factory()->create(['sector_id' => $sector->id, 'order' => 2]);
+        $this->completePretestSurvey($user, $sector);
+
+        $response = $this->actingAs($user)->getJson("/api/v1/sectors/{$sector->slug}");
+
+        $response->assertOk()
+            ->assertJsonPath('data.journeys.0.is_unlocked', true)
+            ->assertJsonPath('data.journeys.1.is_unlocked', true);
     }
 
     public function test_sector_show_returns_404_for_unknown_slug(): void

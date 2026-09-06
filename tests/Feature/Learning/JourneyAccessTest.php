@@ -4,70 +4,64 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Learning;
 
-use App\Enums\ProgressStatus;
 use App\Models\Journey;
-use App\Models\JourneyProgress;
 use App\Models\Module;
 use App\Models\Sector;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Concerns\HasCompletedPretestSurvey;
 use Tests\TestCase;
 
 /**
- * BR-01: journey ke-N hanya terbuka jika journey ke-(N-1) di sektor yang sama completed.
- * Journey pertama (order terkecil) selalu terbuka.
+ * BR-01: journey tidak lagi sequential per-order. Journey manapun di sektor
+ * terbuka asal user sudah menyelesaikan survei pretest sektor tersebut.
  */
 final class JourneyAccessTest extends TestCase
 {
-    use RefreshDatabase;
+    use HasCompletedPretestSurvey, RefreshDatabase;
 
-    public function test_first_journey_in_sector_is_always_unlocked(): void
+    public function test_journey_is_locked_when_pretest_survey_not_completed(): void
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
 
-        $this->actingAs($user)->getJson("/api/v1/journeys/{$journey->id}")->assertOk();
-    }
-
-    public function test_second_journey_is_locked_before_first_completed(): void
-    {
-        $user = User::factory()->create();
-        $sector = Sector::factory()->create();
-        Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
-        $second = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 2]);
-
-        $response = $this->actingAs($user)->getJson("/api/v1/journeys/{$second->id}");
+        $response = $this->actingAs($user)->getJson("/api/v1/journeys/{$journey->id}");
 
         $response->assertStatus(403)->assertJsonPath('code', 'JOURNEY_LOCKED');
     }
 
-    public function test_second_journey_unlocks_after_first_completed(): void
+    public function test_journey_is_unlocked_once_pretest_survey_completed(): void
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
-        $first = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
-        $second = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 2]);
+        $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
+        $this->completePretestSurvey($user, $sector);
 
-        JourneyProgress::factory()->create([
-            'user_id' => $user->id,
-            'journey_id' => $first->id,
-            'status' => ProgressStatus::Completed,
-        ]);
-
-        $this->actingAs($user)->getJson("/api/v1/journeys/{$second->id}")->assertOk();
+        $this->actingAs($user)->getJson("/api/v1/journeys/{$journey->id}")->assertOk();
     }
 
-    public function test_locked_journey_does_not_leak_into_third_journey_unlock(): void
+    public function test_later_journey_does_not_require_earlier_journey_completed(): void
     {
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
         Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
-        Journey::factory()->create(['sector_id' => $sector->id, 'order' => 2]);
-        $third = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 3]);
+        $second = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 2]);
+        $this->completePretestSurvey($user, $sector);
 
-        $this->actingAs($user)->getJson("/api/v1/journeys/{$third->id}")
+        $this->actingAs($user)->getJson("/api/v1/journeys/{$second->id}")->assertOk();
+    }
+
+    public function test_completed_pretest_survey_in_different_sector_does_not_unlock(): void
+    {
+        $user = User::factory()->create();
+        $sectorA = Sector::factory()->create();
+        $sectorB = Sector::factory()->create();
+        $journeyInB = Journey::factory()->create(['sector_id' => $sectorB->id, 'order' => 1]);
+        $this->completePretestSurvey($user, $sectorA);
+
+        $this->actingAs($user)->getJson("/api/v1/journeys/{$journeyInB->id}")
             ->assertStatus(403)->assertJsonPath('code', 'JOURNEY_LOCKED');
     }
 
@@ -80,6 +74,7 @@ final class JourneyAccessTest extends TestCase
         $sector = Sector::factory()->create();
         $journey = Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
         Module::factory()->count(5)->sequence(fn ($sequence) => ['order' => $sequence->index + 1])->create(['journey_id' => $journey->id]);
+        $this->completePretestSurvey($user, $sector);
 
         DB::enableQueryLog();
         $this->actingAs($user)->getJson("/api/v1/journeys/{$journey->id}")->assertOk();

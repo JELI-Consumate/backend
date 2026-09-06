@@ -10,6 +10,7 @@ use App\Models\QuizContent;
 use App\Models\Sector;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\HasCompletedPretestSurvey;
 use Tests\TestCase;
 
 /**
@@ -19,11 +20,12 @@ use Tests\TestCase;
  */
 final class JourneyQuizScoreTest extends TestCase
 {
-    use RefreshDatabase;
+    use HasCompletedPretestSurvey, RefreshDatabase;
 
-    private function makeJourney(): Journey
+    private function makeJourney(User $user): Journey
     {
         $sector = Sector::factory()->create();
+        $this->completePretestSurvey($user, $sector);
 
         return Journey::factory()->create(['sector_id' => $sector->id, 'order' => 1]);
     }
@@ -31,7 +33,7 @@ final class JourneyQuizScoreTest extends TestCase
     public function test_quiz_score_is_null_when_journey_has_no_quiz_module(): void
     {
         $user = User::factory()->create();
-        $journey = $this->makeJourney();
+        $journey = $this->makeJourney($user);
 
         $response = $this->actingAs($user)->getJson("/api/v1/journeys/{$journey->id}");
 
@@ -41,7 +43,7 @@ final class JourneyQuizScoreTest extends TestCase
     public function test_quiz_score_is_null_when_quiz_not_attempted_yet(): void
     {
         $user = User::factory()->create();
-        $journey = $this->makeJourney();
+        $journey = $this->makeJourney($user);
         QuizContent::factory()->create(['journey_id' => $journey->id]);
 
         $response = $this->actingAs($user)->getJson("/api/v1/journeys/{$journey->id}");
@@ -52,7 +54,7 @@ final class JourneyQuizScoreTest extends TestCase
     public function test_quiz_score_is_percentage_of_last_completed_attempt(): void
     {
         $user = User::factory()->create();
-        $journey = $this->makeJourney();
+        $journey = $this->makeJourney($user);
         $quiz = QuizContent::factory()->create(['journey_id' => $journey->id]);
 
         QuizAttempt::factory()->completed()->create([
@@ -81,7 +83,7 @@ final class JourneyQuizScoreTest extends TestCase
     {
         $user = User::factory()->create();
         $otherUser = User::factory()->create();
-        $journey = $this->makeJourney();
+        $journey = $this->makeJourney($user);
         $quiz = QuizContent::factory()->create(['journey_id' => $journey->id]);
 
         QuizAttempt::factory()->completed()->create([
