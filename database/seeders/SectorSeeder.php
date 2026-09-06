@@ -4,23 +4,18 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Sector;
 use Illuminate\Database\Seeder;
 
+/**
+ * Sektor "E-Commerce" (1 baris) — AUTO-GENERATED dari snapshot DB `jeli`.
+ * icon_url null persis seperti di DB (belum ada aset ikon sektor).
+ */
 class SectorSeeder extends Seeder
 {
+    use LoadsContentSnapshot;
+
     public function run(): void
     {
-        Sector::query()->updateOrCreate(
-            ['slug' => 'e-commerce'],
-            [
-                'name' => 'E-Commerce',
-                'description' => 'Edukasi perlindungan konsumen untuk transaksi jual-beli online (e-commerce), mencakup hak & kewajiban konsumen, cara berbelanja aman, perlindungan dari penipuan digital, dan prosedur penyelesaian sengketa.',
-                'icon_url' => 'https://placehold.co/256x256?text=E-Commerce',
-                'color' => null,
-                'order' => 1,
-                'is_active' => true,
-            ]
-        );
+        $this->seedTable('sectors');
     }
 }
