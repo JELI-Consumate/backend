@@ -13,6 +13,7 @@ use App\Models\JourneyProgress;
 use App\Models\LikertScaleOption;
 use App\Models\Module;
 use App\Models\ModulePage;
+use App\Models\QuizAttempt;
 use App\Models\QuizChoiceOption;
 use App\Models\QuizContent;
 use App\Models\QuizQuestion;
@@ -200,10 +201,46 @@ final class QuizAttemptTest extends TestCase
         $this->actingAs($user)->postJson("/api/v1/quizzes/{$quiz->id}/attempts")->assertCreated();
 
         $this->actingAs($user)->getJson("/api/v1/sectors/{$sector->slug}/pretest")
-            ->assertStatus(403)->assertJsonPath('code', 'QUIZ_NOT_ELIGIBLE');
+            ->assertStatus(403)->assertJsonPath('code', 'PRETEST_ALREADY_TAKEN');
 
         $this->actingAs($user)->postJson("/api/v1/quizzes/{$quiz->id}/attempts")
-            ->assertStatus(403)->assertJsonPath('code', 'QUIZ_NOT_ELIGIBLE');
+            ->assertStatus(403)->assertJsonPath('code', 'PRETEST_ALREADY_TAKEN');
+    }
+
+    /**
+     * Dua request start-attempt yang race di attempt_number yang sama harus
+     * pulang sebagai QuizNotEligibleException (403), bukan QueryException
+     * mentah (500). Race disimulasikan lewat event QuizAttempt::creating yang
+     * menyisipkan attempt "pemenang" tepat sebelum insert asli commit.
+     */
+    public function test_racing_pretest_start_returns_not_eligible_instead_of_server_error(): void
+    {
+        $user = User::factory()->create();
+        $sector = Sector::factory()->create();
+        [$quiz] = $this->createSectorQuiz($sector, QuizKind::Pretest);
+
+        $raceInjected = false;
+
+        QuizAttempt::creating(function (QuizAttempt $attempt) use (&$raceInjected, $user, $quiz): void {
+            if ($raceInjected) {
+                return;
+            }
+
+            $raceInjected = true;
+
+            QuizAttempt::query()->create([
+                'user_id' => $user->id,
+                'quiz_content_id' => $quiz->id,
+                'attempt_number' => $attempt->attempt_number,
+            ]);
+        });
+
+        try {
+            $this->actingAs($user)->postJson("/api/v1/quizzes/{$quiz->id}/attempts")
+                ->assertStatus(403)->assertJsonPath('code', 'PRETEST_ALREADY_TAKEN');
+        } finally {
+            QuizAttempt::flushEventListeners();
+        }
     }
 
     /**
@@ -217,7 +254,7 @@ final class QuizAttemptTest extends TestCase
         $this->createSectorQuiz($sector, QuizKind::Posttest);
 
         $this->actingAs($user)->getJson("/api/v1/sectors/{$sector->slug}/posttest")
-            ->assertStatus(403)->assertJsonPath('code', 'QUIZ_NOT_ELIGIBLE');
+            ->assertStatus(403)->assertJsonPath('code', 'POSTTEST_NOT_ELIGIBLE');
 
         JourneyProgress::factory()->create([
             'user_id' => $user->id,
