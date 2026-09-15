@@ -1,58 +1,253 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/logo/logo-aplikasi-consumate-id.png" alt="Consumate Logo" width="180">
 </p>
 
-## About Laravel
+<h1 align="center">Consumate Backend API</h1>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+  REST API untuk aplikasi edukasi dan pemberdayaan konsumen Consumate, dibangun di atas Laravel 13.
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Daftar Isi
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- [Tentang Proyek](#tentang-proyek)
+- [Tech Stack](#tech-stack)
+- [Struktur Modul](#struktur-modul)
+- [Persyaratan Sistem](#persyaratan-sistem)
+- [Instalasi](#instalasi)
+- [Konfigurasi Environment](#konfigurasi-environment)
+- [Menjalankan Aplikasi](#menjalankan-aplikasi)
+- [Dokumentasi API](#dokumentasi-api)
+- [Panel Admin](#panel-admin)
+- [Testing](#testing)
+- [Code Style](#code-style)
+- [Struktur Direktori](#struktur-direktori)
+- [Lisensi](#lisensi)
 
-## Learning Laravel
+## Tentang Proyek
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Consumate adalah platform edukasi digital yang membantu masyarakat memahami hak dan kewajibannya sebagai konsumen di berbagai sektor (jasa keuangan, e-commerce, kesehatan, dan lainnya). Repositori ini adalah backend API yang menangani:
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Autentikasi pengguna (register, login, verifikasi email dengan OTP, login Google, reset password)
+- Konten pembelajaran berjenjang (sector, journey, module, module page)
+- Kuis (pretest dan posttest) dengan penilaian otomatis
+- Simulasi interaktif bergaya latihan bertahap (matching dan ordering)
+- Jurnal refleksi (reflection entry) per pengguna
+- Pelacakan progres belajar (progress tracking) per sector dan journey
+- Sistem badge dan gamifikasi
+- Indeks pemberdayaan konsumen (empowerment index)
+- Notifikasi push melalui Firebase Cloud Messaging (FCM)
+- Survei eksternal (Google Form) sebagai pelengkap kuis in-app
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Tech Stack
 
-## Agentic Development
+| Komponen | Teknologi |
+|---|---|
+| Framework | Laravel 13 (PHP 8.3+) |
+| Autentikasi API | Laravel Sanctum |
+| Login Sosial | Laravel Socialite (Google) |
+| Panel Admin | Filament 5 |
+| Dokumentasi API | L5 Swagger (OpenAPI) |
+| Notifikasi Push | Firebase Cloud Messaging (Kreait Firebase, laravel-notification-channels/fcm) |
+| Storage | Local / Cloudflare R2 (S3-compatible, via Flysystem) |
+| Testing | PHPUnit |
+| Code Style | Laravel Pint |
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Struktur Modul
 
-```bash
-composer require laravel/boost --dev
+Alur belajar mengikuti hierarki berikut:
 
-php artisan boost:install
+```
+Sector -> Journey -> Module -> Module Page
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Setiap sector memiliki pretest dan posttest, serta dapat memiliki survei eksternal terpisah. Progres pengguna dilacak per module page, kemudian diagregasi ke tingkat journey dan sector.
 
-## Contributing
+## Persyaratan Sistem
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- PHP 8.3 atau lebih tinggi
+- Composer 2.x
+- Database (SQLite untuk lokal, MySQL/PostgreSQL untuk staging/produksi)
+- Node.js dan npm (untuk build asset Filament)
+- Ekstensi PHP yang dibutuhkan Laravel 13 (mbstring, pdo, openssl, tokenizer, xml, ctype, json, bcmath)
 
-## Code of Conduct
+## Instalasi
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1. Clone repositori dan masuk ke direktori proyek.
 
-## Security Vulnerabilities
+   ```bash
+   git clone <url-repositori>
+   cd backend
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+2. Install dependency PHP dan Node.
 
-## License
+   ```bash
+   composer install
+   npm install
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+3. Salin file environment dan generate application key.
+
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. Siapkan database (default menggunakan SQLite).
+
+   ```bash
+   touch database/database.sqlite
+   php artisan migrate --seed
+   ```
+
+5. Buat symbolic link storage agar file upload bisa diakses publik.
+
+   ```bash
+   php artisan storage:link
+   ```
+
+6. Build asset frontend (dibutuhkan oleh panel Filament).
+
+   ```bash
+   npm run build
+   ```
+
+## Konfigurasi Environment
+
+Variabel environment penting yang perlu disesuaikan di `.env`:
+
+| Variabel | Keterangan |
+|---|---|
+| `APP_URL` | URL dasar aplikasi, dipakai untuk generate link (verifikasi email, reset password, dsb) |
+| `DB_CONNECTION`, `DB_DATABASE` | Koneksi database |
+| `SESSION_DRIVER`, `QUEUE_CONNECTION`, `CACHE_STORE` | Driver session, queue, dan cache |
+| `FILESYSTEM_DISK` | Disk penyimpanan file (`local` atau `r2`) |
+| `FILAMENT_FILESYSTEM_DISK` | Disk untuk upload media di panel admin |
+| `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` | Kredensial API token Cloudflare R2 |
+| `R2_BUCKET` | Nama bucket R2 |
+| `R2_ACCOUNT_ID` | Account ID Cloudflare, dipakai membentuk endpoint S3-compatible |
+| `R2_PUBLIC_URL` | URL publik bucket (custom domain atau r2.dev) untuk akses file |
+| `L5_SWAGGER_GENERATE_ALWAYS` | Regenerasi dokumentasi OpenAPI otomatis saat request |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Kredensial OAuth untuk login Google |
+| Kredensial Firebase (lihat `config/firebase.php`) | Diperlukan untuk mengirim notifikasi push FCM |
+
+Jangan pernah commit file `.env` ke repositori. File ini berisi kredensial dan harus tetap berada di `.gitignore`.
+
+## Menjalankan Aplikasi
+
+Untuk development, gunakan skrip `dev` yang menjalankan server, queue listener, dan log viewer sekaligus.
+
+```bash
+composer run dev
+```
+
+Atau jalankan server secara manual.
+
+```bash
+php artisan serve
+```
+
+Aplikasi akan berjalan di `http://localhost:8000` (menyesuaikan `APP_URL`).
+
+## Dokumentasi API
+
+Dokumentasi API dibangkitkan otomatis menggunakan L5 Swagger (OpenAPI) dari anotasi di `app/OpenApi` dan controller.
+
+Generate ulang dokumentasi (jika `L5_SWAGGER_GENERATE_ALWAYS=false`):
+
+```bash
+php artisan l5-swagger:generate
+```
+
+Akses dokumentasi interaktif di:
+
+```
+http://localhost:8000/api/docs
+```
+
+Semua endpoint API berada di bawah prefix `/api/v1`, contoh: `/api/v1/auth/login`, `/api/v1/sectors`, `/api/v1/quizzes/{id}`.
+
+## Panel Admin
+
+Panel admin dibangun dengan Filament dan dapat diakses melalui:
+
+```
+http://localhost:8000/admin
+```
+
+Buat akun admin dengan perintah:
+
+```bash
+php artisan make:filament-user
+```
+
+## Testing
+
+Test suite menggunakan PHPUnit dan mencakup Feature test serta Unit test.
+
+```bash
+composer test
+```
+
+atau langsung:
+
+```bash
+php artisan test
+```
+
+## Code Style
+
+Proyek menggunakan Laravel Pint untuk menjaga konsistensi gaya penulisan kode.
+
+```bash
+./vendor/bin/pint
+```
+
+Jalankan sebelum membuat commit untuk memastikan kode sesuai standar proyek.
+
+## Struktur Direktori
+
+Ringkasan direktori penting di dalam `app/`:
+
+```
+app/
+├── Console/
+│   └── Commands/          Perintah artisan kustom
+├── Data/                  Data transfer object (DTO)
+├── Enums/                 Enum domain aplikasi
+├── Events/                Event Laravel
+├── Exceptions/            Exception handler kustom
+├── Filament/
+│   ├── Resources/         Resource CRUD panel admin
+│   ├── Pages/             Halaman kustom panel admin
+│   └── Exports/           Konfigurasi export data
+├── Http/
+│   ├── Controllers/Api/V1/  Controller REST API
+│   ├── Requests/          Form request untuk validasi input
+│   ├── Resources/         API resource untuk transformasi response
+│   └── Middleware/        Middleware HTTP kustom
+├── Listeners/             Event listener
+├── Models/                Eloquent model
+├── Notifications/         Notifikasi email dan push (FCM)
+├── Observers/             Model observer
+├── OpenApi/               Anotasi dokumentasi Swagger/OpenAPI
+├── Policies/              Otorisasi akses resource
+├── Providers/             Service provider
+├── Services/              Logika bisnis, dikelompokkan per domain
+│   ├── Auth/
+│   ├── Content/
+│   ├── Learning/
+│   ├── Quiz/
+│   ├── Simulation/
+│   ├── Reflection/
+│   ├── Progress/
+│   ├── Gamification/
+│   ├── Analytics/
+│   └── Notification/
+└── Support/               Helper dan utilitas pendukung
+```
+
+## Lisensi
+
+Proyek ini dikembangkan untuk keperluan internal dan akademik. Hubungi pemilik repositori untuk informasi lisensi dan penggunaan lebih lanjut.
