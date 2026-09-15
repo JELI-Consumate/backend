@@ -37,7 +37,7 @@ class ArticleBlock extends Model
 
     /**
      * Posisi block ini di antara sesama block bertipe list_item dalam satu
-     * artikel (1-indexed) — dipakai buat nomor bullet di preview panel
+     * artikel (1-indexed), dipakai buat nomor bullet di preview panel
      * admin (lihat ArticleContentPreview), bukan cuma "list_item" ke-N
      * dihitung dari semua block campur tipe lain.
      */

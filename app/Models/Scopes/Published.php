@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 
 /**
- * BR-02: hanya entitas berstatus published yang tampil di API publik.
+ * Hanya entitas berstatus published yang tampil di API publik.
  */
 final class Published implements Scope
 {

@@ -9,7 +9,7 @@ use App\Models\Module;
 use App\Models\Scopes\Published;
 
 /**
- * BR-13: journeys.estimated_minutes adalah kolom turunan dari SUM(modules.estimated_minutes)
+ * journeys.estimated_minutes adalah kolom turunan dari SUM(modules.estimated_minutes)
  * untuk seluruh module published, direkalkulasi tiap module disimpan/dihapus.
  */
 final class ModuleObserver

@@ -7,7 +7,7 @@ namespace App\Exceptions;
 use RuntimeException;
 
 /**
- * BR-01: journey belum unlocked untuk user ini.
+ * Journey belum unlocked untuk user ini.
  */
 final class JourneyLockedException extends RuntimeException
 {

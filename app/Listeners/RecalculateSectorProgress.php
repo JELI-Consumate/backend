@@ -8,7 +8,7 @@ use App\Events\JourneyProgressRecalculated;
 use App\Services\Progress\ProgressService;
 
 /**
- * BR-15: dipicu tiap kali journey_progress berubah (bukan cuma saat 100%),
+ * Dipicu tiap kali journey_progress berubah (bukan cuma saat mencapai 100%),
  * karena progres sektor perlu naik bertahap seiring user mengerjakan halaman
  * di journey mana pun.
  */

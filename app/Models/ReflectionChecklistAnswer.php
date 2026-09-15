@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Tidak ada benar/salah — checklist cuma penanda personal user (sudah/belum
- * dicentang), tidak menghalangi completion module refleksi (BR-10).
+ * Tidak ada benar/salah, checklist cuma penanda personal user (sudah/belum
+ * dicentang) dan tidak menghalangi completion module refleksi.
  */
 #[Fillable(['user_id', 'reflection_checklist_item_id', 'is_checked'])]
 class ReflectionChecklistAnswer extends Model

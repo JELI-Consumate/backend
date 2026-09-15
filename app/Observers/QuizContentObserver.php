@@ -12,7 +12,7 @@ use App\Models\QuizContent;
 final class QuizContentObserver
 {
     /**
-     * BR-04: kind=quiz wajib journey_id terisi & sector_id null;
+     * Kind=quiz wajib journey_id terisi & sector_id null;
      * kind in {pretest, posttest} wajib sector_id terisi & journey_id null.
      */
     public function saving(QuizContent $quizContent): void
@@ -35,9 +35,9 @@ final class QuizContentObserver
     }
 
     /**
-     * BR-09: pretest/posttest wajib minimal 2 segment (multiple_choice + likert).
+     * Pretest/posttest wajib minimal 2 segment (multiple_choice + likert).
      * Dicek di updated() bukan saving()/created() karena segment anak baru bisa
-     * dibuat setelah quiz_content tersimpan (FK ke parent) — create awal (belum
+     * dibuat setelah quiz_content tersimpan (FK ke parent). Create awal (belum
      * ada segment) tidak divalidasi; panggil ulang $quizContent->save() dengan
      * minimal satu atribut berubah setelah seluruh segment lengkap untuk
      * menegakkan aturan ini. Eloquent tidak fire event 'updated' kalau model

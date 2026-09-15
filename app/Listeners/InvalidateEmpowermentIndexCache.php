@@ -10,7 +10,7 @@ use App\Support\CacheKey;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * BR-12: EmpowermentIndexService cache 15 menit diforget saat attempt
+ * EmpowermentIndexService cache 15 menit diforget saat attempt
  * pretest/posttest baru completed, supaya indeks tidak stale. Attempt kind
  * "quiz" (bukan pretest/posttest) tidak memengaruhi indeks, jadi diabaikan.
  */

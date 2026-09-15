@@ -29,7 +29,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmailContr
     use HasApiTokens, HasFactory, HasUlids, MustVerifyEmail, Notifiable;
 
     /**
-     * role & sector_id sengaja tidak masuk #[Fillable] di atas — tidak boleh
+     * role & sector_id sengaja tidak masuk #[Fillable] di atas. Tidak boleh
      * bisa di-set lewat endpoint register/update-profile, hanya lewat resource
      * "Kelola Admin" (super admin) atau seeder/tinker.
      */
@@ -140,7 +140,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmailContr
 
     /**
      * Dibaca package laravel-notification-channels/fcm untuk resolve token
-     * tujuan kirim. Nama method WAJIB persis `routeNotificationForFcm` —
+     * tujuan kirim. Nama method WAJIB persis `routeNotificationForFcm`,
      * konvensi package, bukan bebas dinamai.
      *
      * @return array<int, string>

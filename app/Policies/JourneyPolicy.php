@@ -13,7 +13,7 @@ final readonly class JourneyPolicy
     public function __construct(private JourneyAccessService $access) {}
 
     /**
-     * BR-01: journey hanya bisa dilihat kalau sudah terbuka.
+     * Journey hanya bisa dilihat kalau sudah terbuka.
      */
     public function view(User $user, Journey $journey): bool
     {

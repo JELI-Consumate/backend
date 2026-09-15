@@ -9,7 +9,7 @@ use App\Models\User;
 
 /**
  * Fire tiap kali ProgressService::recalculateJourney() dipanggil (selalu, bukan
- * cuma saat 100% — BR-15). $journey sudah loadMissing('sector') sebelum event
+ * cuma saat mencapai 100%). $journey sudah loadMissing('sector') sebelum event
  * ini dibuat, supaya listener bisa akses $journey->sector tanpa lazy load.
  */
 final readonly class JourneyProgressRecalculated
