@@ -99,7 +99,7 @@ final class SectorSurveyTest extends TestCase
 
         $response = $this->actingAs($user)->postJson("/api/v1/sectors/{$sector->slug}/pretest-survey/complete");
 
-        $response->assertNotFound()->assertJsonPath('code', 'SURVEY_NOT_CONFIGURED');
+        $response->assertUnprocessable()->assertJsonPath('code', 'SURVEY_NOT_CONFIGURED');
     }
 
     public function test_completing_survey_requires_authentication(): void

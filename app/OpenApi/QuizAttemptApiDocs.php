@@ -44,7 +44,7 @@ final class QuizAttemptApiDocs
                 ])
             ),
             new OA\Response(response: 401, description: 'Belum login'),
-            new OA\Response(response: 403, description: 'Belum eligible (`QUIZ_NOT_ELIGIBLE`) atau journey terkunci'),
+            new OA\Response(response: 403, description: 'Belum eligible (`PRETEST_ALREADY_TAKEN`/`POSTTEST_NOT_ELIGIBLE`) atau journey terkunci'),
         ]
     )]
     public function startAttempt(): void {}
@@ -144,7 +144,7 @@ final class QuizAttemptApiDocs
         responses: [
             new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),
             new OA\Response(response: 401, description: 'Belum login'),
-            new OA\Response(response: 403, description: 'Belum eligible (`QUIZ_NOT_ELIGIBLE`), misalnya pretest sudah pernah dikerjakan'),
+            new OA\Response(response: 403, description: 'Pretest sudah pernah dikerjakan (`PRETEST_ALREADY_TAKEN`)'),
             new OA\Response(response: 404, description: 'Sektor/pretest tidak ditemukan'),
         ]
     )]
@@ -160,7 +160,7 @@ final class QuizAttemptApiDocs
         responses: [
             new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),
             new OA\Response(response: 401, description: 'Belum login'),
-            new OA\Response(response: 403, description: 'Belum eligible (`QUIZ_NOT_ELIGIBLE`), misalnya journey wajib belum semua selesai'),
+            new OA\Response(response: 403, description: 'Journey wajib di sektor ini belum semua selesai (`POSTTEST_NOT_ELIGIBLE`)'),
             new OA\Response(response: 404, description: 'Sektor/posttest tidak ditemukan'),
         ]
     )]
