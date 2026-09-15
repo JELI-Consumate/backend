@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('image_url')->nullable();
             $table->unsignedSmallInteger('order');
-            $table->unsignedSmallInteger('estimated_minutes')->default(0)->comment('turunan (BR-13), direkalkulasi ModuleObserver');
+            $table->unsignedSmallInteger('estimated_minutes')->default(0)->comment('Nilai turunan, dihitung ulang otomatis oleh ModuleObserver');
             $table->string('status')->default('draft');
             $table->timestamp('published_at')->nullable();
             $table->softDeletes();

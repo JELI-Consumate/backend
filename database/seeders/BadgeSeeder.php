@@ -7,8 +7,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 
 /**
- * 1 badge per journey (4 baris) — AUTO-GENERATED dari snapshot DB `jeli`.
- * icon_url = placehold.co bawaan DB (belum ada aset badge).
+ * Seed data badge, satu badge per journey (4 baris), mengikuti snapshot database referensi.
+ * icon_url masih memakai placehold.co karena aset badge belum tersedia.
  */
 class BadgeSeeder extends Seeder
 {

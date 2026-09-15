@@ -3,10 +3,9 @@
 declare(strict_types=1);
 
 /**
- * AUTO-GENERATED full snapshot of the `jeli` database — sama persis isi DB.
+ * Full snapshot of the reference database, mirroring its contents exactly.
  *
- * Source: db_dump3.json (live dump 2026-09-03 22:38). Regenerate with
- * scratchpad/gen_seeders.php after every DB change.
+ * Regenerate this file after every reference database change.
  *
  * - EVERY content table for sektor E-Commerce: sectors, journeys, modules,
  *   module_pages, dan seluruh konten (video / article + blocks / quiz +
@@ -899,7 +898,7 @@ Nugroho AZ. 2018. Panduan Menjadi Konsumen Cerdas di Era Digital. Jakarta: Direk
             'id' => '01m1ese5p4s7rdqweq0xrzz3rs',
             'article_content_id' => '01m1ese5p3a7zmzmj22vzk6akr',
             'block_type' => 'paragraph',
-            'text_article' => '[PLACEHOLDER] Konten lengkap belum tersedia dari materi riset — perlu diisi manual oleh tim peneliti.',
+            'text_article' => '[PLACEHOLDER] Konten lengkap belum tersedia dari materi riset, perlu diisi manual oleh tim peneliti.',
             'image_url' => null,
             'alt_text' => null,
             'order' => 1,
@@ -974,7 +973,7 @@ Tahukah kamu bahwa dalam aturan hukum perlindungan konsumen, beban pembuktian aw
             'id' => '01m1ese5pj6a5swz3p17wh1afx',
             'article_content_id' => '01m1ese5pj6a5swz3p17wh1afw',
             'block_type' => 'paragraph',
-            'text_article' => '[PLACEHOLDER] Konten lengkap belum tersedia dari materi riset — perlu diisi manual oleh tim peneliti.',
+            'text_article' => '[PLACEHOLDER] Konten lengkap belum tersedia dari materi riset, perlu diisi manual oleh tim peneliti.',
             'image_url' => null,
             'alt_text' => null,
             'order' => 1,
@@ -998,7 +997,7 @@ Tahukah kamu bahwa dalam aturan hukum perlindungan konsumen, beban pembuktian aw
             'id' => '01m1ese5qddgyf92nyy9pgcxac',
             'article_content_id' => '01m1ese5qddgyf92nyy9pgcxab',
             'block_type' => 'paragraph',
-            'text_article' => '[PLACEHOLDER] Konten lengkap belum tersedia dari materi riset — perlu diisi manual oleh tim peneliti.',
+            'text_article' => '[PLACEHOLDER] Konten lengkap belum tersedia dari materi riset, perlu diisi manual oleh tim peneliti.',
             'image_url' => null,
             'alt_text' => null,
             'order' => 1,
@@ -1181,7 +1180,7 @@ Tahukah kamu bahwa Indonesia kini memiliki regulasi khusus yang melindungi data 
             'id' => '01m1ese5qzhsrsyhsk7m360a7v',
             'article_content_id' => '01m1ese5qzhsrsyhsk7m360a7t',
             'block_type' => 'paragraph',
-            'text_article' => '[PLACEHOLDER] Konten lengkap belum tersedia dari materi riset — perlu diisi manual oleh tim peneliti.',
+            'text_article' => '[PLACEHOLDER] Konten lengkap belum tersedia dari materi riset, perlu diisi manual oleh tim peneliti.',
             'image_url' => null,
             'alt_text' => null,
             'order' => 1,
@@ -1205,7 +1204,7 @@ Tahukah kamu bahwa Indonesia kini memiliki regulasi khusus yang melindungi data 
             'id' => '01m1ese5rz7e8gew4p4jakqnyv',
             'article_content_id' => '01m1ese5rz7e8gew4p4jakqnyt',
             'block_type' => 'paragraph',
-            'text_article' => '[PLACEHOLDER] Konten lengkap belum tersedia dari materi riset — perlu diisi manual oleh tim peneliti.',
+            'text_article' => '[PLACEHOLDER] Konten lengkap belum tersedia dari materi riset, perlu diisi manual oleh tim peneliti.',
             'image_url' => null,
             'alt_text' => null,
             'order' => 1,
@@ -1392,7 +1391,7 @@ Platform e-commerce wajib menyediakan mekanisme pengaduan yang mudah diakses ses
             'id' => '01m1ese5sj64a1xm19tweyxmtw',
             'article_content_id' => '01m1ese5sh86fews65xhfsaqgc',
             'block_type' => 'paragraph',
-            'text_article' => '[PLACEHOLDER] Konten lengkap belum tersedia dari materi riset — perlu diisi manual oleh tim peneliti.',
+            'text_article' => '[PLACEHOLDER] Konten lengkap belum tersedia dari materi riset, perlu diisi manual oleh tim peneliti.',
             'image_url' => null,
             'alt_text' => null,
             'order' => 1,

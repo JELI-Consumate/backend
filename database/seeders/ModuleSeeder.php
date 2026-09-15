@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Seluruh konten sektor E-Commerce — AUTO-GENERATED, sama persis isi DB `jeli`
+ * Seluruh konten sektor E-Commerce, mengikuti snapshot data referensi
  * (lihat database/seeders/data/content_snapshot.php).
  *
  * Menyeed (upsert by ULID, urutan aman FK): video / article (+ blocks) / quiz
@@ -18,12 +18,13 @@ use Illuminate\Support\Facades\DB;
  *
  * Foto: setiap image_url / *_image_url yang diawali "media_pembelajaran/"
  * merujuk file .webp di database/seeders/media/. File itu di-upload ke disk
- * aktif (r2 di production, public di lokal) saat seeding — MediaUrl::resolve
- * yang mengubahnya jadi URL absolut. Nilai gambar lain (r2 key, placehold.co)
+ * aktif (r2 di production, public di lokal) saat seeding, lalu MediaUrl::resolve
+ * mengubahnya jadi URL absolut. Nilai gambar lain (r2 key, placehold.co)
  * disimpan apa adanya.
  *
- * Sengaja query builder (bukan Eloquent) supaya observer tidak ikut jalan:
- * nilai turunan (estimated_minutes, quiz.kind) sudah final di snapshot.
+ * Sengaja memakai query builder (bukan Eloquent) supaya observer tidak ikut
+ * jalan, karena nilai turunan (estimated_minutes, quiz.kind) sudah final
+ * di snapshot.
  */
 class ModuleSeeder extends Seeder
 {

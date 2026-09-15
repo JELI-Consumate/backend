@@ -7,12 +7,12 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 
 /**
- * 4 journey sektor E-Commerce — AUTO-GENERATED dari snapshot DB `jeli`.
+ * Seed data 4 journey sektor E-Commerce, mengikuti snapshot data referensi.
  *
- * image_url = key cover di r2 yang sudah ada (journeys/covers/*.jpg);
+ * image_url memakai key cover yang sudah ada di R2 (journeys/covers/*.jpg);
  * tidak ada file webp cover di media_pembelajaran sehingga dibiarkan.
- * estimated_minutes di-snapshot apa adanya (biasanya diturunkan
- * ModuleObserver, tapi di sini kita simpan nilai final).
+ * estimated_minutes disimpan sebagai nilai final apa adanya, meskipun
+ * pada alur normal nilai ini diturunkan otomatis oleh ModuleObserver.
  */
 class JourneySeeder extends Seeder
 {

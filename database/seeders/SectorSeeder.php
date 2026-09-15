@@ -7,8 +7,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 
 /**
- * Sektor "E-Commerce" (1 baris) — AUTO-GENERATED dari snapshot DB `jeli`.
- * icon_url null persis seperti di DB (belum ada aset ikon sektor).
+ * Seed data sektor "E-Commerce" (1 baris), mengikuti snapshot data referensi.
+ * icon_url bernilai null, karena aset ikon sektor belum tersedia.
  */
 class SectorSeeder extends Seeder
 {
