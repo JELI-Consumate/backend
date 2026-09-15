@@ -8,7 +8,7 @@ use App\Filament\Support\AdminScope;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 /**
- * Halaman awal panel admin — override Dashboard bawaan Filament supaya:
+ * Halaman awal panel admin, override Dashboard bawaan Filament supaya:
  * - sapaan disesuaikan dengan user & scope-nya (super admin / admin sector).
  * - widget-nya cuma ringkasan struktur konten (DashboardOverviewWidget),
  *   bukan AccountWidget/FilamentInfoWidget bawaan (kartu promosi Filament).

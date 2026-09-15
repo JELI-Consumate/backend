@@ -14,7 +14,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
  * Kartu KPI di atas halaman Learning Analytics. Sengaja diletakkan di
  * app/Filament/Pages, bukan app/Filament/Widgets (yang di-auto-discover
  * lewat AdminPanelProvider::discoverWidgets), supaya tidak otomatis ikut
- * tampil di Dashboard utama — cuma dipakai lewat
+ * tampil di Dashboard utama. Cuma dipakai lewat
  * LearningAnalytics::getHeaderWidgets().
  */
 class LearningAnalyticsStatsWidget extends StatsOverviewWidget

@@ -14,11 +14,11 @@ use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Tingkat penyelesaian tiap journey — versi ringkas dari
+ * Tingkat penyelesaian tiap journey, versi ringkas dari
  * LearningAnalyticsService::journeyCompletion() untuk halaman awal, biar
  * admin langsung lihat journey mana yang macet tanpa buka Learning
  * Analytics. Dihitung per baris (bukan lewat withCount) karena Journey
- * belum punya relasi HasMany ke JourneyProgress — jumlah journey per sector
+ * belum punya relasi HasMany ke JourneyProgress. Jumlah journey per sector
  * kecil (puluhan), jadi query per baris masih murah.
  */
 class DashboardJourneyProgressWidget extends TableWidget

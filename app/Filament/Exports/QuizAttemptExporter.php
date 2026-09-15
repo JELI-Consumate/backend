@@ -12,11 +12,11 @@ use Filament\Actions\Exports\Models\Export;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Satu baris per (user, quiz_content) — attempt TERBAIK, sama logikanya
+ * Satu baris per (user, quiz_content), attempt TERBAIK, sama logikanya
  * dengan QuizAttemptService::bestAttempt() (persentase choice_score/
  * choice_max_score tertinggi di antara attempt yang selesai). Self-contained:
  * dipakai baik lewat QuizAttemptsRelationManager (1 user) maupun tombol
- * "Export Data" (semua user sekaligus) — modifyQuery() di sini yang
+ * "Export Data" (semua user sekaligus). modifyQuery() di sini yang
  * menentukan baris "terbaik" itu, bukan menunggu filter dari luar.
  */
 class QuizAttemptExporter extends Exporter
@@ -27,7 +27,7 @@ class QuizAttemptExporter extends Exporter
      * Idempotent dengan sengaja: dipanggil manual dari QuizAttemptsRelationManager
      * (biar tabel & export pakai definisi "terbaik" yang sama persis), lalu
      * dipanggil LAGI otomatis oleh Filament setiap export jalan (lihat
-     * CanExportRecords::modifyQuery di vendor) — tanpa guard ini, addSelect
+     * CanExportRecords::modifyQuery di vendor). Tanpa guard ini, addSelect
      * di bawah bakal nempel dobel dan bikin SQL error duplicate alias.
      */
     public static function modifyQuery(Builder $query): Builder

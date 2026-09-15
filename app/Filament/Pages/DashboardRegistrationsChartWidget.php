@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
 /**
- * Tren pendaftaran pengguna 14 hari terakhir — dipisah dari
+ * Tren pendaftaran pengguna 14 hari terakhir, dipisah dari
  * DashboardOverviewWidget (kartu KPI) supaya pertumbuhan pengguna terlihat
  * sebagai grafik, bukan cuma angka tunggal. Diletakkan di app/Filament/Pages
  * (bukan app/Filament/Widgets) dengan alasan sama seperti widget dashboard

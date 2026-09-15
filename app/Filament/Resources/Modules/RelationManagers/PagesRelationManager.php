@@ -49,7 +49,7 @@ class PagesRelationManager extends RelationManager
 
     /**
      * Resource Filament yang punya form pembuatan/pengeditan konten
-     * sesungguhnya untuk tiap tipe — dipakai buat tombol "Buat Baru" & "Edit
+     * sesungguhnya untuk tiap tipe, dipakai buat tombol "Buat Baru" & "Edit
      * Konten" di bawah, supaya nempel langsung ke form aslinya (title,
      * blocks, segments, dst), bukan cuma dropdown pilih yang sudah ada.
      */
@@ -121,7 +121,7 @@ class PagesRelationManager extends RelationManager
             ->reorderable('order')
             ->headerActions([
                 // Bikin konten baru langsung dari form aslinya (title,
-                // blocks, segments, dst.) — begitu tersimpan, otomatis
+                // blocks, segments, dst.). Begitu tersimpan, otomatis
                 // ditempel ke module ini dan kembali ke halaman ini. Lihat
                 // App\Filament\Concerns\AttachesContentToModulePage.
                 ActionGroup::make(

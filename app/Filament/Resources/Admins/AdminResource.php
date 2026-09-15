@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 /**
- * Kelola akun admin panel (role admin/super_admin) — hanya bisa diakses oleh
+ * Kelola akun admin panel (role admin/super_admin). Hanya bisa diakses oleh
  * super admin. Berbeda dari UserResource yang read-only untuk pengguna
  * aplikasi biasa.
  */
@@ -63,7 +63,7 @@ class AdminResource extends Resource
 
     /**
      * Hanya akun admin/super_admin yang tampil di sini. Kalau yang login
-     * bukan super admin, kosongkan hasilnya sama sekali — jangan andalkan
+     * bukan super admin, kosongkan hasilnya sama sekali. Jangan andalkan
      * shouldRegisterNavigation/canViewAny saja karena ListRecords tidak
      * memanggil otorisasi itu (lihat vendor Filament ListRecords::authorizeAccess).
      */

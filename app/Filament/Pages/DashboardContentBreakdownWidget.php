@@ -13,7 +13,7 @@ use App\Models\VideoContent;
 use Filament\Widgets\ChartWidget;
 
 /**
- * Komposisi konten per jenis (Article/Video/Quiz/Simulation/Reflection) —
+ * Komposisi konten per jenis (Article/Video/Quiz/Simulation/Reflection),
  * versi visual dari deskripsi kartu "Konten" di DashboardOverviewWidget,
  * supaya admin bisa lihat sekilas jenis konten mana yang paling banyak
  * digarap tanpa buka tiap resource satu-satu.

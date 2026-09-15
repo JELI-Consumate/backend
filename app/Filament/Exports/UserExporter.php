@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Ringkasan 1 baris per user, dipakai admin bisnis buat rekap cepat. Sengaja
- * tidak menyertakan avatar_url — file export tidak untuk membawa foto.
+ * tidak menyertakan avatar_url karena file export tidak untuk membawa foto.
  */
 class UserExporter extends Exporter
 {

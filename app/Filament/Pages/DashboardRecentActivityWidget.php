@@ -13,7 +13,7 @@ use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Attempt kuis terbaru yang sudah selesai — sinyal aktivitas paling
+ * Attempt kuis terbaru yang sudah selesai, sinyal aktivitas paling
  * "real-time" yang tersedia di data model kita untuk halaman awal panel,
  * dibanding kartu statis. Dibatasi sector yang sama seperti widget dashboard
  * lain lewat AdminScope::scopeQuizContentSector.

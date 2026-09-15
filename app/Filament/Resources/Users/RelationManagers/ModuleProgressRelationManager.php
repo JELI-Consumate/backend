@@ -12,7 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Read-only, drill-down level halaman modul (BR-11) — dipakai admin bisnis
+ * Read-only, drill-down level halaman modul. Dipakai admin bisnis
  * untuk melihat halaman mana persisnya yang macet, bukan cuma persen journey.
  */
 class ModuleProgressRelationManager extends RelationManager

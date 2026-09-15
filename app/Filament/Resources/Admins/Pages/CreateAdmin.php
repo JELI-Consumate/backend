@@ -16,7 +16,7 @@ class CreateAdmin extends CreateRecord
      * role & sector_id sengaja tidak masuk #[Fillable] User (lihat User::class)
      * supaya tidak bisa di-mass-assign lewat endpoint mobile, jadi di sini
      * di-set eksplisit lewat forceFill(). Akun yang dibuat lewat panel juga
-     * langsung terverifikasi — tidak perlu lewat alur OTP registrasi mobile.
+     * langsung terverifikasi, tidak perlu lewat alur OTP registrasi mobile.
      *
      * @param  array<string, mixed>  $data
      */

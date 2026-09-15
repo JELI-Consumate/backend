@@ -35,7 +35,7 @@ class ModulesTable
             // module dari banyak journey sekaligus, jadi drag-reorder lintas
             // journey akan merusak urutan "order" tiap journey (lihat urutan
             // yang benar & bisa di-drag di tab "Modules" pada halaman edit
-            // Journey — ModulesRelationManager, yang sudah dibatasi ke satu
+            // Journey: ModulesRelationManager, yang sudah dibatasi ke satu
             // journey). Urutan tampil ikut order sector -> order journey ->
             // baru order module itu sendiri. Dibungkus lewat orderBy(Builder)
             // supaya kolom "order" (reserved word di SQL) di-quote dengan

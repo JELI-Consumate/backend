@@ -38,7 +38,7 @@ class JourneysTable
             // journey dari banyak sector sekaligus, jadi drag-reorder lintas
             // sector akan merusak urutan "order" tiap sector (lihat urutan
             // yang benar & bisa di-drag di tab "Journeys" pada halaman edit
-            // Sector — JourneysRelationManager, yang sudah dibatasi ke satu
+            // Sector: JourneysRelationManager, yang sudah dibatasi ke satu
             // sector). Urutan tampil ikut order sector induknya dulu, baru
             // order journey itu sendiri. Dibungkus lewat orderBy(Builder)
             // supaya kolom "order" (reserved word di SQL) di-quote dengan

@@ -16,7 +16,7 @@ use Filament\Support\Icons\Heroicon;
 use UnitEnum;
 
 /**
- * Rekap detail lintas SEMUA user sekaligus — beda dari tab per-user di View
+ * Rekap detail lintas SEMUA user sekaligus, beda dari tab per-user di View
  * User (yang cuma export 1 orang). Tiap tombol pakai Exporter yang sama
  * persis dengan tab View User (lihat modifyQuery() di masing-masing
  * Exporter), jadi definisi datanya konsisten di kedua tempat.

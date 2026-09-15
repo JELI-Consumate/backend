@@ -20,8 +20,8 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 /**
- * Badge yang otomatis diberikan ke user begitu journey ini selesai (BR-07,
- * lihat JourneyCompleted -> AwardJourneyBadge -> BadgeService). Relasinya
+ * Badge yang otomatis diberikan ke user begitu journey ini selesai
+ * (lihat JourneyCompleted -> AwardJourneyBadge -> BadgeService). Relasinya
  * HasOne (unique index di `badges.journey_id`) -- tabel di bawah karena itu
  * cuma pernah berisi 0 atau 1 baris, dan tombol "Buat" disembunyikan begitu
  * badge-nya sudah ada supaya admin tidak coba bikin badge kedua yang bakal

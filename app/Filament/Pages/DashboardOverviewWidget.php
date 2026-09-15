@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
 /**
- * Kartu KPI di halaman awal panel (Dashboard) — gabungan ringkasan struktur
+ * Kartu KPI di halaman awal panel (Dashboard), gabungan ringkasan struktur
  * konten (draft + published) dan snapshot pengguna, biar admin langsung
  * dapat gambaran menyeluruh tanpa harus buka Learning Analytics dulu.
  * Sengaja diletakkan di app/Filament/Pages (bukan app/Filament/Widgets yang

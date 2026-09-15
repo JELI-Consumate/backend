@@ -58,7 +58,7 @@ class JourneyForm
                 ->numeric()
                 ->disabled()
                 ->dehydrated(false)
-                ->helperText('Turunan otomatis dari total durasi module published (BR-13).'),
+                ->helperText('Turunan otomatis dari total durasi module published.'),
             Select::make('status')
                 ->options(collect(PublishStatus::cases())->mapWithKeys(fn ($case) => [$case->value => ucfirst($case->value)]))
                 ->required()

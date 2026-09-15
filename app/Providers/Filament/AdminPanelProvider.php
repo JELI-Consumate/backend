@@ -32,14 +32,14 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             /**
-             * Urutan grup sidebar sengaja didaftarkan eksplisit di sini —
-             * tanpa ini Filament mengurutkan grup berdasarkan urutan
+             * Urutan grup sidebar sengaja didaftarkan eksplisit di sini.
+             * Tanpa ini Filament mengurutkan grup berdasarkan urutan
              * kemunculan item lintas resource (hasil auto-discover),
              * bukan alur kerja sebenarnya. Urutan di bawah mengikuti alur
              * pengisian data: struktur (Sector -> Journey -> Module) lebih
              * dulu, baru konten, lalu data pengguna, lalu administrasi.
              *
-             * Tidak diberi ->icon() di level grup — Filament melarang grup
+             * Tidak diberi ->icon() di level grup. Filament melarang grup
              * dan item di dalamnya sama-sama punya ikon, dan tiap resource
              * di bawah sudah punya ikon sendiri-sendiri yang lebih berguna
              * untuk membedakan Sector/Journey/Module & jenis konten.

@@ -16,7 +16,7 @@ use UnitEnum;
  * Halaman kustom "Pengguna & Analitik" (06-nonfunctional-ops.md §10): user
  * aktif, tingkat penyelesaian per journey, rata-rata skor & kelulusan kuis,
  * distribusi indeks keberdayaan. Query agregat sederhana (lihat
- * LearningAnalyticsService) — halaman ini dibuka jarang oleh peneliti,
+ * LearningAnalyticsService). Halaman ini dibuka jarang oleh peneliti,
  * bukan endpoint publik berbudget ketat seperti §8.
  *
  * Admin sector (lihat AdminScope) cuma melihat data sector-nya sendiri;
@@ -122,7 +122,7 @@ class LearningAnalytics extends Page
     }
 
     /**
-     * Warna satu hue makin gelap seiring makin tinggi rentang indeks —
+     * Warna satu hue makin gelap seiring makin tinggi rentang indeks,
      * memperkuat urutan "makin tinggi = makin gelap" (bukan warna acak per
      * bucket).
      */

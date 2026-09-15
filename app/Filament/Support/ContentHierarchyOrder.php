@@ -13,12 +13,12 @@ use Illuminate\Support\Facades\DB;
  * Sector -> Journey -> Module -> urutan halaman, bukan title/id/created_at.
  * Konten yang belum ditempel ke module manapun ditaruh paling akhir.
  *
- * Sengaja pakai subquery lewat orderBy(Builder) — bukan JOIN di query utama
+ * Sengaja pakai subquery lewat orderBy(Builder), bukan JOIN di query utama
  * dan bukan string SQL mentah:
  * - JOIN ke modules/journeys/sectors akan bikin kolom senama (title, id,
  *   order, deleted_at) jadi ambigu untuk fitur searchable()/sortable()
  *   bawaan Filament di kolom milik tabel konten itu sendiri.
- * - "order" adalah reserved word di SQL (MySQL & SQLite) — kalau ditulis
+ * - "order" adalah reserved word di SQL (MySQL & SQLite), jadi kalau ditulis
  *   manual sebagai string mentah gampang salah quote. orderBy(Builder)
  *   biar query builder yang meng-quote kolomnya, otomatis benar di kedua
  *   database.

@@ -17,8 +17,8 @@ use Illuminate\Support\Facades\Auth;
  *
  * Dipakai di getEloquentQuery() masing-masing Resource (bukan Policy) supaya
  * tidak bentrok dengan Policy yang sudah ada untuk API mobile (mis.
- * JourneyPolicy, yang punya arti "view" berbeda: unlock BR-01, bukan akses
- * admin panel).
+ * JourneyPolicy, yang punya arti "view" berbeda: aturan unlock journey,
+ * bukan akses admin panel).
  */
 final class AdminScope
 {

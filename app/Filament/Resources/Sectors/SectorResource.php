@@ -80,7 +80,7 @@ class SectorResource extends Resource
 
     /**
      * Admin sector tidak boleh membuat sector baru maupun menghapus sector
-     * (termasuk sector-nya sendiri) — hanya super admin.
+     * (termasuk sector-nya sendiri), hanya super admin.
      */
     public static function canCreate(): bool
     {

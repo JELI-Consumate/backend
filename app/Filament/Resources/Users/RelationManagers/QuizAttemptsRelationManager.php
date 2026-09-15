@@ -15,8 +15,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Read-only, satu baris per quiz_content (bukan per attempt): kuis boleh
- * dicoba berkali-kali (BR-06) sehingga skor "berubah-ubah" per attempt —
- * baris di sini merepresentasikan attempt TERBAIK per quiz_content, sama
+ * dicoba berkali-kali sehingga skor "berubah-ubah" per attempt.
+ * Baris di sini merepresentasikan attempt TERBAIK per quiz_content, sama
  * persis dengan logika QuizAttemptService::bestAttempt() (persentase
  * choice_score/choice_max_score tertinggi di antara attempt yang selesai).
  * Histori lengkap tiap attempt sengaja tidak ditampilkan di sini supaya

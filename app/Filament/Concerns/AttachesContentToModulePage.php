@@ -22,7 +22,7 @@ trait AttachesContentToModulePage
 {
     /**
      * Ditangkap sekali di mount() dari query string ?module_id=..., lalu
-     * disimpan sebagai property Livewire biasa — BUKAN dibaca ulang lewat
+     * disimpan sebagai property Livewire biasa, BUKAN dibaca ulang lewat
      * request()->query() di afterCreate()/getRedirectUrl(), karena submit
      * form (wire:submit) adalah request Livewire terpisah yang tidak lagi
      * membawa query string halaman aslinya.
@@ -66,8 +66,8 @@ trait AttachesContentToModulePage
     }
 
     /**
-     * Validasi ulang module_id terhadap scope admin yang sedang login —
-     * jangan percaya begitu saja nilai dari URL (admin sector tidak boleh
+     * Validasi ulang module_id terhadap scope admin yang sedang login.
+     * Jangan percaya begitu saja nilai dari URL (admin sector tidak boleh
      * nempelin konten baru ke module milik sector lain cuma dengan
      * mengarang query string).
      */
