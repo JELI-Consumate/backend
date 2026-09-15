@@ -14,7 +14,7 @@ final class EmpowermentIndexApiDocs
 {
     #[OA\Get(
         path: '/empowerment-index',
-        summary: 'Indeks Keberdayaan per sektor + agregat (BR-12)',
+        summary: 'Indeks Keberdayaan per sektor dan agregat',
         description: '50% skor pengetahuan (choice) + 50% skor sikap (likert dinormalisasi), dari attempt posttest terakhir (fallback pretest). 0 kalau belum ada attempt.',
         tags: ['Gamifikasi'],
         responses: [

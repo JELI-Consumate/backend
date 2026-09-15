@@ -14,7 +14,7 @@ final class ProgressApiDocs
 {
     #[OA\Post(
         path: '/module-pages/{id}/complete',
-        summary: 'Tandai halaman selesai (BR-11: idempotent)',
+        summary: 'Tandai halaman selesai (idempotent)',
         tags: ['Progres'],
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string')),

@@ -29,8 +29,8 @@ final class ReflectionEntryApiDocs
 
     #[OA\Put(
         path: '/reflections/{id}/entries',
-        summary: 'Upsert seluruh jawaban refleksi (BR-10)',
-        description: 'Idempotent by unique index. Module refleksi selesai begitu semua open_question terisi — checklist tidak menghalangi completion (tidak ada benar/salah, murni penanda personal).',
+        summary: 'Upsert seluruh jawaban refleksi',
+        description: 'Idempotent by unique index. Module refleksi selesai begitu semua open_question terisi. Checklist tidak menghalangi completion karena tidak ada benar/salah, murni penanda personal.',
         tags: ['Refleksi'],
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string')),

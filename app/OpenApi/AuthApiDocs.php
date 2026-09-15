@@ -49,7 +49,7 @@ final class AuthApiDocs
     #[OA\Post(
         path: '/auth/login',
         summary: 'Login dengan email/telepon + password',
-        description: 'BR-17: akun yang dibuat via Google (password null) ditolak dengan pesan jelas (kode `GOOGLE_ONLY_ACCOUNT`), bukan pesan generic.',
+        description: 'Akun yang dibuat via Google (password null) ditolak dengan pesan jelas (kode `GOOGLE_ONLY_ACCOUNT`), bukan pesan generic.',
         tags: ['Autentikasi'],
         security: [],
         requestBody: new OA\RequestBody(
@@ -81,7 +81,7 @@ final class AuthApiDocs
 
     #[OA\Post(
         path: '/auth/google',
-        summary: 'Login/register via Google (BR-16)',
+        summary: 'Login/register via Google',
         description: 'Client mengirim access_token hasil Google Sign-In (Socialite stateless). Find-or-create-or-link by google_id/email.',
         tags: ['Autentikasi'],
         security: [],

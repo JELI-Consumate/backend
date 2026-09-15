@@ -19,7 +19,7 @@ final class SectorApiDocs
         responses: [
             new OA\Response(
                 response: 200,
-                description: 'OK — diurutkan sesuai `order`, dilengkapi progres user per sektor',
+                description: 'OK, diurutkan sesuai `order` dan dilengkapi progres user per sektor',
                 content: new OA\JsonContent(properties: [
                     new OA\Property(property: 'data', type: 'array', items: new OA\Items(type: 'object')),
                 ])

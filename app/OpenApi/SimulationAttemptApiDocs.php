@@ -29,7 +29,7 @@ final class SimulationAttemptApiDocs
 
     #[OA\Post(
         path: '/simulations/{id}/attempts',
-        summary: 'Mulai attempt simulasi baru (BR-01: journey harus unlocked)',
+        summary: 'Mulai attempt simulasi baru (journey harus unlocked)',
         tags: ['Simulasi'],
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string'), description: 'simulation_content id'),
@@ -51,7 +51,7 @@ final class SimulationAttemptApiDocs
     #[OA\Post(
         path: '/simulation-attempts/{id}/check',
         summary: 'Cek 1 item jawaban (Duolingo-style: salah ditolak, tidak disimpan)',
-        description: 'BR-08: attempt immutable setelah completed. Jawaban salah dibalas `correct=false` tanpa mengubah attempt — client boleh retry item yang sama. Attempt otomatis completed begitu seluruh item simulasi ini pernah dijawab benar.',
+        description: 'Attempt immutable setelah completed. Jawaban salah dibalas `correct=false` tanpa mengubah attempt, client boleh retry item yang sama. Attempt otomatis completed begitu seluruh item simulasi ini pernah dijawab benar.',
         tags: ['Simulasi'],
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string'), description: 'simulation_attempt id'),

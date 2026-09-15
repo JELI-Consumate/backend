@@ -14,7 +14,7 @@ final class BadgeApiDocs
 {
     #[OA\Get(
         path: '/badges',
-        summary: 'Seluruh badge + status earned/locked (BR-07)',
+        summary: 'Seluruh badge beserta status earned/locked',
         tags: ['Gamifikasi'],
         responses: [
             new OA\Response(

@@ -29,8 +29,8 @@ final class QuizAttemptApiDocs
 
     #[OA\Post(
         path: '/quizzes/{id}/attempts',
-        summary: 'Mulai attempt kuis baru (BR-05, BR-06)',
-        description: 'BR-01: journey harus unlocked. BR-05: pretest sekali, posttest butuh seluruh journey wajib selesai.',
+        summary: 'Mulai attempt kuis baru',
+        description: 'Journey harus unlocked. Pretest hanya bisa dikerjakan sekali, posttest butuh seluruh journey wajib selesai.',
         tags: ['Kuis'],
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string'), description: 'quiz_content id'),
@@ -51,7 +51,7 @@ final class QuizAttemptApiDocs
 
     #[OA\Post(
         path: '/quiz-attempts/{id}/submit',
-        summary: 'Submit jawaban kuis (BR-08: attempt immutable setelah selesai)',
+        summary: 'Submit jawaban kuis (attempt immutable setelah selesai)',
         tags: ['Kuis'],
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string'), description: 'quiz_attempt id'),
@@ -90,7 +90,7 @@ final class QuizAttemptApiDocs
     #[OA\Post(
         path: '/quiz-attempts/{id}/check',
         summary: 'Cek 1 pertanyaan per panggilan (gaya ujian, bukan Duolingo-style)',
-        description: 'BR-08: attempt immutable setelah completed. Jawaban SALAH tetap disimpan permanen (soal langsung terkunci untuk attempt ini, tidak seperti simulasi yang boleh dicoba lagi). Attempt otomatis completed begitu seluruh pertanyaan pernah dicek.',
+        description: 'Attempt immutable setelah completed. Jawaban salah tetap disimpan permanen (soal langsung terkunci untuk attempt ini, tidak seperti simulasi yang boleh dicoba lagi). Attempt otomatis completed begitu seluruh pertanyaan pernah dicek.',
         tags: ['Kuis'],
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string'), description: 'quiz_attempt id'),
@@ -144,7 +144,7 @@ final class QuizAttemptApiDocs
         responses: [
             new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),
             new OA\Response(response: 401, description: 'Belum login'),
-            new OA\Response(response: 403, description: 'Belum eligible (`QUIZ_NOT_ELIGIBLE`) — mis. pretest sudah pernah dikerjakan'),
+            new OA\Response(response: 403, description: 'Belum eligible (`QUIZ_NOT_ELIGIBLE`), misalnya pretest sudah pernah dikerjakan'),
             new OA\Response(response: 404, description: 'Sektor/pretest tidak ditemukan'),
         ]
     )]
@@ -160,7 +160,7 @@ final class QuizAttemptApiDocs
         responses: [
             new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(type: 'object')),
             new OA\Response(response: 401, description: 'Belum login'),
-            new OA\Response(response: 403, description: 'Belum eligible (`QUIZ_NOT_ELIGIBLE`) — mis. journey wajib belum semua selesai'),
+            new OA\Response(response: 403, description: 'Belum eligible (`QUIZ_NOT_ELIGIBLE`), misalnya journey wajib belum semua selesai'),
             new OA\Response(response: 404, description: 'Sektor/posttest tidak ditemukan'),
         ]
     )]
