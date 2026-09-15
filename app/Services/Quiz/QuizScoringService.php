@@ -28,13 +28,13 @@ final readonly class QuizScoringService
     public function submit(QuizAttempt $attempt, QuizSubmissionData $data): QuizAttempt
     {
         if ($attempt->completed_at !== null) {
-            throw new InvalidSubmissionException('Attempt sudah pernah diselesaikan.'); // BR-08
+            throw new InvalidSubmissionException('Attempt sudah pernah diselesaikan.');
         }
 
         return DB::transaction(function () use ($attempt, $data): QuizAttempt {
             $now = Date::now();
 
-            // Preload peta jawaban benar — 1 query (pluck), bukan query per soal.
+            // Preload peta jawaban benar: 1 query (pluck), bukan query per soal.
             $correctOptionIdByQuestion = QuizChoiceOption::query()
                 ->where('is_correct', true)
                 ->whereIn('quiz_question_id', array_column($data->choiceAnswers, 'quiz_question_id'))
@@ -116,18 +116,18 @@ final readonly class QuizScoringService
      * Cek SATU pertanyaan per panggilan (gaya ujian, bukan Duolingo-style
      * `SimulationScoringService::checkAnswer` yang menolak jawaban salah
      * tanpa menyimpannya): jawaban SALAH tetap disimpan permanen begitu
-     * dicek — soal itu langsung terkunci untuk attempt ini, tidak ada
+     * dicek, soal itu langsung terkunci untuk attempt ini, tidak ada
      * "coba lagi sampai benar" seperti simulasi. Pertanyaan yang SUDAH
      * pernah dicek (idempotent lewat `firstOrCreate`) mengembalikan hasil
      * PERTAMA kali tersimpan, mengabaikan jawaban baru yang dikirim.
      *
      * Attempt otomatis completed begitu SELURUH pertanyaan (choice + likert)
-     * sudah pernah dicek — lihat `completeIfAllAnswered`.
+     * sudah pernah dicek, lihat `completeIfAllAnswered`.
      */
     public function checkAnswer(QuizAttempt $attempt, QuizAnswerCheckData $data): QuizAnswerCheckResult
     {
         if ($attempt->completed_at !== null) {
-            throw new InvalidSubmissionException('Attempt sudah pernah diselesaikan.'); // BR-08
+            throw new InvalidSubmissionException('Attempt sudah pernah diselesaikan.');
         }
 
         return DB::transaction(function () use ($attempt, $data): QuizAnswerCheckResult {
@@ -171,7 +171,7 @@ final readonly class QuizScoringService
 
     /**
      * Paralel sengaja dibiarkan terpisah dari agregasi di `submit()` (bukan
-     * di-refactor jadi satu method bersama) — `submit()` sudah punya kontrak
+     * di-refactor jadi satu method bersama). `submit()` sudah punya kontrak
      * jumlah query yang dikunci test (`test_submit_query_count_does_not_scale_with_question_count`),
      * jadi tidak disentuh sama sekali di sini.
      */

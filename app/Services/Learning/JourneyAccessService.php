@@ -12,7 +12,7 @@ use App\Models\User;
 final readonly class JourneyAccessService
 {
     /**
-     * BR-01: journey tidak lagi sequential per-order. Journey manapun di sektor
+     * Journey tidak lagi sequential per-order. Journey manapun di sektor
      * terbuka asal user sudah menyelesaikan survei pretest sektor tersebut
      * (SectorProgress.pretest_survey_completed_at terisi).
      */
@@ -22,7 +22,7 @@ final readonly class JourneyAccessService
     }
 
     /**
-     * Versi bulk untuk endpoint daftar journey — satu query untuk seluruh
+     * Versi bulk untuk endpoint daftar journey: satu query untuk seluruh
      * journey di sektor ini, semua bernilai sama (tidak lagi dirantai per-order).
      *
      * @return array<int, bool> keyed by journey_id

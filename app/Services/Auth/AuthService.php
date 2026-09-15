@@ -31,7 +31,7 @@ final readonly class AuthService
 
     /**
      * No token here on purpose: the app doesn't log the user in until they
-     * come back with the OTP (see verifyOtp) — matches the mobile flow where
+     * come back with the OTP (see verifyOtp), matching the mobile flow where
      * register() only lands on the OTP-entry screen, never on a session.
      */
     public function register(RegisterData $data): User
@@ -122,7 +122,7 @@ final readonly class AuthService
     }
 
     /**
-     * Only one OTP is ever valid per user — generating a new one invalidates
+     * Only one OTP is ever valid per user: generating a new one invalidates
      * whatever was issued before (register, or an earlier resend).
      */
     private function generateAndSendOtp(User $user): void
@@ -201,7 +201,7 @@ final readonly class AuthService
     }
 
     /**
-     * Only one reset OTP is ever valid per user — generating a new one
+     * Only one reset OTP is ever valid per user: generating a new one
      * invalidates whatever was issued before (an earlier forgot-password call).
      */
     private function generateAndSendPasswordResetOtp(User $user): void

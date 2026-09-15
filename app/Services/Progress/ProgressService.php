@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\DB;
 final readonly class ProgressService
 {
     /**
-     * BR-11: idempotent — kalau status sudah completed, tidak diubah lagi.
+     * Idempotent: kalau status sudah completed, tidak diubah lagi.
      */
     public function markPageCompleted(User $user, ModulePage $page): ModuleProgress
     {
@@ -46,7 +46,7 @@ final readonly class ProgressService
     }
 
     /**
-     * Simpan posisi terakhir (mis. detik video, indeks slide) — tidak menurunkan
+     * Simpan posisi terakhir (mis. detik video, indeks slide), tidak menurunkan
      * status dari completed, dan menaikkan not_started ke in_progress.
      */
     public function updateLastPosition(User $user, ModulePage $page, int $position): ModuleProgress
@@ -67,10 +67,10 @@ final readonly class ProgressService
     }
 
     /**
-     * BR-03: persen = Σ estimated_minutes module wajib yang SELURUH halamannya
+     * Persen = Σ estimated_minutes module wajib yang SELURUH halamannya
      * completed ÷ Σ estimated_minutes seluruh module wajib × 100, floor.
      * "Seluruh halaman completed" dicek via correlated subquery whereDoesntHave
-     * bertingkat — bukan loop PHP. Fire JourneyProgressRecalculated selalu (BR-15),
+     * bertingkat, bukan loop PHP. Fire JourneyProgressRecalculated selalu,
      * dan JourneyCompleted khusus saat status baru berubah jadi completed.
      */
     public function recalculateJourney(User $user, Journey $journey): JourneyProgress
@@ -120,13 +120,13 @@ final readonly class ProgressService
     }
 
     /**
-     * BR-14: rata-rata berbobot durasi seluruh journey_progress user dalam sektor,
-     * memakai journeys.estimated_minutes yang sudah denormalized (BR-13) — tidak
+     * Rata-rata berbobot durasi seluruh journey_progress user dalam sektor,
+     * memakai journeys.estimated_minutes yang sudah denormalized, tidak
      * JOIN ke modules/module_pages, cukup ke journeys + journey_progress.
      *
      * Status completed saat seluruh journey published di sektor sudah completed
-     * (skema saat ini belum punya `journeys.is_required` — lihat pertanyaan
-     * terbuka #6 di 06-nonfunctional-ops.md — jadi seluruh journey dianggap wajib).
+     * (skema saat ini belum punya `journeys.is_required`, lihat pertanyaan
+     * terbuka #6 di 06-nonfunctional-ops.md, jadi seluruh journey dianggap wajib).
      */
     public function recalculateSector(User $user, Sector $sector): SectorProgress
     {

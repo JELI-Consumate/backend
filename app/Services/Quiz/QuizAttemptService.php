@@ -19,9 +19,9 @@ final readonly class QuizAttemptService
     public function __construct(private JourneyAccessService $journeyAccess) {}
 
     /**
-     * BR-05: pretest sektor hanya dapat dikerjakan satu kali; posttest hanya
+     * Pretest sektor hanya dapat dikerjakan satu kali; posttest hanya
      * terbuka setelah seluruh journey published di sektor selesai. Kuis journey
-     * (kind=quiz) tidak dibatasi (BR-06), tapi tetap butuh journey-nya unlocked.
+     * (kind=quiz) tidak dibatasi, tapi tetap butuh journey-nya unlocked.
      */
     public function guardEligibility(User $user, QuizContent $quizContent): void
     {
@@ -63,7 +63,7 @@ final readonly class QuizAttemptService
     }
 
     /**
-     * BR-06: attempt_number naik tiap percobaan, tidak ada batas jumlah attempt
+     * Attempt_number naik tiap percobaan, tidak ada batas jumlah attempt
      * untuk kind=quiz. Guard eligibility ditegakkan sebelum attempt baru dibuat.
      */
     public function startAttempt(User $user, QuizContent $quizContent): QuizAttempt
@@ -83,7 +83,7 @@ final readonly class QuizAttemptService
     }
 
     /**
-     * BR-06: skor tertinggi (persentase choice) yang dipakai untuk progres.
+     * Skor tertinggi (persentase choice) yang dipakai untuk progres.
      */
     public function bestAttempt(User $user, QuizContent $quizContent): ?QuizAttempt
     {

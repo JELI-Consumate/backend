@@ -42,19 +42,15 @@ final readonly class SimulationScoringService
 
     /**
      * Duolingo-style: cek SATU item per panggilan. Jawaban salah ditolak
-     * (`correct=false`) dan TIDAK disimpan — user boleh coba lagi item yang
-     * sama tanpa attempt-nya berubah status. Jawaban benar disimpan idempotent
-     * (aman dipanggil ulang untuk item yang sama). Attempt otomatis completed
-     * begitu seluruh item simulasi ini sudah pernah dijawab benar — tidak ada
-     * lagi konsep "submit gagal/lulus sebagian", karena satu-satunya cara
-     * selesai adalah menjawab semua benar.
+     * (`correct=false`) dan tidak disimpan, user boleh coba lagi item yang sama.
+     * Jawaban benar disimpan idempotent. Attempt otomatis completed begitu
+     * seluruh item sudah pernah dijawab benar.
      *
-     * BR-08: attempt yang sudah completed bersifat immutable. Mengecek ULANG
-     * satu jawaban di atasnya tetap dilayani (operasi baca murni — TIDAK
-     * menulis apa pun), bukan ditolak 409. Alasannya: tombol "Cek Jalur" di
-     * simulasi ordering mengirim seluruh langkah dalam satu batch; salah satu
-     * panggilan di batch itu yang men-trigger completion, lalu sisa panggilan
-     * di batch yang sama mengenai attempt yang baru saja completed.
+     * Attempt yang sudah completed bersifat immutable, tapi mengecek ulang
+     * satu jawaban di atasnya tetap dilayani sebagai operasi baca murni
+     * (bukan ditolak 409), karena tombol "Cek Jalur" pada simulasi ordering
+     * mengirim seluruh langkah dalam satu batch dan panggilan lain di batch
+     * yang sama bisa mengenai attempt yang baru saja completed.
      */
     public function checkAnswer(SimulationAttempt $attempt, SimulationAnswerCheckData $data): SimulationAnswerCheckResult
     {

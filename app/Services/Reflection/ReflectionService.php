@@ -19,10 +19,10 @@ final readonly class ReflectionService
 
     /**
      * Upsert seluruh jawaban refleksi user (satu panggilan bulk upsert, bukan loop
-     * insert/update per baris) — idempotent lewat UNIQUE(user_id, reflection_question_id)
+     * insert/update per baris). Idempotent lewat UNIQUE(user_id, reflection_question_id)
      * untuk open_question dan UNIQUE(user_id, reflection_checklist_item_id) untuk
      * checklist (tidak ada benar/salah, cuma penanda personal user).
-     * Kalau setelahnya seluruh open_question sudah terisi (BR-10), tandai halaman selesai.
+     * Kalau setelahnya seluruh open_question sudah terisi, tandai halaman selesai.
      */
     public function upsertEntries(User $user, ReflectionContent $content, ReflectionEntriesData $data): void
     {
@@ -74,7 +74,7 @@ final readonly class ReflectionService
     }
 
     /**
-     * BR-10: module refleksi selesai kalau seluruh pertanyaan open_question pada
+     * Module refleksi selesai kalau seluruh pertanyaan open_question pada
      * module tersebut sudah terisi jawabannya. Checklist tidak menghalangi completion.
      */
     public function isCompleted(User $user, ReflectionContent $content): bool

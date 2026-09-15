@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Cache;
 final readonly class EmpowermentIndexService
 {
     /**
-     * BR-12: 50% skor pengetahuan (persentase choice benar) + 50% skor sikap
+     * 50% skor pengetahuan (persentase choice benar) + 50% skor sikap
      * (likert_average dinormalisasi 0-100). Sumber: attempt posttest terakhir
      * sektor; fallback ke pretest kalau posttest belum ada. Bobot disimpan di
      * config/learning.php, bukan hardcode. Cache 15 menit per user, diforget

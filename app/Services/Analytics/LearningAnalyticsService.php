@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
  *
  * Dipisah dari Page/Widget Filament supaya bisa dipakai bareng oleh
  * keduanya dan gampang dites tanpa Livewire. `$sectorId` null berarti tidak
- * dibatasi (super admin); isi berarti dibatasi ke satu sector (admin) —
+ * dibatasi (super admin); isi berarti dibatasi ke satu sector (admin),
  * lihat App\Filament\Support\AdminScope::restrictedSectorId().
  */
 final readonly class LearningAnalyticsService
@@ -94,7 +94,7 @@ final readonly class LearningAnalyticsService
                 ->count();
 
             return [
-                'sector' => $journey->sector?->name ?? '—',
+                'sector' => $journey->sector?->name ?? '-',
                 'title' => $journey->title,
                 'total' => $total,
                 'completed' => $completed,

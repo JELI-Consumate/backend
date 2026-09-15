@@ -21,7 +21,7 @@ final readonly class ContentTreeService
      * Muat module + module_pages + konten polimorfik ter-resolve.
      *
      * Cache key mengandung `updated_at` module (bertambah tiap module sendiri
-     * ATAU salah satu konten/halamannya berubah — lihat ContentModuleCacheObserver
+     * ATAU salah satu konten/halamannya berubah, lihat ContentModuleCacheObserver
      * & ModulePageObserver), jadi 1 query murah selalu dijalankan untuk cek versi
      * sebelum menyentuh cache.
      */

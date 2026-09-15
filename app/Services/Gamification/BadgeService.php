@@ -13,7 +13,7 @@ use Illuminate\Database\UniqueConstraintViolationException;
 final readonly class BadgeService
 {
     /**
-     * BR-07: idempotent secara ganda — firstOrCreate di kode, unique index
+     * Idempotent secara ganda: firstOrCreate di kode, unique index
      * (user_id, badge_id) di DB sebagai pengaman race condition (mis. event
      * JourneyCompleted fire dua kali hampir bersamaan).
      */

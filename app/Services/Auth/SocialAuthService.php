@@ -33,7 +33,7 @@ final readonly class SocialAuthService
                 // (it must never be settable via mass assignment from
                 // request input elsewhere), so passing it through
                 // User::create() above silently drops it instead of saving
-                // it — markEmailAsVerified() uses forceFill() and bypasses
+                // it. markEmailAsVerified() uses forceFill() and bypasses
                 // that guard correctly, same as the existing-user branch
                 // below.
                 $user->markEmailAsVerified();
