@@ -14,7 +14,7 @@ use App\Services\Simulation\SimulationScoringService;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Support\Facades\Gate;
 
 final class SimulationAttemptController extends Controller
 {
@@ -40,9 +40,7 @@ final class SimulationAttemptController extends Controller
     {
         $attempt = SimulationAttempt::query()->with(['user', 'simulationContent.modulePage.module.journey'])->findOrFail($id);
 
-        if ($attempt->user_id !== $request->user()->id) {
-            throw new AccessDeniedHttpException('Attempt ini bukan milik kamu.');
-        }
+        Gate::authorize('check', $attempt);
 
         $result = $this->scoring->checkAnswer($attempt, $request->toData());
         $result->attempt->load(['matchingAnswers', 'orderingAnswers.orderingStep']);

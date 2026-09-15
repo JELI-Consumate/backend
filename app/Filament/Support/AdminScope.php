@@ -15,10 +15,8 @@ use Illuminate\Support\Facades\Auth;
  * - super_admin: tidak dibatasi, lihat semua sector.
  * - admin: dibatasi ke satu sector (users.sector_id).
  *
- * Dipakai di getEloquentQuery() masing-masing Resource (bukan Policy) supaya
- * tidak bentrok dengan Policy yang sudah ada untuk API mobile (mis.
- * JourneyPolicy, yang punya arti "view" berbeda: aturan unlock journey,
- * bukan akses admin panel).
+ * Dipakai di getEloquentQuery() masing-masing Resource, terpisah dari
+ * authorization Policy yang dipakai API mobile.
  */
 final class AdminScope
 {

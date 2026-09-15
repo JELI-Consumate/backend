@@ -13,6 +13,8 @@ use App\Models\QuizAttempt;
 use App\Models\QuizContent;
 use App\Models\User;
 use App\Services\Learning\JourneyAccessService;
+use Illuminate\Database\UniqueConstraintViolationException;
+use RuntimeException;
 
 final readonly class QuizAttemptService
 {
@@ -42,7 +44,7 @@ final readonly class QuizAttemptService
                 ->exists();
 
             if ($alreadyAttempted) {
-                throw new QuizNotEligibleException('Pretest sektor ini sudah pernah dikerjakan.');
+                throw new QuizNotEligibleException('Pretest sektor ini sudah pernah dikerjakan.', 'PRETEST_ALREADY_TAKEN');
             }
 
             return;
@@ -58,28 +60,49 @@ final readonly class QuizAttemptService
             ->count();
 
         if ($journeyIds->isEmpty() || $completedCount < $journeyIds->count()) {
-            throw new QuizNotEligibleException('Selesaikan seluruh journey di sektor ini sebelum mengerjakan posttest.');
+            throw new QuizNotEligibleException('Selesaikan seluruh journey di sektor ini sebelum mengerjakan posttest.', 'POSTTEST_NOT_ELIGIBLE');
         }
     }
 
     /**
      * Attempt_number naik tiap percobaan, tidak ada batas jumlah attempt
      * untuk kind=quiz. Guard eligibility ditegakkan sebelum attempt baru dibuat.
+     *
+     * Dua request start-attempt yang nyaris bersamaan bisa race di penomoran
+     * attempt_number atau di aturan "pretest sekali". Insert dibungkus retry
+     * yang re-check eligibility saat unique constraint (user_id, quiz_content_id,
+     * attempt_number) kena tabrakan, supaya pretest yang benar-benar sudah
+     * ke-attempt duluan pulang sebagai QuizNotEligibleException (403), bukan
+     * QueryException mentah (500).
      */
     public function startAttempt(User $user, QuizContent $quizContent): QuizAttempt
     {
         $this->guardEligibility($user, $quizContent);
 
-        $nextAttemptNumber = 1 + (int) QuizAttempt::query()
-            ->where('user_id', $user->id)
-            ->where('quiz_content_id', $quizContent->id)
-            ->max('attempt_number');
+        $maxRetries = 3;
 
-        return QuizAttempt::query()->create([
-            'user_id' => $user->id,
-            'quiz_content_id' => $quizContent->id,
-            'attempt_number' => $nextAttemptNumber,
-        ]);
+        for ($attempt = 0; $attempt < $maxRetries; $attempt++) {
+            $nextAttemptNumber = 1 + (int) QuizAttempt::query()
+                ->where('user_id', $user->id)
+                ->where('quiz_content_id', $quizContent->id)
+                ->max('attempt_number');
+
+            try {
+                return QuizAttempt::query()->create([
+                    'user_id' => $user->id,
+                    'quiz_content_id' => $quizContent->id,
+                    'attempt_number' => $nextAttemptNumber,
+                ]);
+            } catch (UniqueConstraintViolationException $exception) {
+                $this->guardEligibility($user, $quizContent);
+
+                if ($attempt === $maxRetries - 1) {
+                    throw $exception;
+                }
+            }
+        }
+
+        throw new RuntimeException('Gagal membuat quiz attempt setelah beberapa percobaan.');
     }
 
     /**
