@@ -15,7 +15,7 @@ final class PublishedScopeTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * BR-02: hanya entitas published yang tampil di query publik (default scope).
+     * Hanya entitas published yang tampil di query publik (default scope).
      */
     public function test_br02_draft_and_archived_journeys_excluded_by_default(): void
     {

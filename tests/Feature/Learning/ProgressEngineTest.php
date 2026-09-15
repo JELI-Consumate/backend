@@ -31,7 +31,7 @@ final class ProgressEngineTest extends TestCase
     }
 
     /**
-     * BR-11: complete berulang tidak mengubah completed_at yang sudah terisi.
+     * Complete berulang tidak mengubah completed_at yang sudah terisi.
      */
     public function test_completing_a_page_twice_is_idempotent(): void
     {
@@ -51,7 +51,7 @@ final class ProgressEngineTest extends TestCase
     }
 
     /**
-     * BR-03: progres journey berbobot durasi — module hanya berkontribusi kalau
+     * Progres journey berbobot durasi: module hanya berkontribusi kalau
      * SELURUH halamannya completed, bukan kredit parsial per halaman.
      */
     public function test_journey_progress_is_weighted_by_duration_and_requires_full_module_completion(): void
@@ -91,7 +91,7 @@ final class ProgressEngineTest extends TestCase
     }
 
     /**
-     * BR-14 & BR-15: progres sektor naik bertahap (rata-rata berbobot durasi journey)
+     * Progres sektor naik bertahap (rata-rata berbobot durasi journey)
      * begitu salah satu journey selesai, bukan hanya saat seluruh sektor selesai.
      */
     public function test_sector_progress_increases_incrementally_as_journeys_complete(): void

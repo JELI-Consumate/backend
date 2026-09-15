@@ -145,7 +145,7 @@ final class SimulationAttemptTest extends TestCase
         $attemptId = $this->actingAs($user)->postJson("/api/v1/simulations/{$simulation->id}/attempts")
             ->assertCreated()->json('data.attempt_id');
 
-        // Coba salah dulu untuk pair kedua — harus ditolak, attempt belum selesai.
+        // Coba salah dulu untuk pair kedua: harus ditolak, attempt belum selesai.
         $this->actingAs($user)->postJson("/api/v1/simulation-attempts/{$attemptId}/check", [
             'type' => 'matching',
             'simulation_matching_pair_id' => $pairs[1]->id,
@@ -203,7 +203,7 @@ final class SimulationAttemptTest extends TestCase
     }
 
     /**
-     * BR-08: attempt yang sudah completed_at != null bersifat immutable.
+     * Attempt yang sudah completed_at != null bersifat immutable.
      * Mengecek ULANG jawaban di atasnya dilayani sebagai operasi baca (tidak
      * menulis apa pun, tidak error) -- bukan ditolak 409. Ini yang menjaga
      * tombol "Cek Jalur" simulasi ordering (mengirim seluruh langkah dalam

@@ -46,8 +46,8 @@ final class LoginTest extends TestCase
     }
 
     /**
-     * BR-17: user with password = null (Google-only account) must be rejected
-     * with a clear, non-generic message — not allowed to reach Hash::check().
+     * User with password = null (Google-only account) must be rejected
+     * with a clear, non-generic message, not allowed to reach Hash::check().
      */
     public function test_br17_google_only_account_cannot_login_with_password(): void
     {

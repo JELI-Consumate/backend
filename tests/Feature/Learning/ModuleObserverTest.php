@@ -15,7 +15,7 @@ final class ModuleObserverTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * BR-13: journeys.estimated_minutes = SUM(modules.estimated_minutes) untuk
+     * journeys.estimated_minutes = SUM(modules.estimated_minutes) untuk
      * module published, direkalkulasi otomatis saat module disimpan/diubah/dihapus.
      */
     public function test_br13_journey_estimated_minutes_resyncs_on_module_saved(): void

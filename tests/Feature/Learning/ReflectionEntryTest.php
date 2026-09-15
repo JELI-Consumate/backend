@@ -67,7 +67,7 @@ final class ReflectionEntryTest extends TestCase
     }
 
     /**
-     * BR-10: module refleksi selesai hanya setelah SELURUH open_question terisi.
+     * Module refleksi selesai hanya setelah SELURUH open_question terisi.
      */
     public function test_module_page_completes_only_after_all_open_questions_answered(): void
     {
@@ -93,7 +93,7 @@ final class ReflectionEntryTest extends TestCase
     }
 
     /**
-     * BR-10: pertanyaan checklist tidak menghalangi completion — hanya open_question yang dihitung.
+     * Pertanyaan checklist tidak menghalangi completion, hanya open_question yang dihitung.
      */
     public function test_checklist_question_does_not_block_completion(): void
     {
@@ -191,7 +191,7 @@ final class ReflectionEntryTest extends TestCase
             ->assertJsonPath('data.sections.0.questions.1.checklist_items.0.is_checked', true)
             ->assertJsonPath('data.sections.0.questions.1.checklist_items.1.is_checked', false);
 
-        // Checklist sengaja cuma 1 dari 2 item dicentang — tetap harus completed (BR-10).
+        // Checklist sengaja cuma 1 dari 2 item dicentang, tetap harus completed.
         $pageResponse = $this->actingAs($user)->getJson("/api/v1/module-pages/{$page->id}");
         $pageResponse->assertOk()->assertJsonPath('data.progress.status', 'completed');
 

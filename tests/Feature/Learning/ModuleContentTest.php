@@ -36,7 +36,7 @@ final class ModuleContentTest extends TestCase
     use HasCompletedPretestSurvey, RefreshDatabase;
 
     /**
-     * Kombinasi realistis satu module "materi": video + article — dipakai untuk
+     * Kombinasi realistis satu module "materi": video + article, dipakai untuk
      * assertion budget query ≤8 (06-nonfunctional-ops.md §8). Pretest survei
      * sektor langsung dianggap completed supaya journey-nya (order=1) unlocked
      * tanpa menambah query cek journey (JourneyAccessService::isUnlocked masih
@@ -61,7 +61,7 @@ final class ModuleContentTest extends TestCase
 
     /**
      * Module "kuis": kuis sendirian punya 4 level relasi turunan (segments →
-     * questions → choiceOptions, segments → likertScaleOptions) — sudah menghabiskan
+     * questions → choiceOptions, segments → likertScaleOptions), sudah menghabiskan
      * separuh budget 8 query sendirian, jadi diuji terpisah dari budget test (bukan
      * dicampur dengan video/article) dan tidak diberi assertion count ketat.
      */
@@ -80,7 +80,7 @@ final class ModuleContentTest extends TestCase
     }
 
     /**
-     * Satu module berisi seluruh 5 tipe konten sekaligus — dipakai untuk verifikasi
+     * Satu module berisi seluruh 5 tipe konten sekaligus, dipakai untuk verifikasi
      * korektnes & kebocoran field, BUKAN untuk assertion budget query (kombinasi ini
      * tidak merepresentasikan module nyata; tiap ModuleType biasanya hanya berisi
      * 1-2 tipe konten, lihat 03-model-data.md §3.2 ModuleType).

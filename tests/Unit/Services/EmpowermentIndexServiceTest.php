@@ -29,7 +29,7 @@ final class EmpowermentIndexServiceTest extends TestCase
     }
 
     /**
-     * BR-12: 50% skor pengetahuan (choice benar) + 50% skor sikap (likert 1-5
+     * 50% skor pengetahuan (choice benar) + 50% skor sikap (likert 1-5
      * dinormalisasi ke 0-100), config/learning.php bobot 50:50.
      */
     public function test_calculate_combines_knowledge_and_attitude_with_configured_weights(): void
@@ -143,7 +143,7 @@ final class EmpowermentIndexServiceTest extends TestCase
         $service = app(EmpowermentIndexService::class);
         $first = $service->calculate($user, $sector);
 
-        // Ubah data sumber tanpa invalidasi cache — hasil kedua harus tetap sama (dari cache).
+        // Ubah data sumber tanpa invalidasi cache, hasil kedua harus tetap sama (dari cache).
         QuizAttempt::query()->where('user_id', $user->id)->update(['choice_score' => 0]);
 
         $second = $service->calculate($user, $sector);

@@ -14,7 +14,7 @@ use Tests\Concerns\HasCompletedPretestSurvey;
 use Tests\TestCase;
 
 /**
- * BR-01: journey tidak lagi sequential per-order. Journey manapun di sektor
+ * Journey tidak lagi sequential per-order. Journey manapun di sektor
  * terbuka asal user sudah menyelesaikan survei pretest sektor tersebut.
  */
 final class JourneyAccessTest extends TestCase

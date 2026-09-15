@@ -31,7 +31,7 @@ use Tests\TestCase;
 /**
  * Fase 9: preview builder konten harus bisa dibuka tanpa error 500 (mis.
  * lazy-loading exception di relasi bertingkat), untuk video/artikel/kuis/
- * simulasi/refleksi — sesuai catatan UX admin di 06-nonfunctional-ops.md §10.
+ * simulasi/refleksi, sesuai catatan UX admin.
  */
 final class ContentPreviewTest extends TestCase
 {
@@ -61,7 +61,7 @@ final class ContentPreviewTest extends TestCase
     /**
      * Block bertipe list_item ditampilkan pakai bullet bernomor di preview
      * (lihat ArticleBlock::listItemNumber & resources/views/filament/
-     * infolists/list-item-entry.blade.php), bukan teks polos — pastikan
+     * infolists/list-item-entry.blade.php), bukan teks polos, pastikan
      * preview-nya tetap render sukses (bukan 500) begitu ada list_item.
      */
     public function test_article_preview_renders_with_list_item_blocks(): void

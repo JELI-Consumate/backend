@@ -23,7 +23,7 @@ final class ArticleBlockTest extends TestCase
 
     /**
      * Nomor bullet dihitung cuma dari sesama block list_item, bukan dari
-     * semua block campur tipe lain — supaya paragraph/gambar yang
+     * semua block campur tipe lain, supaya paragraph/gambar yang
      * diselipkan di antara list_item tidak ikut menaikkan nomornya.
      */
     public function test_list_item_number_counts_only_among_sibling_list_items(): void

@@ -42,7 +42,7 @@ final class ProgressServiceTest extends TestCase
     }
 
     /**
-     * BR-11: idempotent — status/completed_at sudah completed tidak diubah lagi.
+     * Idempotent, status/completed_at sudah completed tidak diubah lagi.
      */
     public function test_mark_page_completed_is_idempotent(): void
     {
@@ -98,7 +98,7 @@ final class ProgressServiceTest extends TestCase
     }
 
     /**
-     * BR-03: persen = jumlah menit module wajib yang seluruh halamannya completed,
+     * Persen = jumlah menit module wajib yang seluruh halamannya completed,
      * dibagi total menit module wajib.
      */
     public function test_recalculate_journey_computes_percent_from_required_modules_only(): void
@@ -138,8 +138,8 @@ final class ProgressServiceTest extends TestCase
         $moduleDone = Module::factory()->create(['journey_id' => $journey->id, 'is_required' => true, 'estimated_minutes' => 30]);
         $pageDone = ModulePage::factory()->create(['module_id' => $moduleDone->id]);
 
-        // Module belum disentuh sama sekali (punya page tapi tanpa progress) —
-        // kalau module ini TIDAK diberi page, whereDoesntHave('pages', ...) di
+        // Module belum disentuh sama sekali (punya page tapi tanpa progress).
+        // Kalau module ini TIDAK diberi page, whereDoesntHave('pages', ...) di
         // service jadi trivially true (dianggap "selesai") walau belum disentuh.
         $moduleNotDone = Module::factory()->create(['journey_id' => $journey->id, 'is_required' => true, 'estimated_minutes' => 70]);
         ModulePage::factory()->create(['module_id' => $moduleNotDone->id]);
@@ -192,7 +192,7 @@ final class ProgressServiceTest extends TestCase
     }
 
     /**
-     * BR-14: rata-rata berbobot progress_percent tiap journey berdasar estimated_minutes.
+     * Rata-rata berbobot progress_percent tiap journey berdasar estimated_minutes.
      */
     public function test_recalculate_sector_computes_weighted_average_of_journeys(): void
     {

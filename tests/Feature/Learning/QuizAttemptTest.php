@@ -130,7 +130,7 @@ final class QuizAttemptTest extends TestCase
     }
 
     /**
-     * BR-08: attempt yang sudah completed_at != null bersifat immutable.
+     * Attempt yang sudah completed_at != null bersifat immutable.
      */
     public function test_resubmitting_completed_attempt_returns_409(): void
     {
@@ -189,7 +189,7 @@ final class QuizAttemptTest extends TestCase
     }
 
     /**
-     * BR-05: pretest sektor hanya dapat dikerjakan satu kali.
+     * Pretest sektor hanya dapat dikerjakan satu kali.
      */
     public function test_pretest_cannot_be_started_twice(): void
     {
@@ -207,7 +207,7 @@ final class QuizAttemptTest extends TestCase
     }
 
     /**
-     * BR-05: posttest terkunci sebelum seluruh journey di sektor selesai.
+     * Posttest terkunci sebelum seluruh journey di sektor selesai.
      */
     public function test_posttest_locked_until_all_journeys_completed(): void
     {
@@ -229,7 +229,7 @@ final class QuizAttemptTest extends TestCase
     }
 
     /**
-     * BR-06: kuis journey boleh diulang; skor tertinggi yang dipakai untuk progres.
+     * Kuis journey boleh diulang; skor tertinggi yang dipakai untuk progres.
      */
     public function test_best_attempt_uses_highest_score_across_repeated_attempts(): void
     {
@@ -277,7 +277,7 @@ final class QuizAttemptTest extends TestCase
     {
         // Sektor/journey/user terisolasi per pengukuran, supaya state sebelum submit
         // (journey_progress/sector_progress belum ada baris sama sekali) identik untuk
-        // tiap pengukuran — satu-satunya variabel yang beda cuma jumlah soal.
+        // tiap pengukuran, satu-satunya variabel yang beda cuma jumlah soal.
         $user = User::factory()->create();
         $sector = Sector::factory()->create();
         $this->completePretestSurvey($user, $sector);
@@ -463,7 +463,7 @@ final class QuizAttemptTest extends TestCase
     }
 
     /**
-     * BR-08: attempt yang sudah completed_at != null bersifat immutable.
+     * Attempt yang sudah completed_at != null bersifat immutable.
      */
     public function test_checking_answer_on_completed_attempt_returns_409(): void
     {

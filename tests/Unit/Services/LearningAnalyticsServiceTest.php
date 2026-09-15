@@ -34,7 +34,7 @@ final class LearningAnalyticsServiceTest extends TestCase
         $recentUser = User::factory()->create();
         $staleUser = User::factory()->create();
 
-        // recentUser progres di dua halaman berbeda dalam window — tetap
+        // recentUser progres di dua halaman berbeda dalam window, tetap
         // dihitung satu user, bukan dua.
         ModuleProgress::factory()->create(['user_id' => $recentUser->id, 'module_page_id' => $pageOne->id, 'updated_at' => now()->subDays(5)]);
         ModuleProgress::factory()->create(['user_id' => $recentUser->id, 'module_page_id' => $pageTwo->id, 'updated_at' => now()->subDays(2)]);
@@ -74,7 +74,7 @@ final class LearningAnalyticsServiceTest extends TestCase
 
         QuizAttempt::factory()->completed()->create(['quiz_content_id' => $quiz->id, 'choice_score' => 9, 'choice_max_score' => 10]);
         QuizAttempt::factory()->completed()->create(['quiz_content_id' => $quiz->id, 'choice_score' => 5, 'choice_max_score' => 10]);
-        // Belum selesai — tidak boleh ikut dirata-rata.
+        // Belum selesai, tidak boleh ikut dirata-rata.
         QuizAttempt::factory()->create(['quiz_content_id' => $quiz->id, 'choice_score' => null, 'choice_max_score' => null, 'completed_at' => null]);
 
         $average = app(LearningAnalyticsService::class)->averageQuizScore(null);

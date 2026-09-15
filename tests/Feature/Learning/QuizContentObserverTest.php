@@ -19,7 +19,7 @@ final class QuizContentObserverTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * BR-04: kind=quiz wajib journey_id terisi & sector_id null.
+     * Kind=quiz wajib journey_id terisi & sector_id null.
      */
     public function test_br04_quiz_kind_requires_journey_id_and_rejects_sector_id(): void
     {
@@ -33,7 +33,7 @@ final class QuizContentObserverTest extends TestCase
     }
 
     /**
-     * BR-04: kind pretest/posttest wajib sector_id terisi & journey_id null.
+     * Kind pretest/posttest wajib sector_id terisi & journey_id null.
      */
     public function test_br04_pretest_requires_sector_id_and_rejects_journey_id(): void
     {
@@ -64,7 +64,7 @@ final class QuizContentObserverTest extends TestCase
     }
 
     /**
-     * BR-09: pretest/posttest wajib minimal 2 segment (multiple_choice + likert).
+     * Pretest/posttest wajib minimal 2 segment (multiple_choice + likert).
      */
     public function test_br09_pretest_with_only_one_segment_is_rejected_on_resave(): void
     {

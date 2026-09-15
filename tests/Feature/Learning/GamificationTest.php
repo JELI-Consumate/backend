@@ -37,7 +37,7 @@ final class GamificationTest extends TestCase
     }
 
     /**
-     * BR-07: badge diberikan otomatis tepat sekali begitu journey selesai.
+     * Badge diberikan otomatis tepat sekali begitu journey selesai.
      */
     public function test_badge_is_awarded_automatically_when_journey_completes(): void
     {
@@ -105,7 +105,7 @@ final class GamificationTest extends TestCase
     }
 
     /**
-     * BR-07: race condition aman — dua panggilan hampir bersamaan tidak
+     * Race condition aman: dua panggilan hampir bersamaan tidak
      * menghasilkan baris user_badges ganda (unique index sebagai pengaman
      * kedua di luar firstOrCreate).
      */
@@ -125,7 +125,7 @@ final class GamificationTest extends TestCase
     }
 
     /**
-     * BR-12: 50% pengetahuan (choice) + 50% sikap (likert dinormalisasi 0-100),
+     * 50% pengetahuan (choice) + 50% sikap (likert dinormalisasi 0-100),
      * diambil dari attempt posttest terakhir sektor.
      */
     public function test_empowerment_index_uses_last_posttest_attempt(): void

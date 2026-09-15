@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Halaman awal panel admin (Dashboard) — sapaan personal + ringkasan
+ * Halaman awal panel admin (Dashboard): sapaan personal + ringkasan
  * struktur konten, tanpa AccountWidget/FilamentInfoWidget bawaan Filament.
  */
 final class DashboardTest extends TestCase

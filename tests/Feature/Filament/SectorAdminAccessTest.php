@@ -85,7 +85,7 @@ final class SectorAdminAccessTest extends TestCase
     }
 
     /**
-     * Lapis pertahanan kedua di AdminResource::getEloquentQuery() — halaman
+     * Lapis pertahanan kedua di AdminResource::getEloquentQuery(): halaman
      * list-nya sendiri sudah 403 lewat canViewAny(), tapi query-nya juga
      * sengaja dikosongkan total untuk non-super-admin (lihat komentar di
      * AdminResource).
@@ -104,7 +104,7 @@ final class SectorAdminAccessTest extends TestCase
 
     /**
      * Select "sector_id" di JourneyForm di-disable + di-default-kan ke
-     * sector admin saat dia dibatasi — pastikan kombinasi disabled+default
+     * sector admin saat dia dibatasi, pastikan kombinasi disabled+default
      * itu tetap ikut ter-submit (bukan malah null/kosong).
      */
     public function test_sector_admin_creating_journey_auto_locks_sector_id(): void

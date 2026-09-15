@@ -30,7 +30,7 @@ final class DeviceTokenServiceTest extends TestCase
     }
 
     /**
-     * Flutter bisa kirim token yang sama berkali-kali (mis. tiap app start) —
+     * Flutter bisa kirim token yang sama berkali-kali (mis. tiap app start).
      * WAJIB tidak bikin baris baru tiap kali dipanggil dengan token yang sama.
      */
     public function test_register_token_is_idempotent_for_the_same_fcm_token(): void

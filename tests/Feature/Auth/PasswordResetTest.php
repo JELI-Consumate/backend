@@ -20,7 +20,7 @@ final class PasswordResetTest extends TestCase
     /**
      * The 'array' cache driver used in tests lives for the whole process, so
      * without this, route throttling (keyed by IP+path) leaks across test
-     * methods in this file — several of which hit /forgot-password or
+     * methods in this file: several of which hit /forgot-password or
      * /reset-password repeatedly on purpose (e.g. the lockout test).
      */
     protected function setUp(): void
@@ -153,7 +153,7 @@ final class PasswordResetTest extends TestCase
     public function test_reset_password_locks_out_after_too_many_wrong_attempts(): void
     {
         // This test is about the OTP attempt counter in AuthService, not the
-        // route-level IP throttle (which — a pre-existing quirk — is shared
+        // route-level IP throttle (a pre-existing quirk: it is shared
         // across *all* unauthenticated /auth/* endpoints, not per-route, so
         // 6 wrong-guess requests here would trip it well before the 5-try
         // OTP lockout even comes into play).
@@ -195,7 +195,7 @@ final class PasswordResetTest extends TestCase
 
         // The old code is dead now, even if it happens to match the new one.
         if ($oldOtp === $newOtp) {
-            $this->markTestSkipped('Collided by chance with the new OTP — nothing to assert.');
+            $this->markTestSkipped('Collided by chance with the new OTP, nothing to assert.');
         }
 
         $this->postJson('/api/v1/auth/reset-password', [

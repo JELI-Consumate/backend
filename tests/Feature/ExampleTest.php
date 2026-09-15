@@ -8,7 +8,7 @@ use Tests\TestCase;
 class ExampleTest extends TestCase
 {
     /**
-     * "/" tidak punya landing page publik — langsung arahkan ke login panel
+     * "/" tidak punya landing page publik, langsung arahkan ke login panel
      * Filament.
      */
     public function test_root_redirects_to_the_filament_login_page(): void

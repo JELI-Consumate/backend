@@ -40,7 +40,7 @@ final class GoogleLoginTest extends TestCase
     }
 
     /**
-     * BR-16: new google_id, no matching email -> create new user, password null,
+     * New google_id, no matching email -> create new user, password null,
      * email_verified_at set.
      */
     public function test_br16_creates_new_user_when_no_existing_account(): void
@@ -59,7 +59,7 @@ final class GoogleLoginTest extends TestCase
 
         // email_verified_at isn't in User's #[Fillable] (must never be mass
         // assignable), so a regression that passes it through User::create()
-        // instead of markEmailAsVerified() would silently leave it null —
+        // instead of markEmailAsVerified() would silently leave it null;
         // assertDatabaseHas above can't catch that (it doesn't assert the
         // column at all), so check it explicitly.
         $user = User::where('email', 'newuser@example.com')->firstOrFail();
@@ -72,7 +72,7 @@ final class GoogleLoginTest extends TestCase
     }
 
     /**
-     * BR-16: register manual dulu, lalu login Google email sama -> ter-link,
+     * Register manual dulu, lalu login Google email sama -> ter-link,
      * bukan duplikat.
      */
     public function test_br16_links_existing_manual_account_by_email(): void
