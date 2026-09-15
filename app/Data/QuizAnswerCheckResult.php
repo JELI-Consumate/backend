@@ -10,8 +10,8 @@ final readonly class QuizAnswerCheckResult
 {
     /**
      * [correct]/[correctOptionId]/[explanation] semuanya `null` untuk
-     * pertanyaan segmen `likert` — tidak ada benar/salah di situ (lihat
-     * `QuizScoringService::checkAnswer`).
+     * pertanyaan segmen `likert`, karena tidak ada benar/salah di situ
+     * (lihat `QuizScoringService::checkAnswer`).
      */
     public function __construct(
         public ?bool $correct,

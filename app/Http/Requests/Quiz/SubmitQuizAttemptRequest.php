@@ -34,7 +34,7 @@ final class SubmitQuizAttemptRequest extends FormRequest
 
     /**
      * Custom "whereIn" validation: seluruh pertanyaan/opsi di-preload SEKALI
-     * (nested eager load), lalu dicek keanggotaannya di memori — bukan `exists`
+     * (nested eager load), lalu dicek keanggotaannya di memori, bukan `exists`
      * per baris jawaban (05-service-layer-code.md §7).
      */
     public function withValidator(ValidatorContract $validator): void

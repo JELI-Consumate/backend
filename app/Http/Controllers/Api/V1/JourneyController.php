@@ -80,7 +80,7 @@ final class JourneyController extends Controller
      * di layar detail journey + menentukan "lanjutkan dari modul mana" + module mana
      * yang masih digembok). Tidak ada endpoint ringkas untuk ini, jadi dihitung di
      * sini: 1 query bulk untuk seluruh module_progress user di journey ini, lalu
-     * di-keyBy per module_page_id — bukan query per modul (lihat pola yang sama di
+     * di-keyBy per module_page_id, bukan query per modul (lihat pola yang sama di
      * JourneyAccessService::unlockedMapForSector).
      *
      * Status kunci dihitung SEKALIAN di loop yang sama TANPA query tambahan: module

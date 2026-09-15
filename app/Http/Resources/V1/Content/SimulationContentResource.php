@@ -10,8 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * `correct_position` (simulation_ordering_steps) tidak pernah disertakan di sini —
- * lihat 06-nonfunctional-ops.md §9.3.
+ * `correct_position` (simulation_ordering_steps) tidak pernah disertakan di sini.
  *
  * @mixin SimulationContent
  */

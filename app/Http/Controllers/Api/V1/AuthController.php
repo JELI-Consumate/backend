@@ -28,7 +28,7 @@ final class AuthController extends Controller
     ) {}
 
     /**
-     * No token in the response on purpose — the app navigates straight to
+     * No token in the response on purpose: the app navigates straight to
      * the OTP-entry screen after this, and only gets a session from
      * verifyEmail() once the code is confirmed.
      */
@@ -106,7 +106,7 @@ final class AuthController extends Controller
     }
 
     /**
-     * No auth guard here on purpose — the user has no session/token yet at
+     * No auth guard here on purpose: the user has no session/token yet at
      * this point, only the email+otp they just typed in the app.
      */
     public function verifyEmail(VerifyOtpRequest $request): JsonResponse

@@ -37,7 +37,7 @@ Route::prefix('v1')->group(function (): void {
 
     // 'verified' requires email_verified_at to be set. In practice no token
     // is ever issued for an unverified user (register() no longer returns
-    // one, login()/verifyOtp() both check it first) — this is defense in
+    // one, login()/verifyOtp() both check it first). This is defense in
     // depth, not the primary gate.
     Route::middleware(['auth:sanctum', 'verified', 'throttle:60,1'])->group(function (): void {
         Route::get('/sectors', [SectorController::class, 'index']);

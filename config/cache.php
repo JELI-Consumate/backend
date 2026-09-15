@@ -154,13 +154,13 @@ return [
     | "database" cache store. With this left at `false`, every class in that
     | graph unserializes back as __PHP_Incomplete_Class on a cache HIT (a
     | cache MISS never notices, since Cache::remember() returns the closure's
-    | live result directly without a round-trip) — module detail then 500s
+    | live result directly without a round-trip). Module detail then 500s
     | with "Return value must be of type Module, __PHP_Incomplete_Class
     | returned", but only ever on a *second* request for the same module.
     | The test suite never catches this: CACHE_STORE=array there, which
     | never serializes at all.
     |
-    | Allowlisted below instead of turning this off entirely — every model
+    | Allowlisted below instead of turning this off entirely: every model
     | class (+ Eloquent's own Collection, which wraps every hasMany-style
     | relation) that can appear anywhere in that cached graph. Verified
     | exhaustively by serializing a module exercising all 5 content types
@@ -170,7 +170,7 @@ return [
     | Adding a 6th ContentableType (or a new nested relation on an existing
     | one) needs its model class added here too, or module detail will
     | silently 500 for that content type specifically, in production only,
-    | invisible to the test suite — exactly this bug, again.
+    | invisible to the test suite: exactly this bug, again.
     |
     */
 

@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * Struktur pertanyaan + jawaban jurnal user sebelumnya. Tidak ada skor (BR-10).
+ * Struktur pertanyaan + jawaban jurnal user sebelumnya. Refleksi tidak diberi skor.
  *
  * @mixin ReflectionContent
  */

@@ -9,8 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * Mode "pembahasan" — is_correct/correct_option_id/explanation HANYA muncul
- * setelah attempt selesai (completed_at != null). Lihat 06 §9.3.
+ * Mode "pembahasan": is_correct/correct_option_id/explanation HANYA muncul
+ * setelah attempt selesai (completed_at != null).
  *
  * @mixin QuizAttempt
  */

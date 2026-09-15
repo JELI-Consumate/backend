@@ -11,8 +11,8 @@ use Illuminate\Support\Str;
  * Mengubah path relatif yang disimpan Filament FileUpload (mis.
  * "articles/blocks/xxxx.jpg") jadi URL absolut yang benar-benar bisa dimuat
  * app mobile. Filament menyimpan itu apa adanya (disk-agnostic) lewat disk
- * default (`FILAMENT_FILESYSTEM_DISK`, di production diset ke `r2` —
- * Cloudflare R2, lihat config/filesystems.php & config/filament.php) — jadi
+ * default (`FILAMENT_FILESYSTEM_DISK`, di production diset ke `r2`,
+ * Cloudflare R2, lihat config/filesystems.php & config/filament.php). Jadi
  * resolusi URL-nya pun harus ikut disk yang sama itu, bukan diasumsikan
  * selalu disk lokal.
  *

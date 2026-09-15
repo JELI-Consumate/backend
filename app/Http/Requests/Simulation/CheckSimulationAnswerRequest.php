@@ -33,7 +33,7 @@ final class CheckSimulationAnswerRequest extends FormRequest
 
     /**
      * Pastikan pair/step id yang dikirim memang milik simulasi attempt ini
-     * (bukan milik simulasi lain) — dicek sekali di memori, bukan `exists` query.
+     * (bukan milik simulasi lain), dicek sekali di memori, bukan `exists` query.
      */
     public function withValidator(ValidatorContract $validator): void
     {

@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * Mode "soal" — tidak pernah menyertakan is_correct / explanation.
+ * Mode "soal": tidak pernah menyertakan is_correct / explanation.
  * Mode "pembahasan" (Fase 5, setelah attempt selesai) pakai resource terpisah.
  *
  * @mixin QuizContent

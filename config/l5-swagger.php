@@ -191,7 +191,7 @@ return [
             'securitySchemes' => [
                 'sanctum' => [
                     'type' => 'http',
-                    'description' => 'Laravel Sanctum bearer token — login/register dulu untuk dapat token, lalu kirim sebagai `Authorization: Bearer <token>`.',
+                    'description' => 'Laravel Sanctum bearer token. Login/register dulu untuk dapat token, lalu kirim sebagai `Authorization: Bearer <token>`.',
                     'scheme' => 'bearer',
                 ],
             ],

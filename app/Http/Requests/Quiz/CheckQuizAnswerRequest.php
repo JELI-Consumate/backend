@@ -32,8 +32,8 @@ final class CheckQuizAnswerRequest extends FormRequest
 
     /**
      * Sama seperti `SubmitQuizAttemptRequest`: seluruh pohon kuis di-preload
-     * SEKALI (nested eager load), keanggotaan question/option dicek di memori
-     * — bukan `exists` query per field.
+     * SEKALI (nested eager load), keanggotaan question/option dicek di memori,
+     * bukan `exists` query per field.
      */
     public function withValidator(ValidatorContract $validator): void
     {

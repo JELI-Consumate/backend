@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * Representasi ringan journey (dipakai di dalam daftar sektor) — tanpa daftar module.
+ * Representasi ringan journey (dipakai di dalam daftar sektor), tanpa daftar module.
  *
  * @mixin Journey
  */
