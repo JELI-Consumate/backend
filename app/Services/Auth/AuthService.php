@@ -141,7 +141,9 @@ final readonly class AuthService
 
     public function logout(User $user): void
     {
-        $user->currentAccessToken()->delete();
+        /** @var \Laravel\Sanctum\PersonalAccessToken|null $token */
+        $token = $user->currentAccessToken();
+        $token?->delete();
     }
 
     /**
@@ -198,6 +200,11 @@ final readonly class AuthService
         event(new PasswordReset($user));
 
         return true;
+    }
+
+    public function deleteAccount(User $user): void
+    {
+        $user->delete();
     }
 
     /**

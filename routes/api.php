@@ -32,6 +32,7 @@ Route::prefix('v1')->group(function (): void {
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::get('/me', [AuthController::class, 'me']);
             Route::patch('/profile', [AuthController::class, 'updateProfile']);
+            Route::delete('/profile', [AuthController::class, 'deleteAccount']);
         });
     });
 

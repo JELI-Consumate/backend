@@ -153,4 +153,11 @@ final class AuthController extends Controller
 
         return ApiResponse::success(new UserResource($user));
     }
+
+    public function deleteAccount(Request $request): JsonResponse
+    {
+        $this->authService->deleteAccount($request->user());
+
+        return ApiResponse::success(null, ['message' => 'Akun berhasil dihapus.']);
+    }
 }
