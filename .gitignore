@@ -27,3 +27,7 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 /.claude
+
+# Data responden riset asli (nama, no WhatsApp, password) -- PII, jangan
+# pernah masuk repo publik. Lihat database/seeders/data/respondents.example.php.
+/database/seeders/data/respondents.php

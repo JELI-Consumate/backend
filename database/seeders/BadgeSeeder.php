@@ -6,16 +6,16 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
-/**
- * Seed data badge, satu badge per journey (4 baris), mengikuti snapshot database referensi.
- * icon_url masih memakai placehold.co karena aset badge belum tersedia.
- */
 class BadgeSeeder extends Seeder
 {
     use LoadsContentSnapshot;
+    use UploadsSeedMedia;
 
     public function run(): void
     {
+        $badges = $this->snapshot()['badges'] ?? [];
+
+        $this->uploadSeedMedia(array_column($badges, 'icon_url'));
         $this->seedTable('badges');
     }
 }

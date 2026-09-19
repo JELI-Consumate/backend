@@ -16,6 +16,11 @@ class DatabaseSeeder extends Seeder
      * content_snapshot.php): seluruh modul beserta konten artikel/video/kuis/
      * simulasi/refleksi ikut disertakan di ModuleSeeder.
      * ModuleSeeder juga meng-upload foto .webp bundle ke disk aktif.
+     *
+     * RespondentUserSeeder: 160 akun responden riset sektor E-Commerce, email
+     * sudah terverifikasi. Butuh file privat database/seeders/data/
+     * respondents.php (di-gitignore, PII) -- dilewatkan dengan aman jika tidak
+     * ada, lihat respondents.example.php.
      */
     public function run(): void
     {
@@ -29,6 +34,7 @@ class DatabaseSeeder extends Seeder
             JourneySeeder::class,
             ModuleSeeder::class,
             BadgeSeeder::class,
+            RespondentUserSeeder::class,
         ]);
 
         // Contoh akun admin sector: hanya bisa akses sector "E-Commerce".

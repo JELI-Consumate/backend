@@ -8,8 +8,8 @@ use OpenApi\Attributes as OA;
 
 #[OA\Info(
     version: '1.0.0',
-    title: 'Perlindungan Konsumen API',
-    description: 'API backend aplikasi edukasi perlindungan konsumen (mobile + web). Seluruh endpoint (kecuali `/auth/register`, `/auth/login`, `/auth/google`) butuh Sanctum bearer token, lihat skema keamanan `sanctum`. Response sukses selalu berbentuk `{"data": ..., "meta": {...}}`; response error `{"message": ..., "errors": ..., "code": ...}`.'
+    title: 'Consumate API',
+    description: 'API backend Consumate (mobile + web). Seluruh endpoint (kecuali `/auth/register`, `/auth/login`, `/auth/google`) butuh Sanctum bearer token — lihat skema keamanan `sanctum`. Response sukses selalu berbentuk `{"data": ..., "meta": {...}}`; response error `{"message": ..., "errors": ..., "code": ...}`.'
 )]
 #[OA\Server(url: '/api/v1', description: 'API v1')]
 #[OA\Tag(name: 'Autentikasi', description: 'Register, login (email/telepon atau Google), profil')]

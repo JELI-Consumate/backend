@@ -9,7 +9,7 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'Perlindungan Konsumen API',
+                'title' => 'Consumate API',
             ],
 
             'routes' => [
