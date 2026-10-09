@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BadgeController;
+use App\Http\Controllers\Api\V1\ComplaintAgencyController;
+use App\Http\Controllers\Api\V1\ComplaintCategoryController;
 use App\Http\Controllers\Api\V1\DeviceTokenController;
 use App\Http\Controllers\Api\V1\EmpowermentIndexController;
 use App\Http\Controllers\Api\V1\JourneyController;
@@ -80,6 +82,12 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('/reflections/{id}', [ReflectionEntryController::class, 'show']);
         Route::put('/reflections/{id}/entries', [ReflectionEntryController::class, 'updateEntries']);
+
+        // Pusat Pengaduan Konsumen: konten editorial global (dikelola super
+        // admin lewat Filament), read-only dari sisi API.
+        Route::get('/complaint-agencies', [ComplaintAgencyController::class, 'index']);
+        Route::get('/complaint-agencies/{slug}', [ComplaintAgencyController::class, 'show']);
+        Route::get('/complaint-categories', [ComplaintCategoryController::class, 'index']);
 
         Route::get('/badges', [BadgeController::class, 'index']);
         Route::get('/empowerment-index', [EmpowermentIndexController::class, 'index']);
