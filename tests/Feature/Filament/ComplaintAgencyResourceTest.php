@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament;
 
 use App\Enums\ComplaintChannelType;
+use App\Filament\Resources\ComplaintAgencies\ComplaintAgencyResource;
 use App\Filament\Resources\ComplaintAgencies\Pages\CreateComplaintAgency;
 use App\Filament\Resources\ComplaintAgencies\Pages\EditComplaintAgency;
 use App\Filament\Resources\ComplaintAgencies\RelationManagers\ChannelsRelationManager;
+use App\Filament\Resources\ComplaintCategories\ComplaintCategoryResource;
 use App\Filament\Resources\ComplaintCategories\Pages\CreateComplaintCategory;
 use App\Models\ComplaintAgency;
 use App\Models\ComplaintAgencyChannel;
@@ -94,15 +96,34 @@ final class ComplaintAgencyResourceTest extends TestCase
         $this->assertTrue($category->agencies->contains($agency));
     }
 
-    public function test_sector_admin_can_view_list_but_not_create_or_edit(): void
+    public function test_sector_admin_cannot_access_complaint_resources_at_all(): void
     {
         $sectorAdmin = User::factory()->sectorAdmin(Sector::factory()->create())->create();
         $agency = ComplaintAgency::factory()->create(['short_name' => 'LEMBAGAUJI']);
+        $category = ComplaintCategory::factory()->create();
 
-        $this->actingAs($sectorAdmin)->get('/admin/complaint-agencies')->assertOk()->assertSee('LEMBAGAUJI');
-        $this->actingAs($sectorAdmin)->get('/admin/complaint-agencies/create')->assertForbidden();
-        $this->actingAs($sectorAdmin)->get("/admin/complaint-agencies/{$agency->id}/edit")->assertForbidden();
-        $this->actingAs($sectorAdmin)->get('/admin/complaint-categories/create')->assertForbidden();
+        foreach ([
+            '/admin/complaint-agencies',
+            '/admin/complaint-agencies/create',
+            "/admin/complaint-agencies/{$agency->id}/edit",
+            '/admin/complaint-categories',
+            '/admin/complaint-categories/create',
+            "/admin/complaint-categories/{$category->id}/edit",
+        ] as $url) {
+            // 403 (otorisasi) atau 404 (record tidak terjangkau query kosong): dua-duanya = ditolak.
+            $this->assertContains($this->actingAs($sectorAdmin)->get($url)->getStatusCode(), [403, 404], $url);
+        }
+    }
+
+    public function test_complaint_menu_is_hidden_from_sector_admin_but_shown_to_super_admin(): void
+    {
+        $this->actingAs(User::factory()->sectorAdmin(Sector::factory()->create())->create());
+        $this->assertFalse(ComplaintAgencyResource::shouldRegisterNavigation());
+        $this->assertFalse(ComplaintCategoryResource::shouldRegisterNavigation());
+
+        $this->actingAs(User::factory()->admin()->create());
+        $this->assertTrue(ComplaintAgencyResource::shouldRegisterNavigation());
+        $this->assertTrue(ComplaintCategoryResource::shouldRegisterNavigation());
     }
 
     public function test_channels_relation_manager_creates_whatsapp_channel(): void

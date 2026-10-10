@@ -22,8 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
 /**
- * "Bingung harus mengadu ke mana?" -- pemetaan jenis permasalahan ke lembaga.
- * Global, semua admin boleh lihat, hanya super admin yang boleh ubah.
+ * "Bingung harus mengadu ke mana?" -- pemetaan jenis permasalahan ke lembaga. Global dan murni dikelola super admin: untuk admin sector resource ini tidak tampil sama sekali.
  */
 class ComplaintCategoryResource extends Resource
 {
@@ -64,6 +63,31 @@ class ComplaintCategoryResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    /**
+     * Kosongkan hasil untuk non-super admin. Jangan andalkan canViewAny saja
+     * karena ListRecords tidak memanggil otorisasi itu (lihat AdminResource).
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (! AdminScope::isSuperAdmin()) {
+            $query->whereRaw('1 = 0');
+        }
+
+        return $query;
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return AdminScope::isSuperAdmin();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return AdminScope::isSuperAdmin();
     }
 
     public static function canCreate(): bool
