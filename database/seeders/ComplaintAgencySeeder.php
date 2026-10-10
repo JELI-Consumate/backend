@@ -12,8 +12,11 @@ use Illuminate\Support\Facades\DB;
 /**
  * Seed lembaga pengaduan + jenis permasalahan dari dokumen riset (lihat
  * database/seeders/data/complaint_agencies.php). Idempotent: lembaga dikunci
- * per slug, kategori per teks `problem`, kanal di-replace seluruhnya. Logo
- * sengaja null -- diunggah admin lewat Filament.
+ * per slug, kategori per teks `problem`, kanal di-replace seluruhnya.
+ *
+ * Logo (database/seeders/media/complaint-agencies/{slug}.webp) di-upload ke
+ * disk aktif HANYA untuk lembaga yang logo_url-nya masih kosong, jadi logo
+ * yang sudah diganti admin lewat Filament tidak tertimpa.
  *
  * Tidak dipanggil dari DatabaseSeeder: konten ini diedit admin, jadi
  * menjalankannya ulang akan menimpa perubahan manual. Jalankan manual:
@@ -21,6 +24,8 @@ use Illuminate\Support\Facades\DB;
  */
 class ComplaintAgencySeeder extends Seeder
 {
+    use UploadsSeedMedia;
+
     public function run(): void
     {
         /** @var array{agencies: list<array<string, mixed>>, categories: list<array<string, mixed>>} $data */
@@ -38,6 +43,8 @@ class ComplaintAgencySeeder extends Seeder
                     [...$row, 'order' => $index + 1, 'is_active' => true],
                 );
                 $agency->restore();
+
+                $this->seedLogo($agency);
 
                 $agency->channels()->delete();
                 foreach ($channels as $channelIndex => $channel) {
@@ -62,5 +69,21 @@ class ComplaintAgencySeeder extends Seeder
                 );
             }
         });
+    }
+
+    private function seedLogo(ComplaintAgency $agency): void
+    {
+        if ($agency->logo_url !== null) {
+            return;
+        }
+
+        $key = "media_pembelajaran/complaint-agencies/{$agency->slug}.webp";
+
+        if (! is_file(__DIR__.'/media/complaint-agencies/'.$agency->slug.'.webp')) {
+            return;
+        }
+
+        $this->uploadSeedMedia([$key]);
+        $agency->update(['logo_url' => $key]);
     }
 }
