@@ -18,12 +18,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Kanal kontak per lembaga (situs, WA, telepon, email, alamat). Admin hanya
- * mengisi `value` mentah; URL tel:/mailto:/wa.me dihitung di
- * ComplaintAgencyChannel::url(). Validasi `value` mengikuti `type` supaya
- * skema berbahaya (mis. javascript:) tidak bisa jadi tombol di app.
- */
 class ChannelsRelationManager extends RelationManager
 {
     protected static string $relationship = 'channels';

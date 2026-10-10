@@ -21,9 +21,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
-/**
- * "Bingung harus mengadu ke mana?" -- pemetaan jenis permasalahan ke lembaga. Global dan murni dikelola super admin: untuk admin sector resource ini tidak tampil sama sekali.
- */
 class ComplaintCategoryResource extends Resource
 {
     protected static ?string $model = ComplaintCategory::class;
@@ -65,10 +62,7 @@ class ComplaintCategoryResource extends Resource
             ]);
     }
 
-    /**
-     * Kosongkan hasil untuk non-super admin. Jangan andalkan canViewAny saja
-     * karena ListRecords tidak memanggil otorisasi itu (lihat AdminResource).
-     */
+    // ListRecords tidak memanggil canViewAny, jadi query dikosongkan untuk non-super admin.
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
