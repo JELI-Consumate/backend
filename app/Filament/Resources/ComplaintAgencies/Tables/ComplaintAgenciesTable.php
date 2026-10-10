@@ -25,7 +25,10 @@ class ComplaintAgenciesTable
                 TextColumn::make('order')->sortable(),
                 ImageColumn::make('logo_url')
                     ->label('Logo')
-                    ->disk(config('filament.default_filesystem_disk')),
+                    ->disk(config('filament.default_filesystem_disk'))
+                    // Tanpa ini Filament memanggil Storage::exists() per baris = 1 request
+                    // ke R2 per logo (~300 ms), berurutan, bikin halaman daftar lemot.
+                    ->checkFileExistence(false),
                 TextColumn::make('short_name')->label('Nama singkat')->searchable(),
                 TextColumn::make('full_name')->label('Nama lengkap')->limit(50)->searchable(),
                 TextColumn::make('channels_count')->counts('channels')->label('Kanal'),
