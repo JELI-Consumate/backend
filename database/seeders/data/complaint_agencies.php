@@ -1,0 +1,367 @@
+<?php
+
+/**
+ * Data awal Pusat Pengaduan Konsumen, bersumber dari dokumen riset
+ * "Fitur Pengaduan_Riset Perlindungan Konsumen".
+ *
+ * Kanal yang di dokumen belum punya URL/kontak (BPSK direktori, BPKN situs,
+ * BPOM portal & aplikasi, Kemenhub NusantaraHub) sengaja TIDAK dibuat --
+ * lengkapi lewat Filament setelah URL resmi dikonfirmasi. Semua kontak wajib
+ * diverifikasi ke situs resmi sebelum rilis.
+ *
+ * Tipe kanal: website | whatsapp | phone | email | app | address
+ */
+$web = fn (string $label, string $value, ?string $button = null): array => ['type' => 'website', 'label' => $label, 'value' => $value, 'button_label' => $button];
+$wa = fn (string $label, string $value, ?string $button = null): array => ['type' => 'whatsapp', 'label' => $label, 'value' => $value, 'button_label' => $button];
+$tel = fn (string $label, string $value, ?string $button = null): array => ['type' => 'phone', 'label' => $label, 'value' => $value, 'button_label' => $button];
+$mail = fn (string $label, string $value, ?string $button = null): array => ['type' => 'email', 'label' => $label, 'value' => $value, 'button_label' => $button];
+$addr = fn (string $value): array => ['type' => 'address', 'label' => 'Alamat', 'value' => $value, 'button_label' => null];
+
+return [
+    'agencies' => [
+        [
+            'slug' => 'bpsk',
+            'short_name' => 'BPSK',
+            'full_name' => 'Badan Penyelesaian Sengketa Konsumen',
+            'summary' => 'Penyelesaian sengketa antara konsumen dan pelaku usaha.',
+            'description' => 'BPSK merupakan lembaga yang menangani penyelesaian sengketa antara konsumen dan pelaku usaha di luar pengadilan. BPSK dapat menjadi pilihan ketika konsumen mengalami kerugian dalam transaksi dan ingin menyelesaikan sengketa melalui mekanisme yang menjadi kewenangan BPSK.',
+            'when_to_contact' => [
+                'Barang yang diterima tidak sesuai dengan perjanjian dan menimbulkan sengketa dengan penjual.',
+                'Konsumen mengalami kerugian akibat transaksi dan tidak mencapai penyelesaian dengan pelaku usaha.',
+                'Konsumen membutuhkan penyelesaian sengketa konsumen melalui mekanisme di luar pengadilan.',
+            ],
+            'how_to_access' => 'Pengguna dapat mencari BPSK sesuai wilayah domisilinya. Pengajuan sengketa pada umumnya dilakukan melalui sekretariat BPSK setempat, dengan prosedur dan ketersediaan layanan daring yang dapat berbeda antarwilayah.',
+            'notes' => null,
+            'channels' => [],
+        ],
+        [
+            'slug' => 'ylki',
+            'short_name' => 'YLKI',
+            'full_name' => 'Yayasan Lembaga Konsumen Indonesia',
+            'summary' => 'Informasi, konsultasi, dan pengaduan terkait permasalahan konsumen.',
+            'description' => 'YLKI merupakan organisasi perlindungan konsumen yang berperan dalam memperjuangkan hak konsumen, memberikan informasi dan edukasi, serta memfasilitasi penanganan pengaduan konsumen sesuai prosedur layanannya. YLKI dapat menjadi salah satu pilihan bagi konsumen yang membutuhkan informasi, konsultasi, atau ingin menyampaikan pengaduan mengenai permasalahan yang dialami saat membeli barang maupun menggunakan jasa.',
+            'when_to_contact' => [
+                'Konsumen merasa dirugikan oleh produk atau layanan yang digunakan.',
+                'Konsumen menghadapi kendala dalam menyampaikan keluhan kepada perusahaan.',
+                'Konsumen membutuhkan informasi mengenai hak-haknya sebagai konsumen.',
+                'Konsumen ingin memperoleh informasi atau bantuan terkait penanganan pengaduan konsumen.',
+            ],
+            'how_to_access' => 'Konsumen dapat mengakses portal pelayanan YLKI dan mengikuti prosedur pengaduan yang tersedia.',
+            'notes' => null,
+            'channels' => [
+                $web('Portal pelayanan YLKI', 'https://pelayanan.ylki.or.id', 'Ajukan Pengaduan ke YLKI'),
+            ],
+        ],
+        [
+            'slug' => 'lpksm',
+            'short_name' => 'LPKSM',
+            'full_name' => 'Lembaga Perlindungan Konsumen Swadaya Masyarakat',
+            'summary' => 'Pendampingan dan advokasi konsumen melalui lembaga perlindungan konsumen swadaya masyarakat.',
+            'description' => 'LPKSM merupakan lembaga nonpemerintah yang dibentuk untuk berperan dalam perlindungan konsumen. Sesuai ketentuan yang berlaku, LPKSM dapat melakukan kegiatan edukasi, memberikan nasihat kepada konsumen, bekerja sama dalam perlindungan konsumen, serta membantu konsumen dalam memperjuangkan haknya sesuai kewenangan dan kapasitas lembaga.',
+            'when_to_contact' => [
+                'Konsumen membutuhkan informasi mengenai hak dan kewajibannya.',
+                'Konsumen memerlukan pendampingan dalam menghadapi permasalahan dengan pelaku usaha.',
+                'Konsumen membutuhkan bantuan untuk memahami langkah yang dapat ditempuh ketika mengalami kerugian.',
+                'Konsumen ingin mengetahui bentuk advokasi yang tersedia melalui lembaga perlindungan konsumen.',
+            ],
+            'how_to_access' => 'Pengguna dapat mengunjungi situs LPKNI untuk memperoleh informasi mengenai lembaga dan layanan yang tersedia.',
+            'notes' => 'LPKSM merupakan kategori lembaga, sedangkan LPKNI adalah nama lembaga tertentu.',
+            'channels' => [
+                $web('Situs LPKNI', 'https://lpkni.id', 'Kunjungi Layanan LPKNI'),
+            ],
+        ],
+        [
+            'slug' => 'bpkn',
+            'short_name' => 'BPKN',
+            'full_name' => 'Badan Perlindungan Konsumen Nasional',
+            'summary' => 'Informasi dan penyaluran pengaduan terkait perlindungan konsumen di tingkat nasional.',
+            'description' => 'BPKN merupakan lembaga nasional yang berperan dalam pengembangan perlindungan konsumen, memberikan saran dan pertimbangan kepada pemerintah dalam upaya perlindungan konsumen, serta menerima pengaduan masyarakat sesuai tugas dan mekanisme yang berlaku.',
+            'when_to_contact' => [
+                'Konsumen ingin menyampaikan pengaduan terkait permasalahan perlindungan konsumen.',
+                'Konsumen membutuhkan informasi mengenai saluran pengaduan yang relevan.',
+                'Konsumen ingin menyampaikan permasalahan yang berkaitan dengan praktik usaha yang merugikan konsumen.',
+            ],
+            'how_to_access' => 'Pengguna dapat mengakses kanal pengaduan atau menghubungi kontak resmi BPKN untuk memperoleh informasi mengenai prosedur penyampaian pengaduan.',
+            'notes' => null,
+            'channels' => [
+                $wa('WhatsApp pengaduan BPKN', '08153-153-153', 'Hubungi BPKN via WhatsApp'),
+                $mail('Email sekretariat BPKN', 'sekretariat@bpkn.go.id', 'Kirim Email ke BPKN'),
+                $addr('Graha BPKN, Jl. Jambu No. 32, Gondangdia, Menteng, Jakarta Pusat, DKI Jakarta 10350'),
+            ],
+        ],
+        [
+            'slug' => 'bpom',
+            'short_name' => 'BPOM',
+            'full_name' => 'Badan Pengawas Obat dan Makanan',
+            'summary' => 'Pengaduan terkait obat, makanan, kosmetik, dan produk lain yang berada dalam pengawasan BPOM.',
+            'description' => 'BPOM merupakan lembaga pemerintah yang melakukan pengawasan terhadap obat dan makanan sesuai kewenangannya. Pengawasan tersebut mencakup produk seperti obat, obat tradisional, suplemen kesehatan, kosmetik, dan pangan olahan. BPOM menjadi kanal yang relevan bagi konsumen yang ingin menyampaikan keluhan atau laporan mengenai dugaan pelanggaran terkait keamanan, mutu, khasiat, atau persyaratan produk yang berada dalam lingkup pengawasannya.',
+            'when_to_contact' => [
+                'Konsumen menemukan dugaan produk obat atau makanan ilegal.',
+                'Konsumen menemukan kosmetik yang diduga mengandung bahan berbahaya.',
+                'Konsumen menemukan produk yang diduga tidak memenuhi ketentuan keamanan atau peredaran.',
+                'Konsumen ingin melaporkan dugaan permasalahan terkait produk yang berada dalam pengawasan BPOM.',
+            ],
+            'how_to_access' => 'Konsumen dapat menyampaikan pengaduan melalui kanal resmi BPOM yang tersedia, dengan menyertakan informasi produk dan bukti pendukung apabila diperlukan.',
+            'notes' => null,
+            'channels' => [
+                $wa('WhatsApp Halo BPOM', '0811-9181-533', 'Hubungi Halo BPOM'),
+                $tel('Telepon Halo BPOM', '1-500-533'),
+                $mail('Email Halo BPOM', 'halobpom@pom.go.id', 'Kirim Email ke BPOM'),
+            ],
+        ],
+        [
+            'slug' => 'kemenhub',
+            'short_name' => 'Kemenhub',
+            'full_name' => 'Kementerian Perhubungan Republik Indonesia',
+            'summary' => 'Kanal pengaduan dan informasi terkait pelayanan serta penyelenggaraan transportasi darat, laut, udara, perkeretaapian, dan sektor penunjang sesuai kewenangan Kementerian Perhubungan.',
+            'description' => 'Kementerian Perhubungan merupakan instansi pemerintah yang menyelenggarakan urusan pemerintahan di bidang transportasi. Kementerian Perhubungan menyediakan Contact Center 151 yang dapat dimanfaatkan masyarakat untuk menyampaikan keluhan, pertanyaan, masukan, dan permasalahan terkait pelayanan transportasi. Kanal ini dapat menjadi pilihan bagi konsumen yang membutuhkan informasi atau ingin menyampaikan pengaduan mengenai pelayanan transportasi kepada instansi yang berwenang.',
+            'when_to_contact' => [
+                'Konsumen mengalami permasalahan terkait pelayanan transportasi yang menjadi kewenangan Kemenhub.',
+                'Konsumen ingin menyampaikan keluhan mengenai aspek keselamatan dan keamanan penyelenggaraan transportasi.',
+                'Konsumen mengalami permasalahan pelayanan transportasi darat, laut, udara, atau perkeretaapian.',
+                'Konsumen membutuhkan informasi mengenai ketentuan atau prosedur pelayanan transportasi.',
+                'Konsumen ingin menyampaikan masukan atau pengaduan mengenai penyelenggaraan transportasi kepada instansi pemerintah terkait.',
+            ],
+            'how_to_access' => 'Konsumen dapat menghubungi Contact Center Kemenhub melalui telepon, WhatsApp, atau email. Konsumen perlu menjelaskan kronologi kejadian, menyebutkan moda transportasi dan penyedia jasa yang terkait, serta melampirkan bukti pendukung apabila diperlukan.',
+            'notes' => null,
+            'channels' => [
+                $web('Situs resmi Kemenhub', 'https://kemenhub.go.id/', 'Akses Layanan Informasi Transportasi'),
+                $tel('Contact Center 151', '151', 'Hubungi Kemenhub'),
+                $wa('WhatsApp Contact Center 151', '0811-2011-151', 'Ajukan Pengaduan ke Kemenhub'),
+                $mail('Email Contact Center 151', 'info151@kemenhub.go.id'),
+            ],
+        ],
+        [
+            'slug' => 'sp4n-lapor',
+            'short_name' => 'SP4N-LAPOR!',
+            'full_name' => 'Sistem Pengelolaan Pengaduan Pelayanan Publik Nasional - Layanan Aspirasi dan Pengaduan Online Rakyat (SP4N-LAPOR!)',
+            'summary' => 'Kanal pengaduan nasional yang memungkinkan masyarakat menyampaikan laporan, aspirasi, dan keluhan terkait pelayanan publik kepada instansi pemerintah yang berwenang.',
+            'description' => 'SP4N-LAPOR! merupakan sistem pengaduan pelayanan publik nasional yang mengintegrasikan penyampaian laporan masyarakat kepada instansi pemerintah terkait. Melalui platform ini, masyarakat dapat menyampaikan keluhan mengenai pelayanan publik tanpa harus terlebih dahulu mengetahui seluruh mekanisme pengaduan di setiap instansi. Dalam konteks jasa transportasi, SP4N-LAPOR! dapat digunakan untuk menyampaikan pengaduan yang berkaitan dengan pelayanan publik atau tugas instansi pemerintah di bidang transportasi.',
+            'when_to_contact' => [
+                'Konsumen ingin mengadukan permasalahan pelayanan publik di bidang transportasi.',
+                'Konsumen mengalami kendala terkait pelayanan instansi pemerintah yang menangani urusan transportasi.',
+                'Konsumen ingin menyampaikan keluhan mengenai pelayanan publik yang diduga tidak sesuai dengan ketentuan.',
+                'Konsumen ingin menyampaikan aspirasi, kritik, atau saran mengenai peningkatan kualitas pelayanan transportasi publik.',
+                'Konsumen membutuhkan kanal pengaduan nasional untuk menyampaikan permasalahan kepada instansi pemerintah yang sesuai.',
+            ],
+            'how_to_access' => 'Konsumen dapat membuka situs resmi SP4N-LAPOR!, memilih jenis laporan, mengisi judul dan kronologi kejadian, mencantumkan tanggal kejadian serta instansi yang dituju jika diketahui, kemudian menyertakan lampiran pendukung sesuai ketentuan. Setelah laporan dikirim, konsumen dapat memantau proses verifikasi dan tindak lanjut melalui platform tersebut.',
+            'notes' => 'Layanan SMS 1708 tersedia dengan ketentuan yang mengikuti informasi resmi yang berlaku.',
+            'channels' => [
+                $web('Situs pengaduan SP4N-LAPOR!', 'https://www.lapor.go.id/', 'Ajukan Pengaduan ke SP4N-LAPOR!'),
+                $web('Tentang SP4N-LAPOR!', 'https://sp4n.lapor.go.id/tentang'),
+                $web('Panduan pertanyaan umum', 'https://sp4n.lapor.go.id/faq', 'Pantau Pengaduan'),
+                $tel('SMS LAPOR!', '1708'),
+            ],
+        ],
+        [
+            'slug' => 'ditjen-pktn',
+            'short_name' => 'Ditjen PKTN',
+            'full_name' => 'Direktorat Jenderal Perlindungan Konsumen dan Tertib Niaga, Kementerian Perdagangan Republik Indonesia',
+            'summary' => 'Layanan pemerintah untuk menyampaikan pengaduan konsumen, memperoleh informasi mengenai perlindungan konsumen, serta mencari bantuan terkait permasalahan barang dan jasa, sesuai kewenangan dan prosedur yang berlaku.',
+            'description' => 'Direktorat Jenderal Perlindungan Konsumen dan Tertib Niaga (Ditjen PKTN) merupakan unit di lingkungan Kementerian Perdagangan yang melaksanakan tugas di bidang perlindungan konsumen dan tertib niaga. Ditjen PKTN menyediakan layanan pengaduan konsumen yang dapat dimanfaatkan masyarakat ketika mengalami permasalahan dalam penggunaan barang atau jasa. Penanganan pengaduan tetap mengikuti kewenangan serta prosedur yang berlaku.',
+            'when_to_contact' => [
+                'Konsumen mengalami kerugian akibat penggunaan barang atau jasa, termasuk jasa transportasi.',
+                'Konsumen menghadapi kendala dalam menyelesaikan keluhan dengan pelaku usaha.',
+                'Konsumen ingin menyampaikan pengaduan terkait dugaan pelanggaran hak konsumen.',
+                'Konsumen membutuhkan informasi mengenai hak dan kewajibannya sebagai konsumen.',
+                'Konsumen membutuhkan informasi mengenai prosedur pengaduan atau mekanisme penanganan permasalahan perlindungan konsumen.',
+            ],
+            'how_to_access' => 'Konsumen dapat mengakses layanan pengaduan melalui kanal resmi Ditjen PKTN atau Sistem Informasi Manajemen Perlindungan Konsumen dan Tertib Niaga (SIMPKTN). Konsumen perlu mengikuti petunjuk pengajuan pengaduan yang tersedia dan menyiapkan kronologi kejadian serta bukti pendukung, seperti tiket perjalanan, bukti transaksi, percakapan dengan penyedia jasa, dan dokumentasi permasalahan jika relevan.',
+            'notes' => null,
+            'channels' => [
+                $web('Situs resmi Ditjen PKTN', 'https://ditjenpktn.kemendag.go.id/', 'Kunjungi Situs Resmi Ditjen PKTN'),
+                $web('Tata cara pengaduan konsumen', 'https://ditjenpktn.kemendag.go.id/secara-berkala/ditpk/tcpk'),
+                $web('SIMPKTN', 'https://simpktn.kemendag.go.id/', 'Ajukan Pengaduan ke Ditjen PKTN'),
+                $wa('WhatsApp pengaduan', '0853-1111-1010', 'Akses Layanan Pengaduan Konsumen'),
+                $tel('Telepon', '(021) 3441839'),
+                $mail('Email pengaduan', 'pengaduan.konsumen@kemendag.go.id'),
+                $addr('Direktorat Pemberdayaan Konsumen, Gedung I Lantai 6, Jl. M. I. Ridwan Rais No. 5, Gambir, Jakarta Pusat 10110'),
+            ],
+        ],
+        [
+            'slug' => 'ojk',
+            'short_name' => 'OJK',
+            'full_name' => 'Otoritas Jasa Keuangan (OJK) - Kontak 157',
+            'summary' => 'Layanan informasi dan pengaduan konsumen sektor jasa keuangan, termasuk perbankan, asuransi, pembiayaan, dan investasi.',
+            'description' => 'OJK merupakan lembaga yang mengatur dan mengawasi sektor jasa keuangan, seperti perbankan, asuransi, pembiayaan, dan pasar modal. Kontak 157 adalah layanan OJK bagi konsumen yang membutuhkan informasi atau ingin menyampaikan pengaduan terkait produk dan layanan jasa keuangan. Penyampaian dan penanganan pengaduan tidak dipungut biaya.',
+            'when_to_contact' => [
+                'Konsumen mengalami permasalahan dengan produk atau layanan bank, asuransi, pembiayaan, atau investasi dari lembaga jasa keuangan.',
+                'Keluhan yang disampaikan kepada lembaga jasa keuangan belum ditanggapi atau penyelesaiannya belum memuaskan.',
+                'Konsumen membutuhkan informasi mengenai produk, layanan, atau hak konsumen di sektor jasa keuangan.',
+            ],
+            'how_to_access' => 'Umumnya, pengaduan disampaikan terlebih dahulu kepada lembaga jasa keuangan yang bersangkutan. Jika belum terselesaikan, konsumen dapat menghubungi Kontak 157 melalui telepon, WhatsApp, email, atau portal pengaduan. Siapkan kronologi kejadian, identitas, serta bukti pendukung, seperti polis, bukti transaksi, dan korespondensi dengan lembaga terkait.',
+            'notes' => null,
+            'channels' => [
+                $tel('Kontak 157', '157', 'Hubungi Kontak 157'),
+                $wa('WhatsApp OJK', '0811-5715-7157', 'Chat via WhatsApp OJK'),
+                $mail('Email OJK', 'konsumen@ojk.go.id', 'Kirim Email ke OJK'),
+                $web('Portal pengaduan OJK', 'https://kontak157.ojk.go.id', 'Buka Portal Pengaduan OJK'),
+            ],
+        ],
+        [
+            'slug' => 'laps-sjk',
+            'short_name' => 'LAPS SJK',
+            'full_name' => 'Lembaga Alternatif Penyelesaian Sengketa Sektor Jasa Keuangan',
+            'summary' => 'Penyelesaian sengketa di luar pengadilan antara konsumen dan lembaga jasa keuangan, termasuk perusahaan asuransi.',
+            'description' => 'LAPS SJK merupakan lembaga penyelesaian sengketa di luar pengadilan untuk sektor jasa keuangan. Lembaga ini menjadi wadah bagi konsumen dan lembaga jasa keuangan, termasuk perusahaan asuransi, untuk menyelesaikan sengketa melalui mekanisme yang bersifat rahasia.',
+            'when_to_contact' => [
+                'Konsumen dan lembaga jasa keuangan tidak mencapai kesepakatan setelah pengaduan disampaikan kepada lembaga tersebut.',
+                'Konsumen ingin menyelesaikan sengketa tanpa melalui pengadilan.',
+                'Sengketa bersifat keperdataan, misalnya perbedaan pendapat mengenai klaim, produk, atau layanan keuangan.',
+            ],
+            'how_to_access' => 'Konsumen dapat mengajukan permohonan penyelesaian sengketa melalui situs resmi LAPS SJK atau menghubungi kontak resminya.',
+            'notes' => 'LAPS SJK hanya menangani sengketa dengan lembaga jasa keuangan berizin OJK, pengaduan sudah pernah disampaikan kepada lembaga yang bersangkutan, dan sengketa tidak sedang atau pernah diputus oleh pengadilan, arbitrase, atau lembaga penyelesaian sengketa lain.',
+            'channels' => [
+                $web('Pengajuan mediasi', 'https://lapssjk.id/page/mediasi', 'Ajukan Penyelesaian Sengketa'),
+                $web('Situs resmi LAPS SJK', 'https://lapssjk.id', 'Kunjungi Situs LAPS SJK'),
+                $mail('Email LAPS SJK', 'info@lapssjk.id', 'Kirim Email ke LAPS SJK'),
+                $tel('Telepon', '021-2527700'),
+            ],
+        ],
+        [
+            'slug' => 'bank-indonesia',
+            'short_name' => 'Bank Indonesia',
+            'full_name' => 'Bank Indonesia',
+            'summary' => 'Informasi dan pengaduan terkait sistem pembayaran, seperti dompet digital dan QRIS.',
+            'description' => 'Bank Indonesia merupakan bank sentral yang antara lain mengatur dan mengawasi sistem pembayaran. Kanal ini relevan bagi konsumen yang mengalami permasalahan pada layanan yang berada dalam kewenangan BI, seperti dompet digital dan QRIS.',
+            'when_to_contact' => [
+                'Konsumen mengalami kendala pada layanan sistem pembayaran, seperti dompet digital atau pembayaran melalui QRIS.',
+                'Konsumen membutuhkan informasi mengenai ketentuan layanan yang diatur oleh Bank Indonesia.',
+                'Konsumen ingin menyampaikan pengaduan terkait penyelenggaraan sistem pembayaran.',
+            ],
+            'how_to_access' => 'Konsumen dapat menghubungi layanan Bank Indonesia melalui telepon atau email dengan menjelaskan kronologi kejadian dan melampirkan bukti transaksi.',
+            'notes' => null,
+            'channels' => [
+                $web('Tata cara penyampaian pengaduan', 'https://www.bi.go.id/id/layanan/pengaduan-konsumen/default.aspx'),
+                $web('Webportal pengaduan Bicara 131', 'https://bicara131.bi.go.id/'),
+                $tel('Telepon Bicara 131', '1 500 131', 'Hubungi Bank Indonesia'),
+                $mail('Email Bicara', 'bicara@bi.go.id', 'Kirim Email ke Bank Indonesia'),
+            ],
+        ],
+        [
+            'slug' => 'satgas-pasti',
+            'short_name' => 'Satgas PASTI',
+            'full_name' => 'Satuan Tugas Pemberantasan Aktivitas Keuangan Ilegal (Satgas PASTI)',
+            'summary' => 'Penanganan aktivitas keuangan ilegal, seperti investasi bodong dan pinjol ilegal.',
+            'description' => 'Satgas PASTI (sebelumnya bernama Satgas Waspada Investasi) merupakan forum koordinasi lintas otoritas dan lembaga yang menangani aktivitas keuangan ilegal, seperti investasi bodong dan pinjaman online ilegal.',
+            'when_to_contact' => [
+                'Konsumen menemukan penawaran investasi atau pinjaman yang diduga ilegal.',
+                'Konsumen menjadi korban investasi bodong atau pinjol ilegal.',
+                'Konsumen ragu apakah suatu penyedia layanan keuangan berizin.',
+            ],
+            'how_to_access' => 'Konsumen dapat melapor melalui kanal resmi Satgas PASTI dengan menyertakan kronologi dan bukti pendukung, atau memeriksa legalitas penyedia layanan melalui Kontak OJK 157.',
+            'notes' => null,
+            'channels' => [
+                $web('Kanal pelaporan', 'https://ojk.go.id/waspada-investasi/id/HubungiKami.aspx', 'Lapor via situs resmi'),
+                $web('Daftar entitas dihentikan (ilegal)', 'https://www.ojk.go.id/waspada-investasi/id/alert-portal/Pages/default.aspx', 'Laporkan Aktivitas Keuangan Ilegal'),
+                $tel('Kontak OJK 157', '157', 'Cek Legalitas via Kontak 157'),
+                $mail('Email Satgas PASTI', 'satgaspasti@ojk.go.id'),
+                $wa('WhatsApp Satgas PASTI', '(+62) 81-157-157-157'),
+            ],
+        ],
+        [
+            'slug' => 'iasc',
+            'short_name' => 'IASC',
+            'full_name' => 'Indonesia Anti-Scam Centre (IASC)',
+            'summary' => 'Pusat penanganan penipuan (scam) transaksi keuangan, termasuk pemblokiran rekening pelaku.',
+            'description' => 'IASC merupakan pusat penanganan penipuan transaksi keuangan yang dibentuk OJK bersama anggota Satgas PASTI dan didukung asosiasi industri keuangan. IASC menerima laporan korban penipuan dan berperan dalam pemblokiran rekening pelaku serta upaya penyelamatan dana korban.',
+            'when_to_contact' => [
+                'Konsumen baru saja menjadi korban penipuan transaksi keuangan.',
+                'Konsumen mentransfer dana ke rekening yang diduga milik pelaku penipuan.',
+                'Konsumen ingin melaporkan nomor telepon atau rekening yang diduga digunakan untuk penipuan.',
+            ],
+            'how_to_access' => 'Laporkan sesegera mungkin melalui situs resmi IASC, karena kecepatan pelaporan memengaruhi peluang dana diselamatkan. Siapkan bukti transfer, identitas rekening atau nomor pelaku, dan kronologi kejadian.',
+            'notes' => 'Waspada situs atau pihak yang mengatasnamakan IASC; satu-satunya situs resmi adalah iasc.ojk.go.id.',
+            'channels' => [
+                $web('Buat laporan IASC', 'https://iasc.ojk.go.id/Guest/LaporanV2', 'Laporkan Penipuan ke IASC'),
+                $web('Situs resmi IASC', 'https://iasc.ojk.go.id'),
+                $mail('Email OJK', 'konsumen@ojk.go.id', 'Kirim Email ke IASC'),
+                $tel('Call Center OJK', '157'),
+            ],
+        ],
+        [
+            'slug' => 'bpjs-kesehatan',
+            'short_name' => 'BPJS Kesehatan',
+            'full_name' => 'Badan Penyelenggara Jaminan Sosial (BPJS) Kesehatan',
+            'summary' => 'Layanan informasi dan pengaduan bagi peserta yang mengalami kendala terkait kepesertaan maupun pelayanan JKN.',
+            'description' => 'BPJS Kesehatan merupakan badan hukum publik yang menyelenggarakan program Jaminan Kesehatan Nasional (JKN). BPJS Kesehatan menyediakan layanan informasi dan pengaduan bagi peserta yang mengalami kendala terkait kepesertaan maupun pelayanan JKN. Pengaduan dapat disampaikan melalui aplikasi Mobile JKN, Care Center 165, dan kanal resmi lainnya.',
+            'when_to_contact' => [
+                'Konsumen mengalami kendala terkait kepesertaan JKN, seperti status kepesertaan atau perubahan data peserta.',
+                'Konsumen mengalami masalah terkait pelayanan JKN di fasilitas kesehatan.',
+                'Konsumen membutuhkan informasi atau ingin menyampaikan keluhan terkait program JKN.',
+                'Konsumen ingin memantau tindak lanjut pengaduan yang telah disampaikan melalui Mobile JKN.',
+            ],
+            'how_to_access' => 'Konsumen dapat menyampaikan pengaduan melalui fitur Pengaduan Pelayanan JKN pada aplikasi Mobile JKN. Pilih anggota keluarga yang ingin mengajukan pengaduan, kemudian isi formulir dengan memilih kategori Pengaduan Keluhan atau Permintaan Informasi. Setelah formulir lengkap, pilih Laporkan. Pengaduan yang telah dikirim dapat dilihat kembali melalui menu Pengaduan Layanan JKN. Selain melalui Mobile JKN, konsumen dapat menghubungi Care Center 165 yang tersedia selama 24 jam setiap hari.',
+            'notes' => 'WhatsApp PANDAWA terutama melayani administrasi kepesertaan. Untuk pengaduan layanan JKN, gunakan Mobile JKN atau Care Center 165 sesuai kebutuhan.',
+            'channels' => [
+                $web('Panduan pengaduan pelayanan Mobile JKN', 'https://bpjs-kesehatan.go.id/user-manual-mobile-jkn/mobilejkn/pengaduanpelayanan.html', 'Ajukan Pengaduan melalui Mobile JKN'),
+                $web('Panduan penggunaan Mobile JKN', 'https://bpjs-kesehatan.go.id/user-manual-mobile-jkn/video_mjkn.html'),
+                $web('Layanan chat Care Center 165', 'https://bpjs-kesehatan.go.id/layanan-chat'),
+                $web('Situs resmi BPJS Kesehatan', 'https://www.bpjs-kesehatan.go.id/'),
+                $tel('Care Center BPJS Kesehatan', '165', 'Hubungi Care Center 165'),
+                $wa('WhatsApp PANDAWA (administrasi kepesertaan)', '0811-8-165-165'),
+            ],
+        ],
+        [
+            'slug' => 'kemenkes',
+            'short_name' => 'Kemenkes RI',
+            'full_name' => 'Kementerian Kesehatan Republik Indonesia',
+            'summary' => 'Kanal informasi dan pengaduan terkait program, kebijakan, dan layanan kesehatan yang berada dalam kewenangan Kemenkes.',
+            'description' => 'Kementerian Kesehatan Republik Indonesia merupakan instansi pemerintah yang menyelenggarakan urusan pemerintahan di bidang kesehatan. Kemenkes menyediakan kanal informasi dan pengaduan bagi masyarakat yang membutuhkan informasi atau ingin menyampaikan keluhan terkait layanan dan program yang berada dalam kewenangannya.',
+            'when_to_contact' => [
+                'Konsumen membutuhkan informasi terkait kebijakan, program, atau layanan Kementerian Kesehatan.',
+                'Konsumen mengalami kendala atau ingin menyampaikan keluhan terkait layanan yang berada dalam kewenangan Kemenkes.',
+                'Konsumen ingin memperoleh informasi mengenai tindak lanjut atas pertanyaan atau pengaduan yang telah disampaikan melalui kanal resmi Kemenkes.',
+            ],
+            'how_to_access' => 'Konsumen dapat mengakses kanal kontak resmi Kemenkes untuk mencari informasi atau menyampaikan pertanyaan dan keluhan. Sebelum menghubungi Kemenkes, pastikan permasalahan yang disampaikan berkaitan dengan layanan atau kewenangan Kemenkes. Jelaskan kendala secara jelas dan sertakan informasi pendukung yang relevan apabila diperlukan.',
+            'notes' => 'Untuk masalah yang terjadi langsung di rumah sakit, klinik, atau puskesmas, utamakan menyampaikan keluhan melalui kanal pengaduan fasilitas pelayanan kesehatan tersebut terlebih dahulu.',
+            'channels' => [
+                $web('Situs resmi Kemenkes RI', 'https://kemkes.go.id/'),
+                $web('Kontak Kemenkes RI', 'https://kemkes.go.id/id/layanan/kontak-kami', 'Lihat Informasi Kontak Kemenkes RI'),
+                $tel('Telepon Halo Kemenkes', '1500-567', 'Hubungi Kementerian Kesehatan'),
+                $wa('WhatsApp Halo Kemenkes', '0811-10-500-567'),
+                $mail('Email Kemenkes', 'kontak@kemkes.go.id'),
+                $addr('Biro Komunikasi dan Informasi Publik, Sekretariat Jenderal Kementerian Kesehatan RI, Jl. Rasuna Said X-5 Kav. 4-9, Kuningan, Jakarta Selatan 12950'),
+            ],
+        ],
+        [
+            'slug' => 'ombudsman-ri',
+            'short_name' => 'Ombudsman RI',
+            'full_name' => 'Ombudsman Republik Indonesia',
+            'summary' => 'Lembaga negara yang menerima laporan dugaan maladministrasi dalam penyelenggaraan pelayanan publik.',
+            'description' => 'Ombudsman Republik Indonesia merupakan lembaga negara yang berwenang mengawasi penyelenggaraan pelayanan publik, termasuk menerima laporan masyarakat mengenai dugaan maladministrasi. Maladministrasi dapat berupa tindakan melawan hukum, melampaui wewenang, penyalahgunaan wewenang, kelalaian, atau pengabaian kewajiban dalam penyelenggaraan pelayanan publik yang menimbulkan kerugian bagi masyarakat.',
+            'when_to_contact' => [
+                'Konsumen mengalami dugaan maladministrasi dalam pelayanan publik, termasuk pelayanan kesehatan yang diselenggarakan oleh instansi atau penyelenggara pelayanan publik.',
+                'Konsumen mengalami penundaan berlarut, tidak memperoleh pelayanan sebagaimana mestinya, atau menghadapi dugaan penyimpangan prosedur.',
+                'Konsumen telah menyampaikan keluhan kepada pihak terkait, tetapi belum memperoleh penyelesaian yang semestinya.',
+                'Konsumen membutuhkan saluran untuk melaporkan dugaan maladministrasi dalam penyelenggaraan pelayanan publik.',
+            ],
+            'how_to_access' => 'Sebelum melapor, konsumen perlu menyampaikan keluhan terlebih dahulu kepada pihak penyelenggara pelayanan publik yang terkait. Jika keluhan tidak memperoleh penyelesaian sebagaimana mestinya, konsumen dapat mengajukan laporan kepada Ombudsman RI melalui kanal pengaduan resmi. Siapkan identitas pelapor, uraian kejadian, pihak yang dilaporkan, serta dokumen pendukung yang tersedia.',
+            'notes' => 'Pastikan laporan berkaitan dengan dugaan maladministrasi dalam pelayanan publik dan sesuai dengan kewenangan Ombudsman RI.',
+            'channels' => [
+                $web('Pengaduan online Ombudsman RI', 'https://ombudsman.go.id/pengaduan', 'Laporkan Dugaan Maladministrasi'),
+                $web('FAQ Ombudsman RI', 'https://www.ombudsman.go.id/faq', 'Lihat Panduan Pengaduan Ombudsman RI'),
+                $web('Situs resmi Ombudsman RI', 'https://ombudsman.go.id/'),
+            ],
+        ],
+    ],
+
+    // Pemetaan "Bingung Harus Mengadu ke Mana?" (docx Bagian 4). Baris
+    // "Belum mengetahui lembaga yang sesuai" tidak di-seed (bukan lembaga,
+    // ditangani fallback di app).
+    'categories' => [
+        ['problem' => 'Sengketa transaksi dengan penjual atau pelaku usaha', 'agencies' => ['bpsk', 'ylki']],
+        ['problem' => 'Membutuhkan informasi atau pendampingan perlindungan konsumen', 'agencies' => ['ylki', 'lpksm']],
+        ['problem' => 'Ingin menyampaikan pengaduan terkait perlindungan konsumen di tingkat nasional', 'agencies' => ['bpkn']],
+        ['problem' => 'Dugaan produk obat, makanan, atau kosmetik ilegal maupun tidak memenuhi ketentuan', 'agencies' => ['bpom']],
+        ['problem' => 'Masalah dengan produk atau layanan bank, asuransi, pembiayaan, atau investasi dari lembaga jasa keuangan berizin', 'agencies' => ['ojk']],
+        ['problem' => 'Ragu apakah penyedia layanan keuangan atau asuransi berizin', 'agencies' => ['ojk']],
+        ['problem' => 'Pengaduan kepada lembaga jasa keuangan atau perusahaan asuransi belum membuahkan kesepakatan', 'agencies' => ['laps-sjk']],
+        ['problem' => 'Kendala pada dompet digital atau pembayaran melalui QRIS', 'agencies' => ['bank-indonesia']],
+        ['problem' => 'Menemukan atau menjadi korban investasi bodong atau pinjol ilegal', 'agencies' => ['satgas-pasti']],
+        ['problem' => 'Baru saja menjadi korban penipuan (scam) transaksi keuangan', 'agencies' => ['iasc']],
+        ['problem' => 'Mengalami kendala kepesertaan atau pelayanan JKN', 'agencies' => ['bpjs-kesehatan']],
+        ['problem' => 'Membutuhkan informasi atau ingin menyampaikan pengaduan terkait program dan layanan kesehatan dalam kewenangan Kemenkes', 'agencies' => ['kemenkes']],
+        ['problem' => 'Mengalami dugaan maladministrasi dalam pelayanan publik yang belum memperoleh penyelesaian semestinya', 'agencies' => ['ombudsman-ri']],
+    ],
+];

@@ -25,6 +25,9 @@ final class ApiDocumentationTest extends TestCase
         $this->assertArrayHasKey('/sectors', $paths);
         $this->assertArrayHasKey('/auth/login', $paths);
         $this->assertArrayHasKey('/badges', $paths);
+        $this->assertArrayHasKey('/complaint-agencies', $paths);
+        $this->assertArrayHasKey('/complaint-agencies/{slug}', $paths);
+        $this->assertArrayHasKey('/complaint-categories', $paths);
         $this->assertArrayHasKey('/empowerment-index', $paths);
         $this->assertGreaterThanOrEqual(24, count($paths));
     }
