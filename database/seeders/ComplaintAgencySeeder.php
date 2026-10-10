@@ -10,16 +10,18 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Seed lembaga pengaduan + jenis permasalahan dari dokumen riset (lihat
- * database/seeders/data/complaint_agencies.php). Idempotent: lembaga dikunci
- * per slug, kategori per teks `problem`, kanal di-replace seluruhnya.
+ * Bootstrap lembaga pengaduan + jenis permasalahan dari dokumen riset (lihat
+ * database/seeders/data/complaint_agencies.php). Hanya MEMBUAT yang belum ada:
+ * lembaga dikenali lewat slug, kategori lewat teks `problem`. Baris yang
+ * sudah ada (termasuk yang disembunyikan/dihapus admin) tidak disentuh --
+ * teks, kanal, urutan, status, dan pivot kategori tetap seperti hasil edit
+ * di Filament. Aman dijalankan ulang di production.
  *
- * Logo (database/seeders/media/complaint-agencies/{slug}.webp) di-upload ke
- * disk aktif HANYA untuk lembaga yang logo_url-nya masih kosong, jadi logo
- * yang sudah diganti admin lewat Filament tidak tertimpa.
+ * Satu-satunya pengisian ulang: logo (database/seeders/media/complaint-agencies
+ * /{slug}.webp) di-upload ke disk aktif untuk lembaga yang logo_url-nya masih
+ * kosong, jadi logo yang sudah diganti admin tidak tertimpa.
  *
- * Tidak dipanggil dari DatabaseSeeder: konten ini diedit admin, jadi
- * menjalankannya ulang akan menimpa perubahan manual. Jalankan manual:
+ * Tidak dipanggil dari DatabaseSeeder. Jalankan manual:
  * php artisan db:seed --class=ComplaintAgencySeeder
  */
 class ComplaintAgencySeeder extends Seeder
@@ -38,30 +40,31 @@ class ComplaintAgencySeeder extends Seeder
                 $channels = $row['channels'];
                 unset($row['channels']);
 
-                $agency = ComplaintAgency::withTrashed()->updateOrCreate(
-                    ['slug' => $row['slug']],
-                    [...$row, 'order' => $index + 1, 'is_active' => true],
-                );
-                $agency->restore();
+                $agency = ComplaintAgency::withTrashed()->firstOrNew(['slug' => $row['slug']]);
+
+                if (! $agency->exists) {
+                    $agency->fill([...$row, 'order' => $index + 1, 'is_active' => true])->save();
+
+                    foreach ($channels as $channelIndex => $channel) {
+                        $agency->channels()->create([...$channel, 'order' => $channelIndex + 1]);
+                    }
+                }
 
                 $this->seedLogo($agency);
-
-                $agency->channels()->delete();
-                foreach ($channels as $channelIndex => $channel) {
-                    $agency->channels()->create([...$channel, 'order' => $channelIndex + 1]);
-                }
 
                 $agencyIds[$row['slug']] = $agency->id;
             }
 
             foreach ($data['categories'] as $index => $row) {
-                $category = ComplaintCategory::withTrashed()->updateOrCreate(
-                    ['problem' => $row['problem']],
-                    ['order' => $index + 1, 'is_active' => true],
-                );
-                $category->restore();
+                $category = ComplaintCategory::withTrashed()->firstOrNew(['problem' => $row['problem']]);
 
-                $category->agencies()->sync(
+                if ($category->exists) {
+                    continue;
+                }
+
+                $category->fill(['order' => $index + 1, 'is_active' => true])->save();
+
+                $category->agencies()->attach(
                     collect($row['agencies'])
                         ->values()
                         ->mapWithKeys(fn (string $slug, int $position) => [$agencyIds[$slug] => ['order' => $position + 1]])

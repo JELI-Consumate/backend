@@ -86,4 +86,55 @@ final class ComplaintAgencySeederTest extends TestCase
 
         $this->assertSame('complaint-agencies/logos/custom.png', ComplaintAgency::query()->where('slug', 'ojk')->value('logo_url'));
     }
+
+    public function test_rerun_does_not_overwrite_admin_edits(): void
+    {
+        $this->seed(ComplaintAgencySeeder::class);
+
+        $agency = ComplaintAgency::query()->where('slug', 'ojk')->firstOrFail();
+        $agency->update(['summary' => 'Teks hasil edit admin', 'order' => 99, 'is_active' => false]);
+        $agency->channels()->delete();
+        $category = ComplaintCategory::query()->firstOrFail();
+        $category->update(['problem' => $category->problem, 'order' => 77, 'is_active' => false]);
+        $category->agencies()->detach();
+
+        $this->seed(ComplaintAgencySeeder::class);
+
+        $agency->refresh();
+        $this->assertSame('Teks hasil edit admin', $agency->summary);
+        $this->assertSame(99, $agency->order);
+        $this->assertFalse($agency->is_active);
+        $this->assertSame(0, $agency->channels()->count());
+        $category->refresh();
+        $this->assertSame(77, $category->order);
+        $this->assertFalse($category->is_active);
+        $this->assertSame(0, $category->agencies()->count());
+    }
+
+    public function test_rerun_does_not_resurrect_rows_deleted_by_admin(): void
+    {
+        $this->seed(ComplaintAgencySeeder::class);
+
+        ComplaintAgency::query()->where('slug', 'bpom')->firstOrFail()->delete();
+        ComplaintCategory::query()->firstOrFail()->delete();
+
+        $this->seed(ComplaintAgencySeeder::class);
+
+        $this->assertSame(15, ComplaintAgency::query()->count());
+        $this->assertSame(12, ComplaintCategory::query()->count());
+        $this->assertSame(16, ComplaintAgency::withTrashed()->count());
+        $this->assertSame(13, ComplaintCategory::withTrashed()->count());
+    }
+
+    public function test_rerun_creates_only_the_missing_agency(): void
+    {
+        $this->seed(ComplaintAgencySeeder::class);
+        ComplaintAgency::query()->where('slug', 'iasc')->firstOrFail()->forceDelete();
+
+        $this->seed(ComplaintAgencySeeder::class);
+
+        $iasc = ComplaintAgency::query()->where('slug', 'iasc')->firstOrFail();
+        $this->assertGreaterThan(0, $iasc->channels()->count());
+        $this->assertSame(16, ComplaintAgency::query()->count());
+    }
 }
