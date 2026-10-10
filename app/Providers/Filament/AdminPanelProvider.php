@@ -37,7 +37,8 @@ class AdminPanelProvider extends PanelProvider
              * kemunculan item lintas resource (hasil auto-discover),
              * bukan alur kerja sebenarnya. Urutan di bawah mengikuti alur
              * pengisian data: struktur (Sector -> Journey -> Module) lebih
-             * dulu, baru konten, lalu data pengguna, lalu administrasi.
+             * dulu, baru konten, lalu data pengguna, lalu pusat pengaduan, lalu
+             * administrasi.
              *
              * Tidak diberi ->icon() di level grup. Filament melarang grup
              * dan item di dalamnya sama-sama punya ikon, dan tiap resource
@@ -48,6 +49,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Struktur Belajar'),
                 NavigationGroup::make('Konten Modul'),
                 NavigationGroup::make('Pengguna & Analitik'),
+                NavigationGroup::make('Pusat Pengaduan'),
                 NavigationGroup::make('Administrasi'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
