@@ -54,9 +54,9 @@
             <button
                 type="button"
                 wire:click="mountAction('{{ $export['action'] }}')"
-                style="display:flex; flex-direction:column; gap:0.75rem; padding:1.25rem; border-radius:0.75rem; border:1px solid var(--gray-200); background-color:var(--gray-50); text-align:left; cursor:pointer; transition:border-color 0.15s, background-color 0.15s; font:inherit; color:inherit;"
-                onmouseover="this.style.borderColor='var(--primary-400)'; this.style.backgroundColor='color-mix(in srgb, var(--primary-500) 6%, var(--gray-50))';"
-                onmouseout="this.style.borderColor='var(--gray-200)'; this.style.backgroundColor='var(--gray-50)';"
+                style="display:flex; flex-direction:column; gap:0.75rem; padding:1.25rem; border-radius:0.75rem; border:1px solid color-mix(in srgb, var(--gray-500) 25%, transparent); background-color:color-mix(in srgb, var(--gray-500) 6%, transparent); text-align:left; cursor:pointer; transition:border-color 0.15s, background-color 0.15s; font:inherit; color:inherit;"
+                onmouseover="this.style.borderColor='var(--primary-400)'; this.style.backgroundColor='color-mix(in srgb, var(--primary-500) 10%, transparent)';"
+                onmouseout="this.style.borderColor='color-mix(in srgb, var(--gray-500) 25%, transparent)'; this.style.backgroundColor='color-mix(in srgb, var(--gray-500) 6%, transparent)';"
             >
                 <div style="display:flex; align-items:center; justify-content:center; width:2.75rem; height:2.75rem; border-radius:0.625rem; background-color:color-mix(in srgb, var(--primary-500) 12%, transparent);">
                     <x-filament::icon :icon="$export['icon']" style="width:1.375rem; height:1.375rem; color:var(--primary-600);" />
