@@ -16,6 +16,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -28,6 +29,13 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('Consumate')
+            ->brandLogo(fn () => new HtmlString(
+                '<span style="display:flex;align-items:center;gap:0.625rem;font-size:1.25rem;font-weight:700;">'
+                .'<img src="'.e(asset('logo/logo-aplikasi-consumate-id.png')).'" alt="Consumate" style="height:2.5rem;width:2.5rem;object-fit:contain;">'
+                .'<span>Consumate</span></span>'
+            ))
+            ->brandLogoHeight('2.5rem')
+            ->favicon(asset('logo/logo-aplikasi-consumate-id.png'))
             ->databaseNotifications()
             ->colors([
                 'primary' => Color::Amber,
