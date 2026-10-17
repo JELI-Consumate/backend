@@ -7,6 +7,7 @@ namespace App\Filament\Pages;
 use App\Filament\Exports\JourneyProgressExporter;
 use App\Filament\Exports\ModuleProgressExporter;
 use App\Filament\Exports\QuizAttemptExporter;
+use App\Filament\Exports\ReflectionEntryExporter;
 use App\Filament\Exports\SectorProgressExporter;
 use App\Filament\Support\AdminScope;
 use BackedEnum;
@@ -67,6 +68,9 @@ class ExportData extends Page
             ExportAction::make('exportQuizAttempts')
                 ->label('Kuis & Skor')
                 ->exporter(QuizAttemptExporter::class),
+            ExportAction::make('exportReflectionEntries')
+                ->label('Jawaban Refleksi')
+                ->exporter(ReflectionEntryExporter::class),
         ];
     }
 

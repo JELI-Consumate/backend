@@ -41,6 +41,12 @@
                     'description' => 'Skor attempt terbaik, total percobaan, dan status lolos tiap user per kuis.',
                     'action' => 'exportQuizAttempts',
                 ],
+                [
+                    'icon' => \Filament\Support\Icons\Heroicon::OutlinedPencilSquare,
+                    'title' => 'Jawaban Refleksi',
+                    'description' => 'Jawaban teks tiap user per pertanyaan refleksi, lengkap dengan journey, modul, dan bagian.',
+                    'action' => 'exportReflectionEntries',
+                ],
             ];
         @endphp
 
